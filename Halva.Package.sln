@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3DC84B8F-105
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Halva.Package.Core", "src\Halva.Package.Core\Halva.Package.Core.csproj", "{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{665CD08D-F6F4-402C-AE95-69F74FB11B48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Halva.Package.Core.Tests", "tests\Halva.Package.Core.Tests\Halva.Package.Core.Tests.csproj", "{220717C9-97FA-49F4-A679-998D0A384F5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +21,17 @@ Global
 		{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{220717C9-97FA-49F4-A679-998D0A384F5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{220717C9-97FA-49F4-A679-998D0A384F5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{220717C9-97FA-49F4-A679-998D0A384F5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{220717C9-97FA-49F4-A679-998D0A384F5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01} = {3DC84B8F-1059-4821-8655-ED29A9C0B60E}
+		{220717C9-97FA-49F4-A679-998D0A384F5B} = {665CD08D-F6F4-402C-AE95-69F74FB11B48}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F73E00BE-A4AB-4E91-9818-7C3CA5F7429A}

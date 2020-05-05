@@ -10,6 +10,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <AssemblyVersion>1.0.0.20126</AssemblyVersion>
     <FileVersion>1.0.0.20126</FileVersion>
+    <PackageId>Halva.Package</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

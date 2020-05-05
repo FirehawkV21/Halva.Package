@@ -17,15 +17,14 @@ namespace Halva.Package.Core
             sourceLocation = new StringBuilder(source);
             destinationLocation = new StringBuilder(destination);
             fileList = PullFiles(sourceLocation.ToString());
-
         }
 
-        public void AddFileToArchive(string fileLocation)
+        public void AddFileToList(string fileLocation)
         {
             fileList.Add(fileLocation);
         }
 
-        public void RemoveFileFromArchive(string fileLocation)
+        public void RemoveFileFromList(string fileLocation)
         {
             fileList.Remove(fileLocation);
         }
@@ -50,8 +49,8 @@ namespace Halva.Package.Core
                 {
                     finalArchive.CreateEntryFromFile(file, file.Replace(sourceLocation.ToString(), ""), CompressionLevel.NoCompression);
                 }
-                PackageUtilities.CompressArchive(PackageUtilities.TempArchive, destinationLocation.ToString());
             }
+            PackageUtilities.CompressArchive(PackageUtilities.TempArchive, destinationLocation.ToString());
         }
     }
 }
