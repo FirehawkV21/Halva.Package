@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <AssemblyVersion>1.0.0.20126</AssemblyVersion>
+
+    <FileVersion>1.0.0.20126</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +25,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Halva.Package.Core\Halva.Package.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="SampleFiles\TestText.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
