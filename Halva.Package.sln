@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3DC84B8F-1059-4821-8655-ED29A9C0B60E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Halva.Package.Core", "src\Halva.Package.Core\Halva.Package.Core.csproj", "{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01} = {3DC84B8F-1059-4821-8655-ED29A9C0B60E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F73E00BE-A4AB-4E91-9818-7C3CA5F7429A}
+	EndGlobalSection
+EndGlobal
