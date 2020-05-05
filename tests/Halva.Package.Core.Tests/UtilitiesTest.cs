@@ -10,7 +10,7 @@ namespace Halva.Package.Core.Tests
         public void CompressionCheck()
         {
             bool finished = true;
-            if (Directory.Exists("SampleFiles1")) Directory.Delete("SampleFiles1", true);
+            if (File.Exists("SampleFiles.halva")) File.Delete("SampleFiles.halva");
             try
             {
                PackageUtilities.CreateArchiveFromFolder("SampleFiles", "SampleFiles.halva");
