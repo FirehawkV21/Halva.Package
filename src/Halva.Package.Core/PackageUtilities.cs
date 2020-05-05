@@ -6,7 +6,7 @@ namespace Halva.Package.Core
 {
     public static class PackageUtilities
     {
-        private static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive.tmp");
+        public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive.tmp");
         public static void CreateArchiveFromFolder(in string input, in string archiveLocation)
         {
             if (File.Exists(TempArchive)) File.Delete(TempArchive);

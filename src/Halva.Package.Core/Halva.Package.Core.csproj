@@ -1,7 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <Authors>AceOfAces</Authors>
+    <Company>Studio ACE</Company>
+    <Product>Halva Package</Product>
+    <RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
+    <PackageTags>compression, package, Brotli</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <AssemblyVersion>1.0.0.20126</AssemblyVersion>
+    <FileVersion>1.0.0.20126</FileVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
