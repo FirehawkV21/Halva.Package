@@ -1,11 +1,19 @@
 using System;
 using System.IO;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Halva.Package.Core.Tests
 {
     public class UtilitiesTest
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public UtilitiesTest(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
         [Fact]
         public void CompressionCheck()
         {
@@ -17,7 +25,7 @@ namespace Halva.Package.Core.Tests
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _testOutputHelper.WriteLine(e.ToString());
                 finished = false;
             }
             Assert.True(finished);
@@ -34,7 +42,7 @@ namespace Halva.Package.Core.Tests
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _testOutputHelper.WriteLine(e.ToString());
                 finished = false;
             }
             Assert.True(finished);
