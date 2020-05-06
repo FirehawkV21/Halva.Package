@@ -32,6 +32,11 @@ namespace Halva.Package.Core
 
         }
 
+        public static void ExportFromArchive(in MemoryStream inputMemoryStream)
+        {
+
+        }
+
         public static void DecompressArchive(in string inputArchive)
         {
             using (FileStream inputStream = File.OpenRead(inputArchive))

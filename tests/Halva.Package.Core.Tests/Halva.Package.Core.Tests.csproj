@@ -5,9 +5,9 @@
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyVersion>1.0.0.20126</AssemblyVersion>
+    <AssemblyVersion>1.0.0.20127</AssemblyVersion>
 
-    <FileVersion>1.0.0.20126</FileVersion>
+    <FileVersion>1.0.0.20127</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="SampleFiles\TestFile.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="SampleFiles\TestImage.webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

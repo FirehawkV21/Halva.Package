@@ -8,8 +8,8 @@
     <RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
     <PackageTags>compression, package, Brotli</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <AssemblyVersion>1.0.0.20126</AssemblyVersion>
-    <FileVersion>1.0.0.20126</FileVersion>
+    <AssemblyVersion>1.0.0.20127</AssemblyVersion>
+    <FileVersion>1.0.0.20127</FileVersion>
     <PackageId>Halva.Package</PackageId>
   </PropertyGroup>
 
