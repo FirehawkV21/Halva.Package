@@ -1,0 +1,4 @@
+<Playlist Version="1.0">
+  <Add Test="Halva.Package.Core.Tests.UtilitiesTest.CompressionCheck" />
+  <Add Test="Halva.Package.Core.Tests.UtilitiesTest.DecompressionCheck" />
+</Playlist>

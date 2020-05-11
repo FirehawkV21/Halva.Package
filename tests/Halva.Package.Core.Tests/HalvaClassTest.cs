@@ -28,7 +28,7 @@ namespace Halva.Package.Core.Tests
         }
 
         [Fact]
-        public void ArchiveBuilderCanExtract()
+        public void CanArchiveBuilderExtract()
         {
             HalvaPackage package = new HalvaPackage(destinationArchive);
             package.ExtractFile("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));

@@ -1,0 +1,4 @@
+<Playlist Version="1.0">
+  <Add Test="Halva.Package.Core.Tests.HalvaClassTest.ArchiveBuilderTest" />
+  <Add Test="Halva.Package.Core.Tests.HalvaClassTest.CanArchiveBuilderExtract" />
+</Playlist>

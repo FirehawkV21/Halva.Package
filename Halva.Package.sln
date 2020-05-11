@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Halva.Package.Core", "src\H
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{665CD08D-F6F4-402C-AE95-69F74FB11B48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Halva.Package.Core.Tests", "tests\Halva.Package.Core.Tests\Halva.Package.Core.Tests.csproj", "{220717C9-97FA-49F4-A679-998D0A384F5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Halva.Package.Core.Tests", "tests\Halva.Package.Core.Tests\Halva.Package.Core.Tests.csproj", "{220717C9-97FA-49F4-A679-998D0A384F5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
