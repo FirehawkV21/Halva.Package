@@ -12,6 +12,7 @@ namespace Halva.Package.Core
         private StringBuilder destinationLocation;
         private List<string> fileList = new List<string>();
         private ZipArchive archiveMemoryStream;
+        private MemoryStream tempMemoryStream;
 
         public HalvaPackage(string source, string destination)
         {
@@ -35,7 +36,7 @@ namespace Halva.Package.Core
         public void AddFileToList(string fileLocation)
         {
             fileList.Add(fileLocation);
-            archiveMemoryStream.CreateEntryFromFile(fileLocation,fileLocation.Replace(sourceLocation.ToString(), ""),CompressionLevel.NoCompression);
+            archiveMemoryStream.CreateEntryFromFile(fileLocation,fileLocation.Replace(sourceLocation + "\\", ""),CompressionLevel.NoCompression);
         }
 
         public void RemoveFileFromList(string fileLocation)
@@ -48,19 +49,19 @@ namespace Halva.Package.Core
 
         public void OpenArchiveToMemory()
         {
-            using (MemoryStream tempMemoryStream = new MemoryStream())
+            tempMemoryStream = new MemoryStream();
             using (FileStream inputFileStream = File.OpenRead(sourceLocation.ToString()))
             using (BrotliStream decompresorStream = new BrotliStream(inputFileStream, CompressionMode.Decompress))
             {
                 decompresorStream.CopyTo(tempMemoryStream);
-                archiveMemoryStream = new ZipArchive(tempMemoryStream);
+                archiveMemoryStream = new ZipArchive(tempMemoryStream, ZipArchiveMode.Update);
                 fileList = PullFiles(archiveMemoryStream);
             }
         }
 
         public List<string> PullFiles(string source)
         {
-            IEnumerable<string> foundFiles = Directory.EnumerateFiles(source);
+            IEnumerable<string> foundFiles = Directory.EnumerateFiles(source, "*",SearchOption.AllDirectories);
             return foundFiles.ToList();
         }
 
@@ -79,6 +80,13 @@ namespace Halva.Package.Core
         {
             archiveMemoryStream.Dispose();
             PackageUtilities.CompressArchive(PackageUtilities.TempArchive + "2", destinationLocation.ToString());
+        }
+
+        public void ExtractFile(string entry, string ExportLocation)
+        {
+            var candidtateFile = archiveMemoryStream.GetEntry(entry);
+            candidtateFile.ExtractToFile(ExportLocation, true);
+
         }
     }
 }
