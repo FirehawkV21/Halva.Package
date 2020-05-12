@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -39,7 +40,8 @@ namespace Halva.Package.Core
         {
             sourceLocation = new StringBuilder(source);
             destinationLocation = new StringBuilder(source);
-            OpenArchiveToMemory();
+            PackageUtilities.DecompressArchive(sourceLocation.ToString());
+            archiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive + "2", ZipArchiveMode.Update);
         }
 
         /// <summary>

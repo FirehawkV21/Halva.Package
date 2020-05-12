@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace Halva.Package.Core.Tests
@@ -34,6 +35,16 @@ namespace Halva.Package.Core.Tests
             package.ExtractFile("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
         }
 
+        [Fact]
+        public void CanArchiveRemoveEntry()
+        {
+            HalvaPackage package = new HalvaPackage(destinationArchive);
+            package.RemoveFileFromList("TestImage.webp");
+            package.CloseArchive();
+            if(Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
+            PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
+            Assert.Equal(2, Directory.EnumerateFiles(destinationFolder).Count());
+        }
 
     }
 }
