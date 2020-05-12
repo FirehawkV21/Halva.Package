@@ -13,7 +13,6 @@ namespace Halva.Package.Core
         private StringBuilder destinationLocation;
         private List<string> fileList = new List<string>();
         private ZipArchive archiveMemoryStream;
-        private MemoryStream tempMemoryStream;
 
         /// <summary>
         /// Creates a Halva package using the source folder as the input. It will automatically put the files in the input folder to a temporary archive.
@@ -25,7 +24,7 @@ namespace Halva.Package.Core
             sourceLocation = new StringBuilder(source);
             destinationLocation = new StringBuilder(destination);
             List<string> foundFilesList = PullFiles(source);
-            archiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive + "2", ZipArchiveMode.Create);
+            archiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Create);
             foreach (string file in foundFilesList)
             {
                 AddFileToList(file);
@@ -38,10 +37,11 @@ namespace Halva.Package.Core
         /// <param name="source">The source archive.</param>
         public HalvaPackage(string source)
         {
-            sourceLocation = new StringBuilder(source);
+            sourceLocation = new StringBuilder(Path.GetDirectoryName(source));
             destinationLocation = new StringBuilder(source);
-            PackageUtilities.DecompressArchive(sourceLocation.ToString());
-            archiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive + "2", ZipArchiveMode.Update);
+            PackageUtilities.DecompressArchive(destinationLocation.ToString());
+            archiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Update);
+            PullFiles(archiveMemoryStream);
         }
 
         /// <summary>
@@ -50,8 +50,8 @@ namespace Halva.Package.Core
         /// <param name="fileLocation">The location of the file.</param>
         public void AddFileToList(string fileLocation)
         {
-            fileList.Add(fileLocation);
-            archiveMemoryStream.CreateEntryFromFile(fileLocation,fileLocation.Replace(sourceLocation + "\\", ""),CompressionLevel.NoCompression);
+            fileList.Add(fileLocation.Replace(sourceLocation.ToString() + PackageUtilities.GetFolderCharacter(), ""));
+            archiveMemoryStream.CreateEntryFromFile(fileLocation,fileLocation.Replace(sourceLocation + PackageUtilities.GetFolderCharacter(), ""),CompressionLevel.NoCompression);
         }
 
         public void RemoveFileFromList(string fileLocation)
@@ -60,21 +60,6 @@ namespace Halva.Package.Core
             if (entry == null) return;
             entry.Delete();
             fileList.Remove(fileLocation);
-        }
-
-        /// <summary>
-        /// Opens the archive to memory.
-        /// </summary>
-        public void OpenArchiveToMemory()
-        {
-            tempMemoryStream = new MemoryStream();
-            using (FileStream inputFileStream = File.OpenRead(sourceLocation.ToString()))
-            using (BrotliStream decompresorStream = new BrotliStream(inputFileStream, CompressionMode.Decompress))
-            {
-                decompresorStream.CopyTo(tempMemoryStream);
-                archiveMemoryStream = new ZipArchive(tempMemoryStream, ZipArchiveMode.Update);
-                fileList = PullFiles(archiveMemoryStream);
-            }
         }
 
         /// <summary>
@@ -107,13 +92,13 @@ namespace Halva.Package.Core
         public void CloseArchive()
         {
             archiveMemoryStream.Dispose();
-            PackageUtilities.CompressArchive(PackageUtilities.TempArchive + "2", destinationLocation.ToString());
+            PackageUtilities.CompressArchive(PackageUtilities.TempArchive, destinationLocation.ToString());
         }
 
         public void ExtractFile(string entry, string exportLocation)
         {
-            var candidtateFile = archiveMemoryStream.GetEntry(entry);
-            candidtateFile.ExtractToFile(exportLocation, true);
+            var candidateFile = archiveMemoryStream.GetEntry(entry);
+            candidateFile.ExtractToFile(exportLocation, true);
 
         }
     }
