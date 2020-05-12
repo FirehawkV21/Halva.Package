@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Halva.Package.Core
 {
@@ -50,10 +51,13 @@ namespace Halva.Package.Core
         /// <param name="fileLocation">The location of the file.</param>
         public void AddFileToList(string fileLocation)
         {
-            fileList.Add(fileLocation.Replace(sourceLocation.ToString() + PackageUtilities.GetFolderCharacter(), ""));
+            fileList.Add(fileLocation.Replace(sourceLocation + PackageUtilities.GetFolderCharacter(), ""));
             archiveMemoryStream.CreateEntryFromFile(fileLocation,fileLocation.Replace(sourceLocation + PackageUtilities.GetFolderCharacter(), ""),CompressionLevel.NoCompression);
         }
-
+        /// <summary>
+        /// Removes a specified file from the archive.
+        /// </summary>
+        /// <param name="fileLocation">The file you want to remove. This must be in a relative path. ("folder1/file.extension")</param>
         public void RemoveFileFromList(string fileLocation)
         {
             var entry = archiveMemoryStream.GetEntry(fileLocation);
@@ -89,12 +93,38 @@ namespace Halva.Package.Core
            return foundFiles;
         }
 
+        /// <summary>
+        /// Saves current changes to the destination archive.
+        /// </summary>
+        public void Save()
+        {
+            CloseArchive();
+            ReloadArchive();
+        }
+
+        /// <summary>
+        /// Closes the archive.
+        /// </summary>
         public void CloseArchive()
         {
             archiveMemoryStream.Dispose();
             PackageUtilities.CompressArchive(PackageUtilities.TempArchive, destinationLocation.ToString());
         }
 
+        /// <summary>
+        /// Reloads the archive for editing.
+        /// </summary>
+        public void ReloadArchive()
+        {
+            PackageUtilities.DecompressArchive(destinationLocation.ToString());
+            archiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Update);
+        }
+
+        /// <summary>
+        /// Extracts a specified file to a location specified.
+        /// </summary>
+        /// <param name="entry">The file you want to extract. This must be in a relative path. ("folder1\\file.extension")</param>
+        /// <param name="exportLocation">The location where the file will be extracted to.</param>
         public void ExtractFile(string entry, string exportLocation)
         {
             var candidateFile = archiveMemoryStream.GetEntry(entry);

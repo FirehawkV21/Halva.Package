@@ -16,14 +16,14 @@ namespace Halva.Package.Core.Tests
         {
             if (File.Exists(destinationArchive)) File.Delete(destinationArchive);
             if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
-            if (File.Exists(PackageUtilities.TempArchive + "2")) File.Delete(PackageUtilities.TempArchive + "2");
+            if (File.Exists(PackageUtilities.TempArchive)) File.Delete(PackageUtilities.TempArchive);
         }
 
         [Fact]
         public void ArchiveBuilderTest()
         {
             Cleanup();
-            HalvaPackage package = new HalvaPackage(Path.GetFullPath(sourceFolder), destinationArchive);
+            HalvaPackage package = new HalvaPackage(sourceFolder, destinationArchive);
             package.CloseArchive();
             PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
         }
@@ -44,6 +44,17 @@ namespace Halva.Package.Core.Tests
             if(Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
             PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
             Assert.Equal(2, Directory.EnumerateFiles(destinationFolder).Count());
+        }
+
+        [Fact]
+        public void CanArchiveAddEntry()
+        {
+            HalvaPackage package = new HalvaPackage(destinationArchive);
+            package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
+            package.CloseArchive();
+            if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
+            PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
+            Assert.Equal(3, Directory.EnumerateFiles(destinationFolder).Count());
         }
 
     }
