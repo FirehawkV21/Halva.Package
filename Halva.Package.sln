@@ -40,12 +40,13 @@ Global
 		UpdateAssemblyVersion = True
 		UpdateAssemblyFileVersion = True
 		UpdateAssemblyInfoVersion = True
+		ShouldCreateLogs = True
 		AdvancedSettingsExpanded = True
 		AssemblyVersionSettings = None.None.None.DateStamp
 		AssemblyFileVersionSettings = None.None.None.DateStamp
+		AssemblyInfoVersionSettings = None.None.None.None
 		UpdatePackageVersion = False
-		AssemblyInfoVersionSemVerSettings = AssemblyVersion.None.Alpha
-		AssemblyInfoVersionType = SemVer1
+		AssemblyInfoVersionType = SettingsVersion
 		InheritWinAppVersionFrom = None
 	EndGlobalSection
 EndGlobal
