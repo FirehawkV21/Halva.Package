@@ -57,5 +57,15 @@ namespace Halva.Package.Core.Tests
             Assert.Equal(3, Directory.EnumerateFiles(destinationFolder).Count());
         }
 
+        [Fact]
+        public void CanLibrarySaveChanges()
+        {
+            HalvaPackage package = new HalvaPackage(destinationArchive);
+            package.RemoveFileFromList("TestImage.webp");
+            package.Save();
+            package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
+            package.Save();
+        }
+
     }
 }
