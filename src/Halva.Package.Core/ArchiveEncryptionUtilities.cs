@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Halva.Package.Core
 {
-    class ArchiveEncryptionUtilities
+    public static class ArchiveEncryptionUtilities
     {
 
     }
