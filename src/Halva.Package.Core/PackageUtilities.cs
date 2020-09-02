@@ -54,10 +54,6 @@ namespace Halva.Package.Core
 
         }
 
-        public static void ExportFromArchive(in MemoryStream inputMemoryStream)
-        {
-
-        }
         /// <summary>
         /// Decompresses the archive.
         /// </summary>

@@ -50,7 +50,7 @@ namespace Halva.Package.Core
         /// <summary>
         /// Closes the archive.
         /// </summary>
-        public virtual void CloseArchive()
+        public void CloseArchive()
         {
             archiveMemoryStream.Dispose();
             PackageUtilities.CompressArchive(PackageUtilities.TempArchive, destinationLocation.ToString());
@@ -59,7 +59,7 @@ namespace Halva.Package.Core
         /// <summary>
         /// Reloads the archive for editing.
         /// </summary>
-        public virtual void ReloadArchive()
+        public void ReloadArchive()
         {
             PackageUtilities.DecompressArchive(destinationLocation.ToString());
             archiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Update);
