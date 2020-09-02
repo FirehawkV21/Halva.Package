@@ -8,14 +8,16 @@ using System.Text;
 
 namespace Halva.Package.Core
 {
-    public class EncryptedPackageUtilities
+    public static class EncryptedPackageUtilities
     {
-        public static string GetFolderCharacter()
-        {
-            return (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ? "\\" : "/";
-        }
         public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive.tmp");
 
+        /// <summary>
+        /// Compresses the encrypted archive.
+        /// </summary>
+        /// <param name="inputArchive">The input archive.</param>
+        /// <param name="outputArchive">The output archive.</param>
+        /// <param name="password">The archive's password.</param>
         public static void CompressArchive(in string inputArchive, in string outputArchive, in string password)
         {
 
@@ -43,6 +45,11 @@ namespace Halva.Package.Core
             encryptionKit.Dispose();
         }
 
+        /// <summary>
+        /// Decompresses the archive.
+        /// </summary>
+        /// <param name="inputArchive">The input archive.</param>
+        /// <param name="password">The password of the archive.</param>
         public static void DecompressArchive(in string inputArchive, in string password)
         {
             AesManaged encryptionKit = new AesManaged
@@ -70,6 +77,12 @@ namespace Halva.Package.Core
             encryptionKit.Dispose();
         }
 
+        /// <summary>
+        /// Creates a Halva package from a folder.
+        /// </summary>
+        /// <param name="input">The source folder that the archive will be created from.</param>
+        /// <param name="archiveLocation">The location of the final archive.</param>
+        /// <param name="password">The archive's password.</param>
         public static void CreateArchiveFromFolder(in string input, in string archiveLocation, in string password)
         {
             if (File.Exists(TempArchive)) File.Delete(TempArchive);
@@ -78,11 +91,17 @@ namespace Halva.Package.Core
             File.Delete(TempArchive);
         }
 
-        public static void ExportFromArchive(in string inputArchive, in string destination, in string password)
+        /// <summary>
+        /// Exports all files from an encrypted Halva package.
+        /// </summary>
+        /// <param name="inputArchive">The archive you want to decompress.</param>
+        /// <param name="exportDestination">The location where the contents of the archive will be exported.</param>
+        /// <param name="password">The archive's password.</param>
+        public static void ExportFromArchive(in string inputArchive, in string exportDestination, in string password)
         {
             if (File.Exists(TempArchive)) File.Delete(TempArchive);
             DecompressArchive(inputArchive, password);
-            ZipFile.ExtractToDirectory(TempArchive, destination, true);
+            ZipFile.ExtractToDirectory(TempArchive, exportDestination, true);
             File.Delete(TempArchive);
 
         }

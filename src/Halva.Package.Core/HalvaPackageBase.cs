@@ -2,16 +2,22 @@
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Halva.Package.Core
 {
     public class HalvaPackageBase
     {
-        protected StringBuilder sourceLocation { get; set; }
-        protected StringBuilder destinationLocation { get; set; }
-        List<string> fileList { get; set; } = new List<string>();
-        protected ZipArchive archiveMemoryStream { get; set; }
+        protected StringBuilder SourceLocation { get; set; }
+        protected StringBuilder DestinationLocation { get; set; }
+        List<string> FileList { get; set; } = new List<string>();
+        protected ZipArchive ArchiveMemoryStream { get; set; }
+
+        public static string GetFolderCharacter()
+        {
+            return (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ? "\\" : "/";
+        }
 
         /// <summary>
         /// Adds a specified file to the list. This method only works if the file is in the source folder.
@@ -19,8 +25,8 @@ namespace Halva.Package.Core
         /// <param name="fileLocation">The location of the file.</param>
         public void AddFileToList(string fileLocation)
         {
-            fileList.Add(fileLocation.Replace(sourceLocation + PackageUtilities.GetFolderCharacter(), ""));
-            archiveMemoryStream.CreateEntryFromFile(fileLocation, fileLocation.Replace(sourceLocation + PackageUtilities.GetFolderCharacter(), ""), CompressionLevel.NoCompression);
+            FileList.Add(fileLocation.Replace(SourceLocation + GetFolderCharacter(), ""));
+            ArchiveMemoryStream.CreateEntryFromFile(fileLocation, fileLocation.Replace(SourceLocation + GetFolderCharacter(), ""), CompressionLevel.NoCompression);
         }
 
         /// <summary>
@@ -29,10 +35,10 @@ namespace Halva.Package.Core
         /// <param name="fileLocation">The file you want to remove. This must be in a relative path. ("folder1/file.extension")</param>
         public void RemoveFileFromList(string fileLocation)
         {
-            var entry = archiveMemoryStream.GetEntry(fileLocation);
+            var entry = ArchiveMemoryStream.GetEntry(fileLocation);
             if (entry == null) return;
             entry.Delete();
-            fileList.Remove(fileLocation);
+            FileList.Remove(fileLocation);
         }
 
         /// <summary>
@@ -40,7 +46,7 @@ namespace Halva.Package.Core
         /// </summary>
         /// <param name="source">The folder to scan for files.</param>
         /// <returns>A list of files in the specified folder.</returns>
-        public List<string> PullFiles(string source)
+        public static List<string> PullFiles(string source)
         {
             IEnumerable<string> foundFiles = Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories);
             return foundFiles.ToList();
@@ -51,7 +57,7 @@ namespace Halva.Package.Core
         /// </summary>
         /// <param name="inputStream">The input archive.</param>
         /// <returns>A list of files in the archive.</returns>
-        public List<string> PullFiles(ZipArchive inputStream)
+        public static List<string> PullFiles(ZipArchive inputStream)
         {
             List<string> foundFiles = new List<string>();
             foreach (ZipArchiveEntry entry in inputStream.Entries)
@@ -69,7 +75,7 @@ namespace Halva.Package.Core
         /// <param name="exportLocation">The location where the file will be extracted to.</param>
         public void ExtractFile(string entry, string exportLocation)
         {
-            var candidateFile = archiveMemoryStream.GetEntry(entry);
+            var candidateFile = ArchiveMemoryStream.GetEntry(entry);
             candidateFile.ExtractToFile(exportLocation, true);
 
         }

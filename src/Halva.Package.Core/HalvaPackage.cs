@@ -15,10 +15,10 @@ namespace Halva.Package.Core
         /// <param name="destination">The location of the archive.</param>
         public HalvaPackage(string source, string destination)
         {
-            sourceLocation = new StringBuilder(source);
-            destinationLocation = new StringBuilder(destination);
+            SourceLocation = new StringBuilder(source);
+            DestinationLocation = new StringBuilder(destination);
             List<string> foundFilesList = PullFiles(source);
-            archiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Create);
+            ArchiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Create);
             foreach (string file in foundFilesList)
             {
                 AddFileToList(file);
@@ -31,11 +31,11 @@ namespace Halva.Package.Core
         /// <param name="source">The source archive.</param>
         public HalvaPackage(string source)
         {
-            sourceLocation = new StringBuilder(Path.GetDirectoryName(source));
-            destinationLocation = new StringBuilder(source);
-            PackageUtilities.DecompressArchive(destinationLocation.ToString());
-            archiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Update);
-            PullFiles(archiveMemoryStream);
+            SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
+            DestinationLocation = new StringBuilder(source);
+            PackageUtilities.DecompressArchive(DestinationLocation.ToString());
+            ArchiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Update);
+            PullFiles(ArchiveMemoryStream);
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace Halva.Package.Core
         /// </summary>
         public void CloseArchive()
         {
-            archiveMemoryStream.Dispose();
-            PackageUtilities.CompressArchive(PackageUtilities.TempArchive, destinationLocation.ToString());
+            ArchiveMemoryStream.Dispose();
+            PackageUtilities.CompressArchive(PackageUtilities.TempArchive, DestinationLocation.ToString());
         }
 
         /// <summary>
@@ -61,8 +61,8 @@ namespace Halva.Package.Core
         /// </summary>
         public void ReloadArchive()
         {
-            PackageUtilities.DecompressArchive(destinationLocation.ToString());
-            archiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Update);
+            PackageUtilities.DecompressArchive(DestinationLocation.ToString());
+            ArchiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Update);
         }
     }
 }

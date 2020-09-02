@@ -1,15 +1,10 @@
 ﻿using System.IO;
 using System.IO.Compression;
-using System.Runtime.InteropServices;
 
 namespace Halva.Package.Core
 {
     public static class PackageUtilities
     {
-        public static string GetFolderCharacter()
-        {
-            return (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ? "\\" : "/";
-        }
         public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive.tmp");
 
         /// <summary>
