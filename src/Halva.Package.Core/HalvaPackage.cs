@@ -8,10 +8,10 @@ namespace Halva.Package.Core
 {
     public class HalvaPackage
     {
-        private StringBuilder sourceLocation;
-        private StringBuilder destinationLocation;
-        private List<string> fileList = new List<string>();
-        private ZipArchive archiveMemoryStream;
+        protected StringBuilder sourceLocation { get; set; }
+        protected StringBuilder destinationLocation { get; set; }
+        List<string> fileList { get; set; } = new List<string>();
+        protected ZipArchive archiveMemoryStream { get; set; }
 
         /// <summary>
         /// Creates a Halva package using the source folder as the input. It will automatically put the files in the input folder to a temporary archive.
@@ -103,7 +103,7 @@ namespace Halva.Package.Core
         /// <summary>
         /// Closes the archive.
         /// </summary>
-        public void CloseArchive()
+        public virtual void CloseArchive()
         {
             archiveMemoryStream.Dispose();
             PackageUtilities.CompressArchive(PackageUtilities.TempArchive, destinationLocation.ToString());
@@ -112,7 +112,7 @@ namespace Halva.Package.Core
         /// <summary>
         /// Reloads the archive for editing.
         /// </summary>
-        public void ReloadArchive()
+        public virtual void ReloadArchive()
         {
             PackageUtilities.DecompressArchive(destinationLocation.ToString());
             archiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Update);

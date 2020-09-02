@@ -47,5 +47,39 @@ namespace Halva.Package.Core.Tests
             }
             Assert.True(finished);
         }
+
+        [Fact]
+        public void EncryptedCompressionCheck()
+        {
+            bool finished = true;
+            if (File.Exists("EncryptedSampleFiles.halva")) File.Delete("EncryptedSampleFiles.halva");
+            try
+            {
+                EncryptedPackageUtilities.CreateArchiveFromFolder("SampleFiles", "EncryptedSampleFiles.halva", "1234567890abcdefghijklm");
+            }
+            catch (Exception e)
+            {
+                _testOutputHelper.WriteLine(e.ToString());
+                finished = false;
+            }
+            Assert.True(finished);
+        }
+
+        [Fact] 
+        public void EncryptedDecompressionCheck()
+        {
+            bool finished = true;
+            if (Directory.Exists("SampleFiles2")) Directory.Delete("SampleFiles2", true);
+            try
+            {
+                EncryptedPackageUtilities.ExportFromArchive("EncryptedSampleFiles.halva", "SampleFiles2", "1234567890abcdefghijklm");
+            }
+            catch (Exception e)
+            {
+                _testOutputHelper.WriteLine(e.ToString());
+                finished = false;
+            }
+            Assert.True(finished);
+        }
     }
 }

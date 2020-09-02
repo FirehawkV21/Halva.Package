@@ -9,10 +9,10 @@
     <RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
     <PackageTags>compression, package, Brotli</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <AssemblyVersion>1.0.0.20142</AssemblyVersion>
-    <FileVersion>1.0.0.20142</FileVersion>
+    <AssemblyVersion>1.0.0.20246</AssemblyVersion>
+    <FileVersion>1.0.0.20246</FileVersion>
     <PackageId>Halva.Package.Core</PackageId>
-    <Version>1.0.0-alpha-20200523</Version>
+    <Version>1.0.0-alpha.20200521</Version>
     <Description>Halva (Χαλβάς in Greek) is a small .NET Standard 2.1 library that implements Google's Brotli compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
     <PackageReleaseNotes>First Alpha release.
 
@@ -32,8 +32,7 @@ Not implemented:
     <UpdateAssemblyVersion>False</UpdateAssemblyVersion>
     <UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
     <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
-    <UpdatePackageVersion>True</UpdatePackageVersion>
-    <PackageVersionSettings>AssemblyVersion.None.Alpha</PackageVersionSettings>
+    <UpdatePackageVersion>False</UpdatePackageVersion>
     <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
     <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
   </PropertyGroup>
@@ -44,7 +43,7 @@ Not implemented:
     <UpdateAssemblyVersion>False</UpdateAssemblyVersion>
     <UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
     <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
-    <UpdatePackageVersion>True</UpdatePackageVersion>
+    <UpdatePackageVersion>False</UpdatePackageVersion>
     <PackageVersionSettings>AssemblyVersion.None.Alpha</PackageVersionSettings>
     <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
     <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
@@ -58,7 +57,7 @@ Not implemented:
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
