@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{665CD08D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Halva.Package.Core.Tests", "tests\Halva.Package.Core.Tests\Halva.Package.Core.Tests.csproj", "{220717C9-97FA-49F4-A679-998D0A384F5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Halva.Package.Packer", "src\Halva.Package.Packer\Halva.Package.Packer.csproj", "{2DA4CF8A-A393-49B6-9E81-AF89DFA8311A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{220717C9-97FA-49F4-A679-998D0A384F5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{220717C9-97FA-49F4-A679-998D0A384F5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{220717C9-97FA-49F4-A679-998D0A384F5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DA4CF8A-A393-49B6-9E81-AF89DFA8311A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DA4CF8A-A393-49B6-9E81-AF89DFA8311A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DA4CF8A-A393-49B6-9E81-AF89DFA8311A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DA4CF8A-A393-49B6-9E81-AF89DFA8311A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,21 +38,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{7EFC6EDB-F6A5-4329-9DC0-CCE917C69E01} = {3DC84B8F-1059-4821-8655-ED29A9C0B60E}
 		{220717C9-97FA-49F4-A679-998D0A384F5B} = {665CD08D-F6F4-402C-AE95-69F74FB11B48}
+		{2DA4CF8A-A393-49B6-9E81-AF89DFA8311A} = {3DC84B8F-1059-4821-8655-ED29A9C0B60E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F73E00BE-A4AB-4E91-9818-7C3CA5F7429A}
-	EndGlobalSection
-	GlobalSection(AutomaticVersions) = postSolution
-		UpdateAssemblyVersion = True
-		UpdateAssemblyFileVersion = True
-		UpdateAssemblyInfoVersion = True
-		ShouldCreateLogs = True
-		AdvancedSettingsExpanded = True
-		AssemblyVersionSettings = None.None.None.DateStamp
-		AssemblyFileVersionSettings = None.None.None.DateStamp
-		AssemblyInfoVersionSettings = None.None.None.None
-		UpdatePackageVersion = False
-		AssemblyInfoVersionType = SettingsVersion
-		InheritWinAppVersionFrom = None
 	EndGlobalSection
 EndGlobal

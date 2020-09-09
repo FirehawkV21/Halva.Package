@@ -9,10 +9,11 @@ namespace Halva.Package.Core
 {
     public class HalvaPackageBase
     {
-        protected StringBuilder SourceLocation { get; set; }
-        protected StringBuilder DestinationLocation { get; set; }
-        List<string> FileList { get; set; } = new List<string>();
+        protected StringBuilder SourceLocation { get; set; } 
+        public StringBuilder DestinationLocation { get; set; }
+        public List<string> FileList { get; set; } = new List<string>();
         protected ZipArchive ArchiveMemoryStream { get; set; }
+        public string WorkingArchive { get; set; }
 
         public static string GetFolderCharacter()
         {
@@ -27,6 +28,25 @@ namespace Halva.Package.Core
         {
             FileList.Add(fileLocation.Replace(SourceLocation + GetFolderCharacter(), ""));
             ArchiveMemoryStream.CreateEntryFromFile(fileLocation, fileLocation.Replace(SourceLocation + GetFolderCharacter(), ""), CompressionLevel.NoCompression);
+        }
+
+        public void AddFileToList(string source, string fileRelativeLocation)
+        {
+            FileList.Add(fileRelativeLocation);
+            ArchiveMemoryStream.CreateEntryFromFile(Path.Combine(source, fileRelativeLocation), fileRelativeLocation, CompressionLevel.NoCompression);
+        }
+
+        public void AddFilesFromAFolder(string source)
+        {
+            var tempList = PullFiles(source);
+
+            foreach(string fileEntry in tempList)
+            {
+                ArchiveMemoryStream.CreateEntryFromFile(fileEntry,
+                    fileEntry.Replace(source + GetFolderCharacter(), ""), CompressionLevel.NoCompression);
+                FileList.Add(fileEntry.Replace(source + GetFolderCharacter(), ""));
+            }
+            
         }
 
         /// <summary>
@@ -46,7 +66,7 @@ namespace Halva.Package.Core
         /// </summary>
         /// <param name="source">The folder to scan for files.</param>
         /// <returns>A list of files in the specified folder.</returns>
-        public static List<string> PullFiles(string source)
+        public List<string> PullFiles(string source)
         {
             IEnumerable<string> foundFiles = Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories);
             return foundFiles.ToList();

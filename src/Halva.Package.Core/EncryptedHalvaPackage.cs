@@ -7,7 +7,8 @@ namespace Halva.Package.Core
 {
     public class EncryptedHalvaPackage : HalvaPackageBase
     {
-        private string Password { get; set; }
+        
+        public string Password { get; set; }
 
         /// <summary>
         /// Creates an encrypted Halva package in memory. This is used to update an archive or export some files.
@@ -20,8 +21,14 @@ namespace Halva.Package.Core
             SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
             DestinationLocation = new StringBuilder(source);
             EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), Password);
-            ArchiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Update);
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
             PullFiles(ArchiveMemoryStream);
+        }
+
+        public EncryptedHalvaPackage(string archive)
+        {
+            WorkingArchive = archive;
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
         }
 
         /// <summary>
@@ -58,7 +65,7 @@ namespace Halva.Package.Core
         public void CloseArchive()
         {
             ArchiveMemoryStream.Dispose();
-            EncryptedPackageUtilities.CompressArchive(PackageUtilities.TempArchive, DestinationLocation.ToString(), Password);
+            EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password);
         }
 
         /// <summary>
