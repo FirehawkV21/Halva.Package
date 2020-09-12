@@ -134,7 +134,10 @@ namespace Halva.Package.Packer
                         assetsPackage.AddFilesFromAFolder(Path.Combine(gameFolder, "audio"));
                         assetsPackage.AddFilesFromAFolder(Path.Combine(gameFolder, "img"));
                         assetsPackage.AddFilesFromAFolder(Path.Combine(gameFolder, "icon"));
-                        assetsPackage.AddFilesFromAFolder(Path.Combine(gameFolder, "fonts"));
+                        if(Directory.Exists(Path.Combine(gameFolder,"fonts"))) assetsPackage.AddFilesFromAFolder(Path.Combine(gameFolder, "fonts"));
+                        if(Directory.Exists(Path.Combine(gameFolder, "css"))) assetsPackage.AddFilesFromAFolder(Path.Combine(gameFolder, "css"));
+                        if (Directory.Exists(Path.Combine(gameFolder, "effects"))) assetsPackage.AddFilesFromAFolder(Path.Combine(gameFolder, "effects"));
+                        if (Directory.Exists(Path.Combine(gameFolder, "movies"))) assetsPackage.AddFilesFromAFolder(Path.Combine(gameFolder, "movies"));
                         assetsPackage.CloseArchive();
                         File.Delete(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"));
                         Console.WriteLine("Compressing database...");
