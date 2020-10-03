@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -36,6 +37,10 @@ namespace Halva.Package.Core
             ArchiveMemoryStream.CreateEntryFromFile(Path.Combine(source, fileRelativeLocation), fileRelativeLocation, CompressionLevel.NoCompression);
         }
 
+        /// <summary>
+        /// Adds files from a specific folder.
+        /// </summary>
+        /// <param name="source">The location of the source folder.</param>
         public void AddFilesFromAFolder(string source)
         {
             var tempList = PullFiles(source);
@@ -47,6 +52,24 @@ namespace Halva.Package.Core
                 FileList.Add(fileEntry.Replace(source + GetFolderCharacter(), ""));
             }
             
+        }
+
+        /// <summary>
+        /// Adds files from a specific folder. The folder relative location is used to avoid messing up the folder structure.
+        /// </summary>
+        /// <param name="sourceLocation">The location of the source folder</param>
+        /// <param name="SourceFolderRelativeLocation">The relatice location of the source folder.</param>
+        public void AddFilesFromAFolder(string sourceLocation, string SourceFolderRelativeLocation)
+        {
+            var tempList = PullFiles(Path.Combine(sourceLocation, SourceFolderRelativeLocation));
+
+            foreach (string fileEntry in tempList)
+            {
+                ArchiveMemoryStream.CreateEntryFromFile(fileEntry,
+                    fileEntry.Replace(sourceLocation + GetFolderCharacter(), ""), CompressionLevel.NoCompression);
+                FileList.Add(fileEntry.Replace(sourceLocation + GetFolderCharacter(), ""));
+            }
+
         }
 
         /// <summary>
