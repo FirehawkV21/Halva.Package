@@ -3,6 +3,9 @@ using System.IO.Compression;
 
 namespace Halva.Package.Core
 {
+    /// <summary>
+    /// A set of utilities for simple workloads.
+    /// </summary>
     public static class PackageUtilities
     {
         public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive.tmp");

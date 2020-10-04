@@ -5,11 +5,15 @@ using System.Text;
 
 namespace Halva.Package.Core
 {
+    /// <summary>
+    /// This is the class that handles unencrypted Halva packages.
+    /// </summary>
     public class HalvaPackage: HalvaPackageBase
     {
         /// <summary>
         /// Creates a Halva package using the source folder as the input. It will automatically put the files in the input folder to a temporary archive.
         /// </summary>
+        /// <param name="workingarchive">The temporary archive location used to temporaily save data.</param>
         /// <param name="source">The source folder.</param>
         /// <param name="destination">The location of the archive.</param>
         public HalvaPackage(string workingarchive, string source, string destination)
@@ -25,6 +29,10 @@ namespace Halva.Package.Core
             }
         }
 
+        /// <summary>
+        /// Creates a Halva package 
+        /// </summary>
+        /// <param name="workingarchive">The temporary archive location used to temporaily save data.</param>
         public HalvaPackage(string workingarchive)
         {
             WorkingArchive = workingarchive;

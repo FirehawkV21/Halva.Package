@@ -62,7 +62,7 @@ namespace Halva.Package.Packer
                 password = Console.ReadLine();
             }
 
-            Console.WriteLine("Please put the location for the archives (by default it will output the archives to the same location as the game files);");
+            Console.WriteLine("Please put the location for the archives (by default it will output the archives to the same location as the game files):");
             archiveDestination = Console.ReadLine();
 
             var gameFolder = JsonReader.FindGameFolder(Path.Combine(projectLocation, "package.json"));

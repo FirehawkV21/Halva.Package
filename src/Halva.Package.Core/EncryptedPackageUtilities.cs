@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Halva.Package.Core
 {
+    /// <summary>
+    /// A set of utilities for simple workloads (when working with encrypted archives).
+    /// </summary>
     public static class EncryptedPackageUtilities
     {
         public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive.tmp");

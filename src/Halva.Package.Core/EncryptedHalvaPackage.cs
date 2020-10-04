@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Halva.Package.Core
 {
+    /// <summary>
+    /// This is the class that handles the encrypted Halva packages.
+    /// </summary>
     public class EncryptedHalvaPackage : HalvaPackageBase
     {
         
@@ -25,6 +28,10 @@ namespace Halva.Package.Core
             PullFiles(ArchiveMemoryStream);
         }
 
+        /// <summary>
+        /// Creates an encrypted Halva package with a temporary archive created (specified in the string).
+        /// </summary>
+        /// <param name="archive">The temporary archive location used to temporaily save data.</param>
         public EncryptedHalvaPackage(string archive)
         {
             WorkingArchive = archive;

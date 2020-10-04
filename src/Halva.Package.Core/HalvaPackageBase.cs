@@ -8,6 +8,9 @@ using System.Text;
 
 namespace Halva.Package.Core
 {
+    /// <summary>
+    /// This is the base class for the Halva Package. You should use either HalvaPackage or EncryptedHalvaPackage.
+    /// </summary>
     public class HalvaPackageBase
     {
         protected StringBuilder SourceLocation { get; set; } 
@@ -16,6 +19,10 @@ namespace Halva.Package.Core
         protected ZipArchive ArchiveMemoryStream { get; set; }
         public string WorkingArchive { get; set; }
 
+        /// <summary>
+        /// Gets the character used for path designation.
+        /// </summary>
+        /// <returns>Either "\\" (in Windows) or "/" (Unix systems).</returns>
         public static string GetFolderCharacter()
         {
             return (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ? "\\" : "/";
@@ -31,6 +38,11 @@ namespace Halva.Package.Core
             ArchiveMemoryStream.CreateEntryFromFile(fileLocation, fileLocation.Replace(SourceLocation + GetFolderCharacter(), ""), CompressionLevel.NoCompression);
         }
 
+        /// <summary>
+        /// Adds a specified file to the list. This method is better suited for preserving the folder structure.
+        /// </summary>
+        /// <param name="source">The base folder that holds the file.</param>
+        /// <param name="fileRelativeLocation">The relative location of the file.</param>
         public void AddFileToList(string source, string fileRelativeLocation)
         {
             FileList.Add(fileRelativeLocation);
