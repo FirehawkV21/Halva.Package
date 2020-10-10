@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Halva.Package.Core.Tests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Halva.Package.Packer", "src\Halva.Package.Packer\Halva.Package.Packer.csproj", "{2DA4CF8A-A393-49B6-9E81-AF89DFA8311A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Halva.Package.Extractor", "src\Halva.Package.Extractor\Halva.Package.Extractor.csproj", "{90635A0F-8B7C-427E-8032-23A6D64FCE8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Halva.Package.Bootstrapper", "src\Halva.Package.Extractor\Halva.Package.Bootstrapper.csproj", "{90635A0F-8B7C-427E-8032-23A6D64FCE8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,7 +6,7 @@ using System.IO;
 using System.Reflection;
 using WinSystem = Windows;
 
-namespace NorthbridgeLauncher
+namespace Halva.Package.Bootstrapper
 {
     public class GamePackageManager
     {
