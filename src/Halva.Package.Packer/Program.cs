@@ -15,9 +15,10 @@ namespace Halva.Package.Packer
             string archiveDestination = null;
             string password = null;
             bool settingsSet = false;
+            string stringBuffer;
             Console.WriteLine("===========================================");
             Console.WriteLine("= Halva Packer Tool");
-            Console.WriteLine("= Version D1.00 ({0})", Assembly.GetExecutingAssembly().GetName().Version);
+            Console.WriteLine("= Version R1.00 ({0})", Assembly.GetExecutingAssembly().GetName().Version);
             Console.WriteLine("= Developed by Studio ACE");
             Console.WriteLine("= Licesned under the MIT license.");
             Console.WriteLine("===========================================");
@@ -27,7 +28,6 @@ namespace Halva.Package.Packer
             {
                 for (int argnum = 0; argnum < args.Length; argnum++)
                 {
-                    string stringBuffer;
                     switch (args[argnum])
                     {
                         case "--SourceLocation":
@@ -53,8 +53,11 @@ namespace Halva.Package.Packer
                         case "--Password":
                             if(argnum <= args.Length - 1 && !args[argnum + 1].Contains("--"))
                             {
-                                password = args[argnum + 1];
+                                password = args[argnum + 1].Replace("\"", "");
                                 mustEncrypt = true;
+                                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                Console.WriteLine("Password set. The archives will now be encrypted.");
+                                Console.ResetColor();
 
                             }
                             else
