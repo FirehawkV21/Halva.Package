@@ -1,61 +1,67 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyTitle>Halva Package Core</AssemblyTitle>
-    <Authors>AceOfAces</Authors>
-    <Company>Studio ACE</Company>
-    <Product>Halva Package</Product>
-    <RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
-    <PackageTags>compression, package, Brotli, game-package</PackageTags>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <AssemblyVersion>1.0.0.20284</AssemblyVersion>
-    <FileVersion>1.0.0.20284</FileVersion>
-    <PackageId>Halva.Package.Core</PackageId>
-    <Version>1.0.0</Version>
-    <Description>Halva (Χαλβάς in Greek) is a small .NET Standard 2.1 library that implements Google's Brotli compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
-    <PackageReleaseNotes>First Stable Release:
-
--[Breaking change] Re-worked the contructor for the Halva package to allow setting custom package location.
--Minor improvements.</PackageReleaseNotes>
-    <Copyright>2020 © Studio ACE</Copyright>
+	<TargetFramework>netstandard2.1</TargetFramework>
+	<AssemblyTitle>Halva Package Core</AssemblyTitle>
+	<Authors>AceOfAces</Authors>
+	<Company>Studio ACE</Company>
+	<Product>Halva Package</Product>
+	<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
+	<PackageTags>compression, package, Brotli, game-package</PackageTags>
+	<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	<AssemblyVersion>1.0.1.20307</AssemblyVersion>
+	<FileVersion>1.0.1.20307</FileVersion>
+	<PackageId>Halva.Package.Core</PackageId>
+	<Version>1.0.1</Version>
+	<Description>Halva (Χαλβάς in Greek) is a small .NET Standard 2.1 library that implements Google's Brotli compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
+	<PackageReleaseNotes>-Added Source Link support (for debugging purposes).</PackageReleaseNotes>
+	<Copyright>2020 © Studio ACE</Copyright>
+	  <PublishRepositoryUrl>true</PublishRepositoryUrl>
+	  <EmbedUntrackedSources>true</EmbedUntrackedSources>
+	  <IncludeSymbols>true</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <ContinousIntegrationBuild>true</ContinousIntegrationBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <ShouldCreateLogs>True</ShouldCreateLogs>
-    <AdvancedSettingsExpanded>False</AdvancedSettingsExpanded>
-    <UpdateAssemblyVersion>False</UpdateAssemblyVersion>
-    <UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
-    <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
-    <UpdatePackageVersion>False</UpdatePackageVersion>
-    <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
-    <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
+	<ShouldCreateLogs>True</ShouldCreateLogs>
+	<AdvancedSettingsExpanded>False</AdvancedSettingsExpanded>
+	<UpdateAssemblyVersion>False</UpdateAssemblyVersion>
+	<UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
+	<UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
+	<UpdatePackageVersion>False</UpdatePackageVersion>
+	<AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
+	<InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <ShouldCreateLogs>True</ShouldCreateLogs>
-    <AdvancedSettingsExpanded>False</AdvancedSettingsExpanded>
-    <UpdateAssemblyVersion>False</UpdateAssemblyVersion>
-    <UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
-    <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
-    <UpdatePackageVersion>False</UpdatePackageVersion>
-    <PackageVersionSettings>AssemblyVersion.None.Alpha</PackageVersionSettings>
-    <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
-    <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
+	<ShouldCreateLogs>True</ShouldCreateLogs>
+	<AdvancedSettingsExpanded>False</AdvancedSettingsExpanded>
+	<UpdateAssemblyVersion>False</UpdateAssemblyVersion>
+	<UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
+	<UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
+	<UpdatePackageVersion>False</UpdatePackageVersion>
+	<PackageVersionSettings>AssemblyVersion.None.Alpha</PackageVersionSettings>
+	<AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
+	<InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
+	<None Include="..\..\LICENSE">
+	  <Pack>True</Pack>
+	  <PackagePath></PackagePath>
+	</None>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+	<PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.1">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
   </ItemGroup>
 
 </Project>

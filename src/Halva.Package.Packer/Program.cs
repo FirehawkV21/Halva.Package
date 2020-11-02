@@ -150,7 +150,7 @@ namespace Halva.Package.Packer
             if (gameFolder == "Unknown" || gameFolder == "Null")
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine("The location of the project's files couldn't be found. Please make sure that the \"main\" variables in the JSON file is set and points to the correct location.");
+                Console.WriteLine("The location of the project's files couldn't be found. Please make sure that the \"main\" variable in the JSON file is set and points to the correct location.");
             }
             else
             {
