@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Halva.Package.Bootstrapper
 {
     class Program
     {
-        static async void Main(string[] args)
+        static void Main(string[] args)
         {
             Console.WriteLine("===========================================");
             Console.WriteLine("= Halva Bootstrapper");
@@ -20,25 +19,29 @@ namespace Halva.Package.Bootstrapper
             if (packageManager.IsPackageMetadataPresent()) { 
                  int updatedPackages = 0;
                 if (!packageManager.IsInstalledPackageLatest("assetsVersion")) {
-                    await Task.Run(() => packageManager.ExtractPackage("AssetsPackage.halva", "assetsVersion")).ConfigureAwait(true);
+                    Console.WriteLine("Updating assets...");
+                    packageManager.ExtractPackage("AssetsPackage.halva", "assetsVersion");
                     updatedPackages += 1;
                         }
                 if (!packageManager.IsInstalledPackageLatest("databaseVersion"))
                 {
-                    await Task.Run(() => packageManager.ExtractPackage("DatabasePackage.halva", "databaseVersion")).ConfigureAwait(true);
+                    Console.WriteLine("Updating database...");
+                    packageManager.ExtractPackage("DatabasePackage.halva", "databaseVersion");
                     updatedPackages += 1;
                 }
                 if (!packageManager.IsInstalledPackageLatest("engineVersion")) {
-                    await Task.Run(() => packageManager.ExtractPackage("EnginePackage.halva", "engineVersion")).ConfigureAwait(true);
+                    Console.WriteLine("Updating engine...");
+                    packageManager.ExtractPackage("EnginePackage.halva", "engineVersion");
                     updatedPackages += 1;
                 }
                 if (updatedPackages > 0) packageManager.SavePackageMetadata();
             }
             else
             {
-                await Task.Run(() => packageManager.ExtractPackage("AssetsPackage.halva", "assetsVersion")).ConfigureAwait(true);
-                await Task.Run(() => packageManager.ExtractPackage("DatabasePackage.halva", "databaseVersion")).ConfigureAwait(true);
-                await Task.Run(() => packageManager.ExtractPackage("EnginePackage.halva", "engineVersion")).ConfigureAwait(true);
+                Console.WriteLine("Decompressing the game's assets. This will take a while.");
+                packageManager.ExtractPackage("AssetsPackage.halva", "assetsVersion");
+                packageManager.ExtractPackage("DatabasePackage.halva", "databaseVersion");
+                packageManager.ExtractPackage("EnginePackage.halva", "engineVersion");
                 packageManager.SavePackageMetadata();
             }
         }
