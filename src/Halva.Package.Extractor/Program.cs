@@ -1,12 +1,20 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Halva.Package.Bootstrapper
 {
     class Program
     {
+
         static void Main(string[] args)
         {
+            Process GameProcess = new Process();
+            ProcessStartInfo GameInfo = new ProcessStartInfo(Directory.GetParent(Assembly.GetExecutingAssembly().Location) + "\\Binaries\\Game.exe");
+
             Console.WriteLine("===========================================");
             Console.WriteLine("= Halva Bootstrapper");
             Console.WriteLine("= Version D1.00 ({0})", Assembly.GetExecutingAssembly().GetName().Version);
@@ -44,8 +52,10 @@ namespace Halva.Package.Bootstrapper
                 packageManager.ExtractPackage("EnginePackage.halva", "engineVersion");
                 packageManager.SavePackageMetadata();
             }
-        }
 
-        
+            GameInfo.Arguments += "--nwapp=\"" + Path.Combine(packageManager.ExctractLocation, "GameData") + "\"";
+            GameProcess.StartInfo = GameInfo;
+            GameProcess.Start();
+        }        
     }
 }

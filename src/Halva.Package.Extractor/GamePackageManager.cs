@@ -61,7 +61,7 @@ namespace Halva.Package.Bootstrapper
                 var LocalStorageFolderUWP = WinSystem.Storage.ApplicationData.Current.LocalFolder;
                 ExctractLocation = LocalStorageFolderUWP.Path;
             }
-            else ExctractLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Studio ACE", "Immortal Sins SE");
+            else ExctractLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
         }
 
         private void ExtractPackage(string PackageName)
