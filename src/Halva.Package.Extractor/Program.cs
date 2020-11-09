@@ -1,9 +1,7 @@
-﻿using Microsoft.VisualBasic;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace Halva.Package.Bootstrapper
 {
@@ -13,6 +11,7 @@ namespace Halva.Package.Bootstrapper
         static void Main(string[] args)
         {
             Process GameProcess = new Process();
+            // Edit this part to point over to the game's executable.
             ProcessStartInfo GameInfo = new ProcessStartInfo(Directory.GetParent(Assembly.GetExecutingAssembly().Location) + "\\Binaries\\Game.exe");
 
             Console.WriteLine("===========================================");

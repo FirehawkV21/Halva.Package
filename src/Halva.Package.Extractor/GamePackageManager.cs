@@ -11,7 +11,17 @@ namespace Halva.Package.Bootstrapper
     public class GamePackageManager
     {
         private string PackageLocation = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).ToString(), "GamePackages");
-        public string ExctractLocation;
+        public string ExctractLocation { get
+            {
+                if (IsRunningInCentennial())
+                {
+                    var LocalStorageFolderUWP = WinSystem.Storage.ApplicationData.Current.LocalFolder;
+                    return LocalStorageFolderUWP.Path;
+                }
+                //Change this to set a different folder.
+                else return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
+            }
+        }
         private string PackagePassword = "";
         private readonly Dictionary<string, int> TargetPackageVersion = new Dictionary<string, int>();
         private Dictionary<string, int> CurrentPackageVersion = new Dictionary<string, int>();
@@ -21,10 +31,10 @@ namespace Halva.Package.Bootstrapper
         /// </summary>
         public GamePackageManager()
         {
+            // Edit these to show the correct package version (or offload it to a JSON file).
             TargetPackageVersion.Add("assetsVersion", 20201003);
             TargetPackageVersion.Add("databaseVersion", 20201003);
             TargetPackageVersion.Add("engineVersion", 202001003);
-            GetExctractLocation();
             if (!Directory.Exists(Path.Combine(ExctractLocation, "GameData"))) Directory.CreateDirectory(Path.Combine(ExctractLocation, "GameData"));
             if (File.Exists(Path.Combine(ExctractLocation, "PackageData.json")))
             {
@@ -52,16 +62,6 @@ namespace Halva.Package.Bootstrapper
         {
             DesktopBridge.Helpers checker = new DesktopBridge.Helpers();
             return checker.IsRunningAsUwp();
-        }
-
-        private void GetExctractLocation()
-        {
-            if (IsRunningInCentennial())
-            {
-                var LocalStorageFolderUWP = WinSystem.Storage.ApplicationData.Current.LocalFolder;
-                ExctractLocation = LocalStorageFolderUWP.Path;
-            }
-            else ExctractLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
         }
 
         private void ExtractPackage(string PackageName)
