@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Halva.Package.Core;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using Halva.Package.Core;
 
 namespace Halva.Package.Packer
 {
@@ -16,12 +16,12 @@ namespace Halva.Package.Packer
             string password = null;
             bool settingsSet = false;
             string stringBuffer;
-            Console.WriteLine("===========================================");
-            Console.WriteLine("= Halva Packer Tool");
-            Console.WriteLine("= Version R1.00 ({0})", Assembly.GetExecutingAssembly().GetName().Version);
-            Console.WriteLine("= Developed by Studio ACE");
-            Console.WriteLine("= Licesned under the MIT license.");
-            Console.WriteLine("===========================================");
+            Console.WriteLine(Halva.Package.Packer.Properties.Resources.SplitterText);
+            Console.WriteLine(Halva.Package.Packer.Properties.Resources.ProgramTitle);
+            Console.WriteLine(Halva.Package.Packer.Properties.Resources.ProgramVersion, Assembly.GetExecutingAssembly().GetName().Version);
+            Console.WriteLine(Halva.Package.Packer.Properties.Resources.AuthorSignature);
+            Console.WriteLine(Halva.Package.Packer.Properties.Resources.LicenseText);
+            Console.WriteLine(Halva.Package.Packer.Properties.Resources.SplitterText);
             Console.WriteLine();
 
             if (args.Length >= 1)
@@ -38,32 +38,32 @@ namespace Halva.Package.Packer
                                 if (Directory.Exists(projectLocation) && File.Exists(Path.Combine(projectLocation, "package.json")))
                                 {
                                     Console.ForegroundColor = ConsoleColor.DarkGreen;
-                                    Console.WriteLine("The project is found.");
+                                    Console.WriteLine(Halva.Package.Packer.Properties.Resources.ProjectFoundText);
                                     Console.ResetColor();
                                     settingsSet = true;
                                 }
                                 else
                                 {
                                     Console.ForegroundColor = ConsoleColor.DarkRed;
-                                    Console.WriteLine("No project was found.");
+                                    Console.WriteLine(Halva.Package.Packer.Properties.Resources.NoProjectFoundText);
                                     Console.ResetColor();
                                 }
                             }
                             break;
                         case "--Password":
-                            if(argnum <= args.Length - 1 && !args[argnum + 1].Contains("--"))
+                            if (argnum <= args.Length - 1 && !args[argnum + 1].Contains("--"))
                             {
                                 password = args[argnum + 1].Replace("\"", "");
                                 mustEncrypt = true;
                                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                                Console.WriteLine("Password set. The archives will now be encrypted.");
+                                Console.WriteLine(Halva.Package.Packer.Properties.Resources.PasswordSetText);
                                 Console.ResetColor();
 
                             }
                             else
                             {
                                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                                Console.WriteLine("No password added. The archives will not be encrypted.");
+                                Console.WriteLine(Halva.Package.Packer.Properties.Resources.NoPassowrdSetText);
                                 Console.ResetColor();
                             }
                             break;
@@ -73,14 +73,14 @@ namespace Halva.Package.Packer
                                 stringBuffer = args[argnum + 1];
                                 archiveDestination = stringBuffer.Replace("\"", "");
 
-                                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                                    Console.WriteLine("The output is now set.");
-                                    Console.ResetColor();
+                                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                Console.WriteLine(Halva.Package.Packer.Properties.Resources.OutputSetText);
+                                Console.ResetColor();
                             }
                             else
                             {
                                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                                Console.WriteLine("No output folder set. The archives will be placed to the project's folder.");
+                                Console.WriteLine(Halva.Package.Packer.Properties.Resources.NoOutputSetText);
                                 Console.ResetColor();
 
                             }
@@ -94,18 +94,18 @@ namespace Halva.Package.Packer
             {
                 do
                 {
-                    Console.WriteLine("Where's the location of the project?");
+                    Console.WriteLine(Properties.Resources.ProjectLocationQuestion);
                     projectLocation = Console.ReadLine();
                     if (!Directory.Exists(projectLocation))
                     {
                         Console.ForegroundColor = ConsoleColor.DarkRed;
-                        Console.WriteLine("The location is not present.");
+                        Console.WriteLine(Properties.Resources.LocationDoesNotExistText);
                         Console.ResetColor();
                     }
                     else if (!File.Exists(Path.Combine(projectLocation, "package.json")))
                     {
                         Console.ForegroundColor = ConsoleColor.DarkRed;
-                        Console.WriteLine("The file package.json isn't present.");
+                        Console.WriteLine(Properties.Resources.ProjectFileNotPresentText);
                         Console.ResetColor();
                         projectLocation = null;
                     }
@@ -113,7 +113,7 @@ namespace Halva.Package.Packer
 
                 if (string.IsNullOrEmpty(password))
                 {
-                    Console.WriteLine("Do you need to encrypt the archives? (Y/N, default is No)");
+                    Console.WriteLine(Properties.Resources.EncryptionQuestion);
                     var tempChar = Console.ReadKey();
                     switch (tempChar.KeyChar)
                     {
@@ -131,17 +131,17 @@ namespace Halva.Package.Packer
                             mustEncrypt = false;
                             break;
                     }
-
+                    Console.WriteLine();
                     if (mustEncrypt)
                     {
-                        Console.WriteLine("Please type in the password:");
+                        Console.WriteLine(Properties.Resources.PasswordQuestion);
                         password = Console.ReadLine();
                     }
                 }
 
                 if (string.IsNullOrEmpty(archiveDestination))
                 {
-                    Console.WriteLine("Please put the location for the archives (by default it will output the archives to the same location as the game files):");
+                    Console.WriteLine(Properties.Resources.OutputLocationQuestion);
                     archiveDestination = Console.ReadLine();
                 }
             }
@@ -150,15 +150,15 @@ namespace Halva.Package.Packer
             if (gameFolder == "Unknown" || gameFolder == "Null")
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine("The location of the project's files couldn't be found. Please make sure that the \"main\" variable in the JSON file is set and points to the correct location.");
+                Console.WriteLine(Properties.Resources.ProjectFilesLocationNotFound);
             }
             else
             {
                 if (!Directory.Exists(archiveDestination) && !string.IsNullOrEmpty(archiveDestination)) Directory.CreateDirectory(archiveDestination);
                 string destinationPath = !string.IsNullOrEmpty(archiveDestination) ? archiveDestination : gameFolder;
-                if(File.Exists(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"))) File.Delete(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"));
-                if(File.Exists(Path.Combine(Path.GetTempPath(), "dbPack.tmp"))) File.Delete(Path.Combine(Path.GetTempPath(), "dbPack.tmp"));
-                if(File.Exists(Path.Combine(Path.GetTempPath(), "enginePack.tmp"))) File.Delete(Path.Combine(Path.GetTempPath(), "enginePack.tmp"));
+                if (File.Exists(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"))) File.Delete(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"));
+                if (File.Exists(Path.Combine(Path.GetTempPath(), "dbPack.tmp"))) File.Delete(Path.Combine(Path.GetTempPath(), "dbPack.tmp"));
+                if (File.Exists(Path.Combine(Path.GetTempPath(), "enginePack.tmp"))) File.Delete(Path.Combine(Path.GetTempPath(), "enginePack.tmp"));
                 try
                 {
                     if (mustEncrypt && password != null)
@@ -178,18 +178,18 @@ namespace Halva.Package.Packer
                             new StringBuilder(Path.Combine(destinationPath, "DatabasePackage.halva"));
                         encryptedEnginePackage.DestinationLocation =
                             new StringBuilder(Path.Combine(destinationPath, "EnginePackage.halva"));
-                        Console.WriteLine("Compressing assets...");
+                        Console.WriteLine(Properties.Resources.CompressingAssetsText);
                         encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "audio");
                         encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "img");
                         encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "icon");
                         encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "fonts");
                         encryptedAssetsPackage.CloseArchive();
                         File.Delete(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"));
-                        Console.WriteLine("Compressing database...");
+                        Console.WriteLine(Halva.Package.Packer.Properties.Resources.CompressingDatabaseText);
                         encryptedDatabasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "data");
                         encryptedDatabasePackage.CloseArchive();
                         File.Delete(Path.Combine(Path.GetTempPath(), "dbPack.tmp"));
-                        Console.WriteLine("Compressing engine files...");
+                        Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
                         encryptedEnginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
                         encryptedEnginePackage.AddFileToList(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "index.html");
                         encryptedEnginePackage.AddFileToList(projectLocation, "package.json");
@@ -207,21 +207,21 @@ namespace Halva.Package.Packer
                             new StringBuilder(Path.Combine(destinationPath, "DatabasePackage.halva"));
                         enginePackage.DestinationLocation =
                             new StringBuilder(Path.Combine(destinationPath, "EnginePackage.halva"));
-                        Console.WriteLine("Compressing assets...");
+                        Console.WriteLine(Properties.Resources.CompressingAssetsText);
                         assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "audio");
                         assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "img");
                         assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "icon");
-                        if(Directory.Exists(Path.Combine(gameFolder,"fonts"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "fonts");
-                        if(Directory.Exists(Path.Combine(gameFolder, "css"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "css");
+                        if (Directory.Exists(Path.Combine(gameFolder, "fonts"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "fonts");
+                        if (Directory.Exists(Path.Combine(gameFolder, "css"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "css");
                         if (Directory.Exists(Path.Combine(gameFolder, "effects"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "effects");
                         if (Directory.Exists(Path.Combine(gameFolder, "movies"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "movies");
                         assetsPackage.CloseArchive();
                         File.Delete(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"));
-                        Console.WriteLine("Compressing database...");
+                        Console.WriteLine(Properties.Resources.CompressingDatabaseText);
                         databasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "data");
                         databasePackage.CloseArchive();
                         File.Delete(Path.Combine(Path.GetTempPath(), "dbPack.tmp"));
-                        Console.WriteLine("Compressing engine files...");
+                        Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
                         enginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
                         enginePackage.AddFileToList(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "index.html");
                         enginePackage.AddFileToList(projectLocation, "package.json");
@@ -235,7 +235,7 @@ namespace Halva.Package.Packer
                     Console.WriteLine(e);
                 }
 
-                
+
             }
 
         }

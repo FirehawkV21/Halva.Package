@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+		Microsoft ResX Schema
+
+		Version 1.3
+
+		The primary goals of this format is to allow a simple XML format 
+		that is mostly human readable. The generation and parsing of the 
+		various data types are done through the TypeConverter classes 
+		associated with the data types.
+
+		Example:
+
+		... ado.net/XML headers & schema ...
+		<resheader name="resmimetype">text/microsoft-resx</resheader>
+		<resheader name="version">1.3</resheader>
+		<resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+		<resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+		<data name="Name1">this is my long string</data>
+		<data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+		<data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+			[base64 mime encoded serialized .NET Framework object]
+		</data>
+		<data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+			[base64 mime encoded string representing a byte array form of the .NET Framework object]
+		</data>
+
+		There are any number of "resheader" rows that contain simple 
+		name/value pairs.
+
+		Each data row contains a name, and value. The row also contains a 
+		type or mimetype. Type corresponds to a .NET class that support 
+		text/value conversion through the TypeConverter architecture. 
+		Classes that don't support this are serialized and stored with the 
+		mimetype set.
+
+		The mimetype is used for serialized objects, and tells the 
+		ResXResourceReader how to depersist the object. This is currently not 
+		extensible. For a given mimetype the value must be set accordingly:
+
+		Note - application/x-microsoft.net.object.binary.base64 is the format 
+		that the ResXResourceWriter will generate, however the reader can 
+		read any of the formats listed below.
+
+		mimetype: application/x-microsoft.net.object.binary.base64
+		value   : The object must be serialized with 
+			: System.Serialization.Formatters.Binary.BinaryFormatter
+			: and then encoded with base64 encoding.
+
+		mimetype: application/x-microsoft.net.object.soap.base64
+		value   : The object must be serialized with 
+			: System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+			: and then encoded with base64 encoding.
+
+		mimetype: application/x-microsoft.net.object.bytearray.base64
+		value   : The object must be serialized into a byte array 
+			: using a System.ComponentModel.TypeConverter
+			: and then encoded with base64 encoding.
+	-->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="SplitterText" xml:space="preserve">
+    <value>===========================================</value>
+  </data>
+  <data name="ProgramTitle" xml:space="preserve">
+    <value>= Halva Packer Tool</value>
+  </data>
+  <data name="ProgramVersion" xml:space="preserve">
+    <value>= Version R1.00 ({0})</value>
+  </data>
+  <data name="AuthorSignature" xml:space="preserve">
+    <value>= Developed by Studio ACE</value>
+  </data>
+  <data name="LicenseText" xml:space="preserve">
+    <value>= Licesned under the MIT license.</value>
+  </data>
+  <data name="ProjectFoundText" xml:space="preserve">
+    <value>The project is found.</value>
+  </data>
+  <data name="NoProjectFoundText" xml:space="preserve">
+    <value>No project was found.</value>
+  </data>
+  <data name="PasswordSetText" xml:space="preserve">
+    <value>Password set. The archives will now be encrypted.</value>
+  </data>
+  <data name="NoPassowrdSetText" xml:space="preserve">
+    <value>No password added. The archives will not be encrypted.</value>
+  </data>
+  <data name="OutputSetText" xml:space="preserve">
+    <value>The output is now set.</value>
+  </data>
+  <data name="NoOutputSetText" xml:space="preserve">
+    <value>No output folder set. The archives will be placed to the project's folder.</value>
+  </data>
+  <data name="ProjectLocationQuestion" xml:space="preserve">
+    <value>Where's the location of the project?</value>
+  </data>
+  <data name="LocationDoesNotExistText" xml:space="preserve">
+    <value>The location is not present.</value>
+  </data>
+  <data name="ProjectFileNotPresentText" xml:space="preserve">
+    <value>The file package.json isn't present.</value>
+  </data>
+  <data name="EncryptionQuestion" xml:space="preserve">
+    <value>Do you need to encrypt the archives? (Y/N, default is No)</value>
+  </data>
+  <data name="PasswordQuestion" xml:space="preserve">
+    <value>Please type in the password:</value>
+  </data>
+  <data name="OutputLocationQuestion" xml:space="preserve">
+    <value>Please put the location for the archives (by default it will output the archives to the same location as the game files):</value>
+  </data>
+  <data name="ProjectFilesLocationNotFound" xml:space="preserve">
+    <value>The location of the project's files couldn't be found. Please make sure that the "main" variable in the JSON file is set and points to the correct location.</value>
+  </data>
+  <data name="CompressingAssetsText" xml:space="preserve">
+    <value>Compressing assets...</value>
+  </data>
+  <data name="CompressingDatabaseText" xml:space="preserve">
+    <value>Compressing database...</value>
+  </data>
+  <data name="CompressingEngineFilesText" xml:space="preserve">
+    <value>Compressing engine files...</value>
+  </data>
+</root>

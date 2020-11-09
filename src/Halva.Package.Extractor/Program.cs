@@ -2,42 +2,43 @@
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace Halva.Package.Bootstrapper
 {
     class Program
     {
 
-        static void Main(string[] args)
+        static void Main()
         {
             Process GameProcess = new Process();
             // Edit this part to point over to the game's executable.
-            ProcessStartInfo GameInfo = new ProcessStartInfo(Directory.GetParent(Assembly.GetExecutingAssembly().Location) + "\\Binaries\\Game.exe");
+            ProcessStartInfo GameInfo = new ProcessStartInfo(Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, "Binaries", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Game.exe" : "Game"));
 
-            Console.WriteLine("===========================================");
-            Console.WriteLine("= Halva Bootstrapper");
-            Console.WriteLine("= Version D1.00 ({0})", Assembly.GetExecutingAssembly().GetName().Version);
-            Console.WriteLine("= Developed by Studio ACE");
-            Console.WriteLine("= Licesned under the MIT license.");
-            Console.WriteLine("===========================================");
+            Console.WriteLine(Properties.Resources.SplitterText);
+            Console.WriteLine(Properties.Resources.ProgramTitle);
+            Console.WriteLine(Properties.Resources.ProgramVersion, Assembly.GetExecutingAssembly().GetName().Version);
+            Console.WriteLine(Properties.Resources.AuthorSignature);
+            Console.WriteLine(Properties.Resources.LicenseText);
+            Console.WriteLine(Properties.Resources.SplitterText);
             Console.WriteLine();
 
             GamePackageManager packageManager = new GamePackageManager();
             if (GamePackageManager.IsPackageMetadataPresent()) { 
                  int updatedPackages = 0;
                 if (!packageManager.IsInstalledPackageLatest("assetsVersion")) {
-                    Console.WriteLine("Updating assets...");
+                    Console.WriteLine(Properties.Resources.UpdatingAssetsText);
                     packageManager.ExtractPackage("AssetsPackage.halva", "assetsVersion");
                     updatedPackages += 1;
                         }
                 if (!packageManager.IsInstalledPackageLatest("databaseVersion"))
                 {
-                    Console.WriteLine("Updating database...");
+                    Console.WriteLine(Properties.Resources.UpdatingDatabaseText);
                     packageManager.ExtractPackage("DatabasePackage.halva", "databaseVersion");
                     updatedPackages += 1;
                 }
                 if (!packageManager.IsInstalledPackageLatest("engineVersion")) {
-                    Console.WriteLine("Updating engine...");
+                    Console.WriteLine(Properties.Resources.UpdatingEngineText);
                     packageManager.ExtractPackage("EnginePackage.halva", "engineVersion");
                     updatedPackages += 1;
                 }
@@ -45,7 +46,7 @@ namespace Halva.Package.Bootstrapper
             }
             else
             {
-                Console.WriteLine("Decompressing the game's assets. This will take a while.");
+                Console.WriteLine(Properties.Resources.DecompressingDataText);
                 packageManager.ExtractPackage("AssetsPackage.halva", "assetsVersion");
                 packageManager.ExtractPackage("DatabasePackage.halva", "databaseVersion");
                 packageManager.ExtractPackage("EnginePackage.halva", "engineVersion");
