@@ -23,7 +23,7 @@ namespace Halva.Package.Bootstrapper
             Console.WriteLine();
 
             GamePackageManager packageManager = new GamePackageManager();
-            if (packageManager.IsPackageMetadataPresent()) { 
+            if (GamePackageManager.IsPackageMetadataPresent()) { 
                  int updatedPackages = 0;
                 if (!packageManager.IsInstalledPackageLatest("assetsVersion")) {
                     Console.WriteLine("Updating assets...");
@@ -52,7 +52,7 @@ namespace Halva.Package.Bootstrapper
                 packageManager.SavePackageMetadata();
             }
 
-            GameInfo.Arguments += "--nwapp=\"" + Path.Combine(packageManager.ExctractLocation, "GameData") + "\"";
+            GameInfo.Arguments += "--nwapp=\"" + Path.Combine(GamePackageManager.ExctractLocation, "GameData") + "\"";
             GameProcess.StartInfo = GameInfo;
             GameProcess.Start();
         }        

@@ -11,7 +11,9 @@ namespace Halva.Package.Bootstrapper
     public class GamePackageManager
     {
         private string PackageLocation = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).ToString(), "GamePackages");
-        public string ExctractLocation { get
+        public static string ExctractLocation
+        {
+            get
             {
                 if (IsRunningInCentennial())
                 {
@@ -22,6 +24,7 @@ namespace Halva.Package.Bootstrapper
                 else return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
             }
         }
+        //If you have a password for the archives, place it here or read from a file.
         private string PackagePassword = "";
         private readonly Dictionary<string, int> TargetPackageVersion = new Dictionary<string, int>();
         private Dictionary<string, int> CurrentPackageVersion = new Dictionary<string, int>();
@@ -96,7 +99,7 @@ namespace Halva.Package.Bootstrapper
             return sameVersion;
         }
 
-        public bool IsPackageMetadataPresent()
+        public static bool IsPackageMetadataPresent()
         {
             return File.Exists(Path.Combine(ExctractLocation, "PackageData.json"));
         }
