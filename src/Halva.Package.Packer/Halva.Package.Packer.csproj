@@ -3,8 +3,20 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+	 <AssemblyTitle>Halva Package Packing Tool</AssemblyTitle>
+	  <Company>Studio ACE</Company>
+	  <Product>Halva Package</Product>
+	  <RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
+	  <PackageId>Halva.Package.Packer</PackageId>
+	  <Version>1.0.0-20201109</Version>
+	  <NeutralLanguage>en</NeutralLanguage>
+	  <PublishReadyToRun>true</PublishReadyToRun>
+	  <PublishTrimmed>false</PublishTrimmed>
+	  <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
+	  <TieredCompilation>true</TieredCompilation>
     <AssemblyVersion>1.0.0.20314</AssemblyVersion>
     <FileVersion>1.0.0.20314</FileVersion>
+	<Copyright>2020 © Studio ACE</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
