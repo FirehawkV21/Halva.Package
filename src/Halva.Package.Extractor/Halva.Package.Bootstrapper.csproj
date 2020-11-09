@@ -2,20 +2,29 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net5.0-windows10.0.19041.0</TargetFrameworks>
     <AssemblyVersion>1.0.0.20278</AssemblyVersion>
     <FileVersion>1.0.0.20278</FileVersion>
   </PropertyGroup>
-
+	<PropertyGroup Condition="$(TargetFramework)=='net5.0-windows10.0.19041.0'">
+		<GenerateTestProjection>true</GenerateTestProjection>
+		<CsWinRTWindowsMetadata>sdk</CsWinRTWindowsMetadata>
+	</PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DesktopBridge.Helpers" Version="1.2.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
+	<ItemGroup Condition="$(TargetFramework)=='netcoreapp3.1'">
+		<PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
+	</ItemGroup>
+	<ItemGroup Condition="$(TargetFramework)=='net5.0-windows10.0.19041.0'">
+		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="1.0.1" />
+	</ItemGroup>
+	
 
   <ItemGroup>
     <ProjectReference Include="..\Halva.Package.Core\Halva.Package.Core.csproj" />
