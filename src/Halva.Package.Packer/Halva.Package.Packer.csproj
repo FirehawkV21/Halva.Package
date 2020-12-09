@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFramework>net5.0</TargetFramework>
 	 <AssemblyTitle>Halva Package Packing Tool</AssemblyTitle>
 	  <Company>Studio ACE</Company>
 	  <Product>Halva Package</Product>
@@ -14,13 +14,13 @@
 	  <PublishTrimmed>false</PublishTrimmed>
 	  <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 	  <TieredCompilation>true</TieredCompilation>
-    <AssemblyVersion>1.0.0.20314</AssemblyVersion>
-    <FileVersion>1.0.0.20314</FileVersion>
+    <AssemblyVersion>1.0.0.20323</AssemblyVersion>
+    <FileVersion>1.0.0.20323</FileVersion>
 	<Copyright>2020 © Studio ACE</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.2">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
