@@ -16,12 +16,12 @@ namespace Halva.Package.Packer
             string password = null;
             bool settingsSet = false;
             string stringBuffer;
-            Console.WriteLine(Halva.Package.Packer.Properties.Resources.SplitterText);
-            Console.WriteLine(Halva.Package.Packer.Properties.Resources.ProgramTitle);
-            Console.WriteLine(Halva.Package.Packer.Properties.Resources.ProgramVersion, Assembly.GetExecutingAssembly().GetName().Version);
-            Console.WriteLine(Halva.Package.Packer.Properties.Resources.AuthorSignature);
-            Console.WriteLine(Halva.Package.Packer.Properties.Resources.LicenseText);
-            Console.WriteLine(Halva.Package.Packer.Properties.Resources.SplitterText);
+            Console.WriteLine(Properties.Resources.SplitterText);
+            Console.WriteLine(Properties.Resources.ProgramTitle);
+            Console.WriteLine(Properties.Resources.ProgramVersion, Assembly.GetExecutingAssembly().GetName().Version);
+            Console.WriteLine(Properties.Resources.AuthorSignature);
+            Console.WriteLine(Properties.Resources.LicenseText);
+            Console.WriteLine(Properties.Resources.SplitterText);
             Console.WriteLine();
 
             if (args.Length >= 1)
@@ -38,14 +38,14 @@ namespace Halva.Package.Packer
                                 if (Directory.Exists(projectLocation) && File.Exists(Path.Combine(projectLocation, "package.json")))
                                 {
                                     Console.ForegroundColor = ConsoleColor.DarkGreen;
-                                    Console.WriteLine(Halva.Package.Packer.Properties.Resources.ProjectFoundText);
+                                    Console.WriteLine(Properties.Resources.ProjectFoundText);
                                     Console.ResetColor();
                                     settingsSet = true;
                                 }
                                 else
                                 {
                                     Console.ForegroundColor = ConsoleColor.DarkRed;
-                                    Console.WriteLine(Halva.Package.Packer.Properties.Resources.NoProjectFoundText);
+                                    Console.WriteLine(Properties.Resources.NoProjectFoundText);
                                     Console.ResetColor();
                                 }
                             }
@@ -56,14 +56,14 @@ namespace Halva.Package.Packer
                                 password = args[argnum + 1].Replace("\"", "");
                                 mustEncrypt = true;
                                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                                Console.WriteLine(Halva.Package.Packer.Properties.Resources.PasswordSetText);
+                                Console.WriteLine(Properties.Resources.PasswordSetText);
                                 Console.ResetColor();
 
                             }
                             else
                             {
                                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                                Console.WriteLine(Halva.Package.Packer.Properties.Resources.NoPassowrdSetText);
+                                Console.WriteLine(Properties.Resources.NoPassowrdSetText);
                                 Console.ResetColor();
                             }
                             break;
@@ -74,13 +74,13 @@ namespace Halva.Package.Packer
                                 archiveDestination = stringBuffer.Replace("\"", "");
 
                                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                                Console.WriteLine(Halva.Package.Packer.Properties.Resources.OutputSetText);
+                                Console.WriteLine(Properties.Resources.OutputSetText);
                                 Console.ResetColor();
                             }
                             else
                             {
                                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                                Console.WriteLine(Halva.Package.Packer.Properties.Resources.NoOutputSetText);
+                                Console.WriteLine(Properties.Resources.NoOutputSetText);
                                 Console.ResetColor();
 
                             }
@@ -115,22 +115,11 @@ namespace Halva.Package.Packer
                 {
                     Console.WriteLine(Properties.Resources.EncryptionQuestion);
                     var tempChar = Console.ReadKey();
-                    switch (tempChar.KeyChar)
+                    mustEncrypt = tempChar.KeyChar switch
                     {
-                        case 'Y':
-                        case 'y':
-                        case 'Ν':
-                        case 'ν':
-                            mustEncrypt = true;
-                            break;
-                        case 'N':
-                        case 'n':
-                        case 'Ο':
-                        case 'ο':
-                        default:
-                            mustEncrypt = false;
-                            break;
-                    }
+                        'Y' or 'y' or 'Ν' or 'ν' => true,
+                        _ => false,
+                    };
                     Console.WriteLine();
                     if (mustEncrypt)
                     {
