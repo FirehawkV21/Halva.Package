@@ -14,8 +14,8 @@
 	  <PublishTrimmed>false</PublishTrimmed>
 	  <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 	  <TieredCompilation>true</TieredCompilation>
-    <AssemblyVersion>1.0.0.20344</AssemblyVersion>
-    <FileVersion>1.0.0.20344</FileVersion>
+    <AssemblyVersion>1.0.0.21027</AssemblyVersion>
+    <FileVersion>1.0.0.21027</FileVersion>
 	<Copyright>2020 © Studio ACE</Copyright>
   </PropertyGroup>
 
