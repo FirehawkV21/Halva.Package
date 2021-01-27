@@ -1,4 +1,4 @@
-# Halva Packaging System (under construction)
+# Halva Packaging System
 An easy to use packaging system, based on the Brotli compression.
 
 ## What is this?
