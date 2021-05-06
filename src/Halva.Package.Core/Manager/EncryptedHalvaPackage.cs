@@ -21,6 +21,7 @@ namespace Halva.Package.Core.Manager
         /// <param name="pwsd">The password of the archive (if it's encrypted).</param>
         public EncryptedHalvaPackage(string source, string pwsd)
         {
+            WorkingArchive = ReserveRandomArchive();
             Password = pwsd;
             SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
             DestinationLocation = new StringBuilder(source);
@@ -29,14 +30,9 @@ namespace Halva.Package.Core.Manager
             PullFiles(ArchiveMemoryStream);
         }
 
-        /// <summary>
-        /// Creates an encrypted Halva package with a temporary archive created (specified in the string).
-        /// </summary>
-        /// <param name="archive">The temporary archive location used to temporaily save data.</param>
-        public EncryptedHalvaPackage(string archive)
+        public EncryptedHalvaPackage()
         {
-            WorkingArchive = archive;
-            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
+            WorkingArchive = ReserveRandomArchive();
         }
 
         /// <summary>
@@ -47,11 +43,12 @@ namespace Halva.Package.Core.Manager
         /// <param name="pwsd">The password for the encrypted archive.</param>
         public EncryptedHalvaPackage(string source, string destination, string pwsd)
         {
+            WorkingArchive = ReserveRandomArchive();
             SourceLocation = new StringBuilder(source);
             DestinationLocation = new StringBuilder(destination);
             Password = pwsd;
             List<string> foundFilesList = PullFiles(source);
-            ArchiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Create);
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
             foreach (string file in foundFilesList)
             {
                 AddFileToList(file);

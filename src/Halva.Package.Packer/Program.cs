@@ -146,19 +146,16 @@ namespace Halva.Package.Packer
             {
                 if (!Directory.Exists(archiveDestination) && !string.IsNullOrEmpty(archiveDestination)) Directory.CreateDirectory(archiveDestination);
                 string destinationPath = !string.IsNullOrEmpty(archiveDestination) ? archiveDestination : gameFolder;
-                if (File.Exists(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"))) File.Delete(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"));
-                if (File.Exists(Path.Combine(Path.GetTempPath(), "dbPack.tmp"))) File.Delete(Path.Combine(Path.GetTempPath(), "dbPack.tmp"));
-                if (File.Exists(Path.Combine(Path.GetTempPath(), "enginePack.tmp"))) File.Delete(Path.Combine(Path.GetTempPath(), "enginePack.tmp"));
                 try
                 {
                     if (mustEncrypt && password != null)
                     {
                         var encryptedAssetsPackage =
-                            new EncryptedHalvaPackage(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"));
+                            new EncryptedHalvaPackage();
                         var encryptedDatabasePackage =
-                            new EncryptedHalvaPackage(Path.Combine(Path.GetTempPath(), "dbPack.tmp"));
+                            new EncryptedHalvaPackage();
                         var encryptedEnginePackage =
-                            new EncryptedHalvaPackage(Path.Combine(Path.GetTempPath(), "enginePack.tmp"));
+                            new EncryptedHalvaPackage();
                         encryptedAssetsPackage.Password = password;
                         encryptedDatabasePackage.Password = password;
                         encryptedEnginePackage.Password = password;
@@ -188,9 +185,9 @@ namespace Halva.Package.Packer
                     }
                     else
                     {
-                        var assetsPackage = new HalvaPackage(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"));
-                        var databasePackage = new HalvaPackage(Path.Combine(Path.Combine(Path.GetTempPath(), "dbPack.tmp")));
-                        var enginePackage = new HalvaPackage(Path.Combine(Path.Combine(Path.GetTempPath(), "enginePack.tmp")));
+                        var assetsPackage = new HalvaPackage();
+                        var databasePackage = new HalvaPackage();
+                        var enginePackage = new HalvaPackage();
                         assetsPackage.DestinationLocation =
                             new StringBuilder(Path.Combine(destinationPath, "AssetsPackage.halva"));
                         databasePackage.DestinationLocation =

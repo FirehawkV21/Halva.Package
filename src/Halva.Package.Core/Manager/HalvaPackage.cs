@@ -17,10 +17,10 @@ namespace Halva.Package.Core.Manager
         /// <param name="workingarchive">The temporary archive location used to temporaily save data.</param>
         /// <param name="source">The source folder.</param>
         /// <param name="destination">The location of the archive.</param>
-        public HalvaPackage(string workingarchive, string source, string destination)
+        public HalvaPackage(string source, string destination)
         {
             SourceLocation = new StringBuilder(source);
-            WorkingArchive = workingarchive;
+            WorkingArchive = ReserveRandomArchive();
             DestinationLocation = new StringBuilder(destination);
             List<string> foundFilesList = PullFiles(source);
             ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
@@ -34,9 +34,9 @@ namespace Halva.Package.Core.Manager
         /// Creates a Halva package 
         /// </summary>
         /// <param name="workingarchive">The temporary archive location used to temporaily save data.</param>
-        public HalvaPackage(string workingarchive)
+        public HalvaPackage()
         {
-            WorkingArchive = workingarchive;
+            WorkingArchive = ReserveRandomArchive();
             ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
         }
 
@@ -44,8 +44,9 @@ namespace Halva.Package.Core.Manager
         /// Creates a Halva package in memory. This is used to update an archive or export some files.
         /// </summary>
         /// <param name="source">The source archive.</param>
-        public HalvaPackage(string workingarchive, string source)
+        public HalvaPackage(string source)
         {
+            WorkingArchive = ReserveRandomArchive();
             SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
             DestinationLocation = new StringBuilder(source);
             PackageUtilities.DecompressArchive(DestinationLocation.ToString());

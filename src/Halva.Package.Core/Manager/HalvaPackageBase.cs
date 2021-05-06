@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Halva.Package.Core.Manager
@@ -11,8 +12,10 @@ namespace Halva.Package.Core.Manager
     /// <summary>
     /// This is the base class for the Halva Package. You should use either HalvaPackage or EncryptedHalvaPackage.
     /// </summary>
-    public class HalvaPackageBase
+    public class HalvaPackageBase :IDisposable
     {
+        private bool disposedValue;
+
         protected StringBuilder SourceLocation { get; set; } 
         public StringBuilder DestinationLocation { get; set; }
         public List<string> FileList { get; set; } = new List<string>();
@@ -26,6 +29,19 @@ namespace Halva.Package.Core.Manager
         public static string GetFolderCharacter()
         {
             return (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ? "\\" : "/";
+        }
+
+        public static string ReserveRandomArchive()
+        {
+            string tempString = "TempArchive_";
+            Random _random = new Random();
+            int check;
+            do
+            {
+                check = _random.Next(99999);
+            }
+            while (File.Exists(Path.Combine(Path.GetTempPath(), tempString + check + ".tmp")));
+            return Path.Combine(Path.GetTempPath(), tempString + check + ".tmp");
         }
 
         /// <summary>
@@ -133,6 +149,61 @@ namespace Halva.Package.Core.Manager
             var candidateFile = ArchiveMemoryStream.GetEntry(entry);
             candidateFile.ExtractToFile(exportLocation, true);
 
+        }
+
+        public void UpdateFromArchive(string TargetFolder)
+        {
+            foreach (ZipArchiveEntry entry in ArchiveMemoryStream.Entries)
+            {
+                if (File.Exists(Path.Combine(TargetFolder, entry.FullName)))
+                {
+                    string originalFileHash;
+                    string targetFileHash;
+                    using (var algo = SHA256.Create())
+                    {
+                        var archivedFile = entry.Open();
+                        var targetFile = File.OpenRead(Path.Combine(TargetFolder, entry.FullName));
+                        var originalFileSignature = algo.ComputeHash(archivedFile);
+                        originalFileHash = BitConverter.ToString(originalFileSignature);
+                        originalFileSignature = algo.ComputeHash(targetFile);
+                        targetFileHash = BitConverter.ToString(originalFileSignature);
+                        archivedFile.Dispose();
+                        targetFile.Close();                        
+                    }
+                    if (originalFileHash != targetFileHash) 
+                    {
+                        ExtractFile(entry.FullName, Path.Combine(TargetFolder, entry.FullName.Replace(entry.Name, "")));
+                    }
+                }
+                else
+                {
+                    ExtractFile(entry.FullName, Path.Combine(TargetFolder, entry.FullName.Replace(entry.Name, "")));
+                }
+            }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    DestinationLocation.Clear();
+                    SourceLocation.Clear();
+                    FileList.Clear();
+                    FileList = null;
+                    ArchiveMemoryStream.Dispose();
+                    if (File.Exists(WorkingArchive)) File.Delete(WorkingArchive);
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }

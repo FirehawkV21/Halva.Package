@@ -68,5 +68,12 @@ namespace Halva.Package.Core.Tests
             package.Save();
         }
 
+        [Fact]
+        public void CanLibraryCheckForDifferencesInEncryptedArchives()
+        {
+            EncryptedHalvaPackage package = new EncryptedHalvaPackage(destinationArchive, testPassword);
+            package.UpdateFromArchive(destinationFolder);
+        }
+
     }
 }
