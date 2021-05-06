@@ -28,18 +28,18 @@ namespace Halva.Package.Bootstrapper
                  int updatedPackages = 0;
                 if (!packageManager.IsInstalledPackageLatest("assetsVersion")) {
                     Console.WriteLine(Properties.Resources.UpdatingAssetsText);
-                    packageManager.ExtractPackage("AssetsPackage.halva", "assetsVersion");
+                    packageManager.UpdateDataFromArchive("AssetsPackage.halva", "assetsVersion");
                     updatedPackages += 1;
                         }
                 if (!packageManager.IsInstalledPackageLatest("databaseVersion"))
                 {
                     Console.WriteLine(Properties.Resources.UpdatingDatabaseText);
-                    packageManager.ExtractPackage("DatabasePackage.halva", "databaseVersion");
+                    packageManager.UpdateDataFromArchive("DatabasePackage.halva", "databaseVersion");
                     updatedPackages += 1;
                 }
                 if (!packageManager.IsInstalledPackageLatest("engineVersion")) {
                     Console.WriteLine(Properties.Resources.UpdatingEngineText);
-                    packageManager.ExtractPackage("EnginePackage.halva", "engineVersion");
+                    packageManager.UpdateDataFromArchive("EnginePackage.halva", "engineVersion");
                     updatedPackages += 1;
                 }
                 if (updatedPackages > 0) packageManager.SavePackageMetadata();

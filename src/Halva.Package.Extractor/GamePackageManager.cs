@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using WinSystem = Windows;
 using Halva.Package.Core.Utilities;
+using Halva.Package.Core.Manager;
 
 namespace Halva.Package.Bootstrapper
 {
@@ -76,6 +77,25 @@ namespace Halva.Package.Bootstrapper
         public void ExtractPackage(string PackageName, string PackageVersionKey)
         {
             ExtractPackage(PackageName);
+            int packageVersion;
+            if (CurrentPackageVersion.TryGetValue(PackageVersionKey, out _))
+            {
+                CurrentPackageVersion.Remove(PackageVersionKey);
+                TargetPackageVersion.TryGetValue(PackageVersionKey, out packageVersion);
+                CurrentPackageVersion.Add(PackageVersionKey, packageVersion);
+            }
+            else
+            {
+                TargetPackageVersion.TryGetValue(PackageVersionKey, out packageVersion);
+                CurrentPackageVersion.Add(PackageVersionKey, packageVersion);
+            }
+        }
+
+        public void UpdateDataFromArchive(string PackageName, string PackageVersionKey)
+        {
+            EncryptedHalvaPackage package = new EncryptedHalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword);
+            package.UpdateFromArchive(Path.Combine(ExctractLocation, "GameData"));
+            package.Dispose();
             int packageVersion;
             if (CurrentPackageVersion.TryGetValue(PackageVersionKey, out _))
             {
