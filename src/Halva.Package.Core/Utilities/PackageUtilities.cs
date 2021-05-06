@@ -65,5 +65,15 @@ namespace Halva.Package.Core.Utilities
                 decompressorStream.CopyTo(outputStream);
             }
         }
+
+        public static void DecompressArchive(string inputArchive, string workerArchive)
+        {
+            using (FileStream inputStream = File.OpenRead(inputArchive))
+            using (FileStream outputStream = File.Create(workerArchive))
+            using (BrotliStream decompressorStream = new BrotliStream(inputStream, CompressionMode.Decompress))
+            {
+                decompressorStream.CopyTo(outputStream);
+            }
+        }
     }
 }

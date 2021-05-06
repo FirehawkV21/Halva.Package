@@ -80,5 +80,13 @@ namespace Halva.Package.Core.Tests
             package.Dispose();
         }
 
+        [Fact]
+        public void CanLibraryUpdateArhive()
+        {
+            HalvaPackage package = new HalvaPackage(destinationArchive);
+            package.UpdateArchive(sourceFolder);
+            package.Dispose();
+        }
+
     }
 }

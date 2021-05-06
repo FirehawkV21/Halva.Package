@@ -14,7 +14,6 @@ namespace Halva.Package.Core.Manager
         /// <summary>
         /// Creates a Halva package using the source folder as the input. It will automatically put the files in the input folder to a temporary archive.
         /// </summary>
-        /// <param name="workingarchive">The temporary archive location used to temporaily save data.</param>
         /// <param name="source">The source folder.</param>
         /// <param name="destination">The location of the archive.</param>
         public HalvaPackage(string source, string destination)
@@ -31,9 +30,8 @@ namespace Halva.Package.Core.Manager
         }
 
         /// <summary>
-        /// Creates a Halva package 
+        /// Creates an empty Halva package 
         /// </summary>
-        /// <param name="workingarchive">The temporary archive location used to temporaily save data.</param>
         public HalvaPackage()
         {
             WorkingArchive = ReserveRandomArchive();
@@ -49,9 +47,9 @@ namespace Halva.Package.Core.Manager
             WorkingArchive = ReserveRandomArchive();
             SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
             DestinationLocation = new StringBuilder(source);
-            PackageUtilities.DecompressArchive(DestinationLocation.ToString());
+            PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive);
             ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
-            PullFiles(ArchiveMemoryStream);
+            FileList = PullFiles(ArchiveMemoryStream);
         }
 
         /// <summary>

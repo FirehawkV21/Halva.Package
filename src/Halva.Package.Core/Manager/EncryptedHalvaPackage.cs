@@ -25,11 +25,14 @@ namespace Halva.Package.Core.Manager
             Password = pwsd;
             SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
             DestinationLocation = new StringBuilder(source);
-            EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), Password);
+            EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), Password, WorkingArchive);
             ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
             PullFiles(ArchiveMemoryStream);
         }
-
+        
+        /// <summary>
+        /// Creates an empty Encrypted Halva Package.
+        /// </summary>
         public EncryptedHalvaPackage()
         {
             WorkingArchive = ReserveRandomArchive();

@@ -77,6 +77,33 @@ namespace Halva.Package.Core.Utilities
             encryptionKit.Dispose();
         }
 
+        public static void DecompressArchive(in string inputArchive, in string password, in string workerArchive)
+        {
+            AesManaged encryptionKit = new AesManaged
+            {
+                KeySize = 256,
+                Padding = PaddingMode.PKCS7
+            };
+            byte[] hashCode;
+            using (HashAlgorithm hash = new SHA512Managed())
+            {
+                hashCode = hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+            }
+
+            var key = new Rfc2898DeriveBytes(password, hashCode, 50000, HashAlgorithmName.SHA512);
+            encryptionKit.Key = key.GetBytes(encryptionKit.KeySize / 8);
+            encryptionKit.IV = key.GetBytes(encryptionKit.BlockSize / 8);
+            key.Dispose();
+            using (FileStream inputStream = File.OpenRead(inputArchive))
+            using (FileStream outputStream = File.Create(workerArchive))
+            using (CryptoStream cryptStream = new CryptoStream(inputStream, encryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+            using (BrotliStream decompressorStream = new BrotliStream(cryptStream, CompressionMode.Decompress))
+            {
+                decompressorStream.CopyTo(outputStream);
+            }
+            encryptionKit.Dispose();
+        }
+
         /// <summary>
         /// Creates a Halva package from a folder.
         /// </summary>

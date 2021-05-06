@@ -12,7 +12,7 @@ namespace Halva.Package.Core.Manager
     /// <summary>
     /// This is the base class for the Halva Package. You should use either HalvaPackage or EncryptedHalvaPackage.
     /// </summary>
-    public class HalvaPackageBase :IDisposable
+    public class HalvaPackageBase : IDisposable
     {
         private bool disposedValue;
 
@@ -151,6 +151,10 @@ namespace Halva.Package.Core.Manager
 
         }
 
+        /// <summary>
+        /// Exports the files that are different between the archive and the target folder.
+        /// </summary>
+        /// <param name="TargetFolder">The folder where the files to update are.</param>
         public void UpdateFromArchive(string TargetFolder)
         {
             foreach (ZipArchiveEntry entry in ArchiveMemoryStream.Entries)
@@ -178,6 +182,47 @@ namespace Halva.Package.Core.Manager
                 else
                 {
                     ExtractFile(entry.FullName, Path.Combine(TargetFolder, entry.FullName.Replace(entry.Name, "")));
+                }
+            }
+        }
+
+
+
+        /// <summary>
+        /// Updates the files in the archive with the files found in specified folder.
+        /// </summary>
+        /// <param name="SourceFolder">The folder specified.</param>
+        public void UpdateArchive (string SourceFolder)
+        {
+            List<String> SourceFiles = new List<String>();
+            SourceFiles = PullFiles(SourceFolder);
+            foreach (string file in SourceFiles)
+            {
+                var entry = ArchiveMemoryStream.GetEntry(file.Replace(SourceFolder + GetFolderCharacter(), ""));
+                if (entry != null)
+                {
+                    string originalFileHash;
+                    string targetFileHash;
+                    using (var algo = SHA256.Create())
+                    {
+                        var archivedFile = entry.Open();
+                        var targetFile = File.OpenRead(file);
+                        var originalFileSignature = algo.ComputeHash(archivedFile);
+                        originalFileHash = BitConverter.ToString(originalFileSignature);
+                        originalFileSignature = algo.ComputeHash(targetFile);
+                        targetFileHash = BitConverter.ToString(originalFileSignature);
+                        archivedFile.Dispose();
+                        targetFile.Close();
+                    }
+                    if (originalFileHash != targetFileHash)
+                    {
+                        RemoveFileFromList(entry.FullName);
+                        AddFileToList(SourceFolder, file.Replace(SourceFolder + GetFolderCharacter(), ""));
+                    }
+                }
+                else
+                {
+                    AddFileToList(SourceFolder, file.Replace(SourceFolder + GetFolderCharacter(), ""));
                 }
             }
         }
