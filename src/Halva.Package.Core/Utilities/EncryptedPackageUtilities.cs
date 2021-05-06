@@ -3,7 +3,7 @@ using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Halva.Package.Core
+namespace Halva.Package.Core.Utilities
 {
     /// <summary>
     /// A set of utilities for simple workloads (when working with encrypted archives).

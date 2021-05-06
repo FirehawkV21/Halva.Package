@@ -1,10 +1,10 @@
-﻿using Halva.Package.Core;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using WinSystem = Windows;
+using Halva.Package.Core.Utilities;
 
 namespace Halva.Package.Bootstrapper
 {

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Halva.Package.Core
+namespace Halva.Package.Core.Manager
 {
     /// <summary>
     /// This is the base class for the Halva Package. You should use either HalvaPackage or EncryptedHalvaPackage.

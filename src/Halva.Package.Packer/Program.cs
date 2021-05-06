@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using Halva.Package.Core.Manager;
 
 namespace Halva.Package.Packer
 {

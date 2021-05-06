@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.IO.Compression;
 
-namespace Halva.Package.Core
+namespace Halva.Package.Core.Utilities
 {
     /// <summary>
     /// A set of utilities for simple workloads.

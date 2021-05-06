@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Linq;
 using Xunit;
+using Halva.Package.Core.Utilities;
+using Halva.Package.Core.Manager;
 
 namespace Halva.Package.Core.Tests
 

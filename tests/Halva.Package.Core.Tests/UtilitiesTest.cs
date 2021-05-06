@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Xunit;
 using Xunit.Abstractions;
+using Halva.Package.Core.Utilities;
 
 namespace Halva.Package.Core.Tests
 {

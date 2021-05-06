@@ -2,8 +2,9 @@
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using Halva.Package.Core.Utilities;
 
-namespace Halva.Package.Core
+namespace Halva.Package.Core.Manager
 {
     /// <summary>
     /// This is the class that handles the encrypted Halva packages.
