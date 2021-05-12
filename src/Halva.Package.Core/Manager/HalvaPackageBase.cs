@@ -147,6 +147,7 @@ namespace Halva.Package.Core.Manager
         public void ExtractFile(string entry, string exportLocation)
         {
             var candidateFile = ArchiveMemoryStream.GetEntry(entry);
+            
             candidateFile.ExtractToFile(exportLocation, true);
 
         }
@@ -176,12 +177,12 @@ namespace Halva.Package.Core.Manager
                     }
                     if (originalFileHash != targetFileHash) 
                     {
-                        ExtractFile(entry.FullName, Path.Combine(TargetFolder, entry.FullName.Replace(entry.Name, "")));
+                        ExtractFile(entry.FullName, Path.Combine(TargetFolder, entry.FullName));
                     }
                 }
                 else
                 {
-                    ExtractFile(entry.FullName, Path.Combine(TargetFolder, entry.FullName.Replace(entry.Name, "")));
+                    ExtractFile(entry.FullName, Path.Combine(TargetFolder, entry.FullName));
                 }
             }
         }
