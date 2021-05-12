@@ -8,15 +8,17 @@
 		<Product>Halva Package</Product>
 		<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 		<PackageId>Halva.Package.Packer</PackageId>
-		<Version>1.0.1-20210506</Version>
+		<Version>1.0.1-20210512</Version>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishTrimmed>false</PublishTrimmed>
 		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 		<TieredCompilation>true</TieredCompilation>
-		<AssemblyVersion>1.0.1.21126</AssemblyVersion>
-		<FileVersion>1.0.1.21126</FileVersion>
+		<AssemblyVersion>1.0.1.21132</AssemblyVersion>
+		<FileVersion>1.0.1.21132</FileVersion>
 	<Copyright>2021 © Studio ACE</Copyright>
+	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
+	<PackageReleaseNotes>- Support for Halva.Package.Core 1.1.0.</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>

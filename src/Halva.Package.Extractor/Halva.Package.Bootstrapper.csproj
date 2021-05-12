@@ -8,14 +8,15 @@
 	  <Product>Halva Package</Product>
 	  <RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 	  <PackageId>Halva.Package.Bootstrapper</PackageId>
-	  <Version>1.0.0-20201109</Version>
-    <AssemblyVersion>1.0.0.21126</AssemblyVersion>
-    <FileVersion>1.0.0.21126</FileVersion>
+	  <Version>1.0.0-20210512</Version>
+    <AssemblyVersion>1.0.0.21132</AssemblyVersion>
+    <FileVersion>1.0.0.21132</FileVersion>
 	  <NeutralLanguage>en</NeutralLanguage>
 	  <PublishReadyToRun>true</PublishReadyToRun>
 	  <PublishTrimmed>false</PublishTrimmed>
 	  <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 	  <TieredCompilation>true</TieredCompilation>
+	  <PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
   </PropertyGroup>
 	<PropertyGroup Condition="$(TargetFramework)=='net5.0-windows10.0.19041.0'">
 		<GenerateTestProjection>true</GenerateTestProjection>
