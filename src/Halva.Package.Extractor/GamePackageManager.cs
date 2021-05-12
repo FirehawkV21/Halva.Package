@@ -93,9 +93,18 @@ namespace Halva.Package.Bootstrapper
 
         public void UpdateDataFromArchive(string PackageName, string PackageVersionKey)
         {
-            EncryptedHalvaPackage package = new EncryptedHalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword);
-            package.UpdateFromArchive(Path.Combine(ExctractLocation, "GameData"));
-            package.Dispose();
+            if (PackagePassword != "")
+            {
+                var package = new EncryptedHalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword);
+                package.UpdateFromArchive(Path.Combine(ExctractLocation, "GameData"));
+                package.Dispose();
+            }
+            else
+            {
+                var package = new HalvaPackage(Path.Combine(PackageLocation, PackageName));
+                package.UpdateFromArchive(Path.Combine(ExctractLocation, "GameData"));
+                package.Dispose();
+            }
             int packageVersion;
             if (CurrentPackageVersion.TryGetValue(PackageVersionKey, out _))
             {
