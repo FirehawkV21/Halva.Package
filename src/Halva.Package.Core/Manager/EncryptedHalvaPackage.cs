@@ -36,6 +36,7 @@ namespace Halva.Package.Core.Manager
         public EncryptedHalvaPackage()
         {
             WorkingArchive = ReserveRandomArchive();
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
         }
 
         /// <summary>
