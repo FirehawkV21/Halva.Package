@@ -79,6 +79,15 @@ namespace Halva.Package.Packer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compressing audio files....
+        /// </summary>
+        internal static string CompressingAudioFilesText {
+            get {
+                return ResourceManager.GetString("CompressingAudioFilesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Compressing database....
         /// </summary>
         internal static string CompressingDatabaseText {

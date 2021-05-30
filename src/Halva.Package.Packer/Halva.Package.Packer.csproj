@@ -2,30 +2,29 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+		<TargetFramework>net5.0</TargetFramework>
 	 <AssemblyTitle>Halva Package Packing Tool</AssemblyTitle>
 		<Company>Studio ACE</Company>
 		<Product>Halva Package</Product>
 		<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 		<PackageId>Halva.Package.Packer</PackageId>
-		<Version>1.0.2-20210513</Version>
+		<Version>1.0.3-20210528</Version>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishTrimmed>false</PublishTrimmed>
 		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 		<TieredCompilation>true</TieredCompilation>
-		<AssemblyVersion>1.0.2.21133</AssemblyVersion>
-		<FileVersion>1.0.2.21133</FileVersion>
+		<AssemblyVersion>1.0.3.21148</AssemblyVersion>
+		<FileVersion>1.0.3.21148</FileVersion>
 	<Copyright>2021 © Studio ACE</Copyright>
 	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
 	<PackageReleaseNotes>- Support for Halva.Package.Core 1.1.0.</PackageReleaseNotes>
 	</PropertyGroup>
+	<PropertyGroup Condition="$(TargetFramework)=='net6.0'">
+		<PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
 

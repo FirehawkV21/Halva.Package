@@ -152,68 +152,83 @@ namespace Halva.Package.Packer
                     {
                         var encryptedAssetsPackage =
                             new EncryptedHalvaPackage();
+                        var encryptedAudioAssetsPackage = new EncryptedHalvaPackage();
                         var encryptedDatabasePackage =
                             new EncryptedHalvaPackage();
                         var encryptedEnginePackage =
                             new EncryptedHalvaPackage();
                         encryptedAssetsPackage.Password = password;
+                        encryptedAudioAssetsPackage.Password = password;
                         encryptedDatabasePackage.Password = password;
                         encryptedEnginePackage.Password = password;
                         encryptedAssetsPackage.DestinationLocation =
                             new StringBuilder(Path.Combine(destinationPath, "AssetsPackage.halva"));
+                        encryptedAudioAssetsPackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "AudioPackage.halva"));
                         encryptedDatabasePackage.DestinationLocation =
                             new StringBuilder(Path.Combine(destinationPath, "DatabasePackage.halva"));
                         encryptedEnginePackage.DestinationLocation =
                             new StringBuilder(Path.Combine(destinationPath, "EnginePackage.halva"));
                         Console.WriteLine(Properties.Resources.CompressingAssetsText);
-                        encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "audio");
                         encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "img");
-                        encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "icon");
-                        encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "fonts");
+                        if (Directory.Exists(Path.Combine(gameFolder, "fonts"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "fonts");
+                        if (Directory.Exists(Path.Combine(gameFolder, "css"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "css");
+                        if (Directory.Exists(Path.Combine(gameFolder, "effects"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "effects");
+                        if (Directory.Exists(Path.Combine(gameFolder, "movies"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "movies");
+                        if (Directory.Exists(projectLocation + Path.Combine(gameFolder, "icon"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "icon");
                         encryptedAssetsPackage.CloseArchive();
-                        File.Delete(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"));
-                        Console.WriteLine(Halva.Package.Packer.Properties.Resources.CompressingDatabaseText);
+                        encryptedAssetsPackage.Dispose();
+                        Console.WriteLine(Properties.Resources.CompressingAudioFilesText);
+                        encryptedAudioAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "audio");
+                        encryptedAudioAssetsPackage.CloseArchive();
+                        encryptedAudioAssetsPackage.Dispose();
+                        Console.WriteLine(Properties.Resources.CompressingDatabaseText);
                         encryptedDatabasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "data");
                         encryptedDatabasePackage.CloseArchive();
-                        File.Delete(Path.Combine(Path.GetTempPath(), "dbPack.tmp"));
+                        encryptedDatabasePackage.Dispose();
                         Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
                         encryptedEnginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
                         encryptedEnginePackage.AddFileToList(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "index.html");
                         encryptedEnginePackage.AddFileToList(projectLocation, "package.json");
                         encryptedEnginePackage.CloseArchive();
-                        File.Delete(Path.Combine(Path.GetTempPath(), "enginePack.tmp"));
+                        encryptedEnginePackage.Dispose();
                     }
                     else
                     {
                         var assetsPackage = new HalvaPackage();
                         var databasePackage = new HalvaPackage();
                         var enginePackage = new HalvaPackage();
+                        var audioAssetsPackage = new HalvaPackage();
                         assetsPackage.DestinationLocation =
                             new StringBuilder(Path.Combine(destinationPath, "AssetsPackage.halva"));
+                        audioAssetsPackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "audioPackage.halva"));
                         databasePackage.DestinationLocation =
                             new StringBuilder(Path.Combine(destinationPath, "DatabasePackage.halva"));
                         enginePackage.DestinationLocation =
                             new StringBuilder(Path.Combine(destinationPath, "EnginePackage.halva"));
                         Console.WriteLine(Properties.Resources.CompressingAssetsText);
-                        assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "audio");
                         assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "img");
                         assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "icon");
                         if (Directory.Exists(Path.Combine(gameFolder, "fonts"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "fonts");
                         if (Directory.Exists(Path.Combine(gameFolder, "css"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "css");
                         if (Directory.Exists(Path.Combine(gameFolder, "effects"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "effects");
                         if (Directory.Exists(Path.Combine(gameFolder, "movies"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "movies");
+                        if (Directory.Exists(projectLocation + Path.Combine(gameFolder, "icon"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "icon");
                         assetsPackage.CloseArchive();
-                        File.Delete(Path.Combine(Path.GetTempPath(), "assetsPack.tmp"));
+                        assetsPackage.Dispose();
+                        Console.WriteLine(Properties.Resources.CompressingAudioFilesText);
+                        audioAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "audio");
+                        audioAssetsPackage.CloseArchive();
+                        audioAssetsPackage.Dispose();
                         Console.WriteLine(Properties.Resources.CompressingDatabaseText);
                         databasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "data");
                         databasePackage.CloseArchive();
-                        File.Delete(Path.Combine(Path.GetTempPath(), "dbPack.tmp"));
+                        databasePackage.Dispose();
                         Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
                         enginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
                         enginePackage.AddFileToList(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "index.html");
                         enginePackage.AddFileToList(projectLocation, "package.json");
                         enginePackage.CloseArchive();
-                        File.Delete(Path.Combine(Path.GetTempPath(), "enginePack.tmp"));
+                        enginePackage.Dispose();
                     }
                 }
                 catch (Exception e)

@@ -31,6 +31,12 @@ namespace Halva.Package.Bootstrapper
                     packageManager.UpdateDataFromArchive("AssetsPackage.halva", "assetsVersion");
                     updatedPackages += 1;
                         }
+                if (!packageManager.IsInstalledPackageLatest("audioVersion"))
+                {
+                    Console.WriteLine(Properties.Resources.UpdatingAssetsText);
+                    packageManager.UpdateDataFromArchive("AudioPackage.halva", "audioVersion");
+                    updatedPackages += 1;
+                }
                 if (!packageManager.IsInstalledPackageLatest("databaseVersion"))
                 {
                     Console.WriteLine(Properties.Resources.UpdatingDatabaseText);
@@ -48,6 +54,7 @@ namespace Halva.Package.Bootstrapper
             {
                 Console.WriteLine(Properties.Resources.DecompressingDataText);
                 packageManager.ExtractPackage("AssetsPackage.halva", "assetsVersion");
+                packageManager.ExtractPackage("AudioPackage.halva", "audioVersion");
                 packageManager.ExtractPackage("DatabasePackage.halva", "databaseVersion");
                 packageManager.ExtractPackage("EnginePackage.halva", "engineVersion");
                 packageManager.SavePackageMetadata();

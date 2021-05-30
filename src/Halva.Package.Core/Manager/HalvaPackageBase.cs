@@ -234,8 +234,8 @@ namespace Halva.Package.Core.Manager
             {
                 if (disposing)
                 {
-                    DestinationLocation.Clear();
-                    SourceLocation.Clear();
+                    if (DestinationLocation != null) DestinationLocation.Clear();
+                    if (SourceLocation != null) SourceLocation.Clear();
                     FileList.Clear();
                     FileList = null;
                     ArchiveMemoryStream.Dispose();

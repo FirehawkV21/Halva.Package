@@ -160,4 +160,7 @@
   <data name="CompressingEngineFilesText" xml:space="preserve">
     <value>Compressing engine files...</value>
   </data>
+  <data name="CompressingAudioFilesText" xml:space="preserve">
+    <value>Compressing audio files...</value>
+  </data>
 </root>

@@ -1,37 +1,54 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net5.0-windows10.0.19041.0;net6.0-windows10.0.19041.0</TargetFrameworks>
-    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
-	  <AssemblyTitle>Halva Package Bootstrapper</AssemblyTitle>
-	  <Company>Studio ACE</Company>
-	  <Product>Halva Package</Product>
-	  <RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
-	  <PackageId>Halva.Package.Bootstrapper</PackageId>
-	  <Version>1.0.0-20210512</Version>
-    <AssemblyVersion>1.0.0.21133</AssemblyVersion>
-    <FileVersion>1.0.0.21133</FileVersion>
-	  <NeutralLanguage>en</NeutralLanguage>
-	  <PublishReadyToRun>true</PublishReadyToRun>
-	  <PublishTrimmed>false</PublishTrimmed>
-	  <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
-	  <TieredCompilation>true</TieredCompilation>
-	  <PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
-  </PropertyGroup>
-	<PropertyGroup Condition="$(TargetFramework)=='net5.0-windows10.0.19041.0'">
-		<GenerateTestProjection>true</GenerateTestProjection>
-		<CsWinRTWindowsMetadata>sdk</CsWinRTWindowsMetadata>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFrameworks>netcoreapp3.1;net5.0-windows10.0.19041.0</TargetFrameworks>
+		<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+		<AssemblyTitle>Halva Package Bootstrapper</AssemblyTitle>
+		<Company>Studio ACE</Company>
+		<Product>Halva Package</Product>
+		<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
+		<PackageId>Halva.Package.Bootstrapper</PackageId>
+		<Version>1.0.0-20210512</Version>
+		<AssemblyVersion>1.0.0.21133</AssemblyVersion>
+		<FileVersion>1.0.0.21133</FileVersion>
+		<NeutralLanguage>en</NeutralLanguage>
+		<PublishReadyToRun>true</PublishReadyToRun>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
+		<TieredCompilation>true</TieredCompilation>
+		<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="DesktopBridge.Helpers" Version="1.2.2" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="1.2.6" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
+	<PropertyGroup Condition="$(TargetFramework)!='netcoreapp3.1'">
+		<GenerateTestProjection>true</GenerateTestProjection>
+	</PropertyGroup>
+			<PropertyGroup Condition="$(TargetFramework)=='net6.0'">
+		<PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+	</PropertyGroup>
+			<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
+			  <FileAlignment>4096</FileAlignment>
+			</PropertyGroup>
+			<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp3.1|AnyCPU'">
+			  <FileAlignment>4096</FileAlignment>
+			</PropertyGroup>
+			<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net5.0-windows10.0.19041.0|AnyCPU'">
+			  <FileAlignment>4096</FileAlignment>
+			</PropertyGroup>
+			<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net5.0-windows10.0.19041.0|AnyCPU'">
+			  <FileAlignment>4096</FileAlignment>
+			</PropertyGroup>
+			<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows10.0.19041.0|AnyCPU'">
+			  <FileAlignment>4096</FileAlignment>
+			</PropertyGroup>
+			<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0-windows10.0.19041.0|AnyCPU'">
+			  <FileAlignment>4096</FileAlignment>
+			</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="DesktopBridge.Helpers" Version="1.2.2" />
+		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="1.2.6" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
 	<ItemGroup Condition="$(TargetFramework)=='netcoreapp3.1'">
 		<PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
 	</ItemGroup>
@@ -40,25 +57,25 @@
 	</ItemGroup>
 	
 
-  <ItemGroup>
-    <ProjectReference Include="..\Halva.Package.Core\Halva.Package.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Halva.Package.Core\Halva.Package.Core.csproj" />
+	</ItemGroup>
 	
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 	
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 
 </Project>

@@ -37,12 +37,14 @@ namespace Halva.Package.Bootstrapper
         {
             // Edit these to show the correct package version (or offload it to a JSON file).
             TargetPackageVersion.Add("assetsVersion", 20201003);
+            TargetPackageVersion.Add("audioVersion", 20201003);
             TargetPackageVersion.Add("databaseVersion", 20201003);
             TargetPackageVersion.Add("engineVersion", 202001003);
             if (!Directory.Exists(Path.Combine(ExctractLocation, "GameData"))) Directory.CreateDirectory(Path.Combine(ExctractLocation, "GameData"));
             if (File.Exists(Path.Combine(ExctractLocation, "PackageData.json")))
             {
                 int assetsVersion;
+                int audioVersion;
                 int databaseVersion;
                 int engineVersion;
                 char[] JsonIn;
@@ -54,6 +56,7 @@ namespace Halva.Package.Bootstrapper
                 string JsonString = new string(JsonIn);
                 var packageMetadata = JObject.Parse(JsonString);
                 assetsVersion = (int)packageMetadata["packages"]["assets"];
+                audioVersion = (int)packageMetadata["packages"]["audio"];
                 databaseVersion = (int)packageMetadata["packages"]["database"];
                 engineVersion = (int)packageMetadata["packages"]["engine"];
                 CurrentPackageVersion.Add("assetsVersion", assetsVersion);
@@ -136,14 +139,16 @@ namespace Halva.Package.Bootstrapper
         public void SavePackageMetadata()
         {
             CurrentPackageVersion.TryGetValue("assetsVersion", out int assetsVersion);
+            CurrentPackageVersion.TryGetValue("audioVersion", out int audioVersion);
             CurrentPackageVersion.TryGetValue("databaseVersion", out int databaseVersion);
             CurrentPackageVersion.TryGetValue("engineVersion", out int engineVersion);
             JObject gameMetadata = new JObject(
                 new JProperty("packages",
                     new JObject(
                         new JProperty("assets", assetsVersion),
+                        new JProperty("audio", audioVersion),
                         new JProperty("database", databaseVersion),
-                        new JProperty("engine", engineVersion))));
+                        new JProperty("engine", engineVersion)))); ;
             using StreamWriter packageDataFile = new StreamWriter(Path.Combine(ExctractLocation, "PackageData.json"));
             packageDataFile.Write(gameMetadata);
         }
