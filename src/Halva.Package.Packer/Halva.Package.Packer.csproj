@@ -14,8 +14,8 @@
 		<PublishTrimmed>false</PublishTrimmed>
 		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 		<TieredCompilation>true</TieredCompilation>
-		<AssemblyVersion>1.0.3.21148</AssemblyVersion>
-		<FileVersion>1.0.3.21148</FileVersion>
+		<AssemblyVersion>1.0.3.21150</AssemblyVersion>
+		<FileVersion>1.0.3.21150</FileVersion>
 	<Copyright>2021 © Studio ACE</Copyright>
 	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
 	<PackageReleaseNotes>- Support for Halva.Package.Core 1.1.0.</PackageReleaseNotes>

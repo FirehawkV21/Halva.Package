@@ -174,7 +174,7 @@ namespace Halva.Package.Packer
                         if (Directory.Exists(Path.Combine(gameFolder, "css"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "css");
                         if (Directory.Exists(Path.Combine(gameFolder, "effects"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "effects");
                         if (Directory.Exists(Path.Combine(gameFolder, "movies"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "movies");
-                        if (Directory.Exists(projectLocation + Path.Combine(gameFolder, "icon"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "icon");
+                        if (Directory.Exists(Path.Combine(gameFolder, "icon"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "icon");
                         encryptedAssetsPackage.CloseArchive();
                         encryptedAssetsPackage.Dispose();
                         Console.WriteLine(Properties.Resources.CompressingAudioFilesText);
