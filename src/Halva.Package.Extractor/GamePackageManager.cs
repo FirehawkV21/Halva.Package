@@ -56,7 +56,9 @@ namespace Halva.Package.Bootstrapper
                 string JsonString = new string(JsonIn);
                 var packageMetadata = JObject.Parse(JsonString);
                 assetsVersion = (int)packageMetadata["packages"]["assets"];
-                audioVersion = (int)packageMetadata["packages"]["audio"];
+                if (packageMetadata["packages"]["audio"] != null)
+                    audioVersion = (int)packageMetadata["packages"]["audio"];
+                else audioVersion = 0;
                 databaseVersion = (int)packageMetadata["packages"]["database"];
                 engineVersion = (int)packageMetadata["packages"]["engine"];
                 CurrentPackageVersion.Add("assetsVersion", assetsVersion);
@@ -148,7 +150,7 @@ namespace Halva.Package.Bootstrapper
                         new JProperty("assets", assetsVersion),
                         new JProperty("audio", audioVersion),
                         new JProperty("database", databaseVersion),
-                        new JProperty("engine", engineVersion)))); ;
+                        new JProperty("engine", engineVersion))));
             using StreamWriter packageDataFile = new StreamWriter(Path.Combine(ExctractLocation, "PackageData.json"));
             packageDataFile.Write(gameMetadata);
         }
