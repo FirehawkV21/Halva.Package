@@ -11,7 +11,7 @@ namespace Halva.Package.Packer
         {
             string JsonString;
             char[] JsonIn;
-            using (StreamReader settingsLoader = new StreamReader(fileLocation))
+            using (StreamReader settingsLoader = new(fileLocation))
             {
                 JsonIn = new Char[(int)settingsLoader.BaseStream.Length];
                 settingsLoader.Read(JsonIn, 0, (int)settingsLoader.BaseStream.Length);
@@ -38,6 +38,10 @@ namespace Halva.Package.Packer
                         {
                             tempString2 += dataPart[i] + ((RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ? "\\" : "/");
                         }
+                    }
+                    else
+                    {
+                            if (tempString2.Contains(".html")) tempString2 = "";
                     }
                     return Path.Combine(metadataFile.Replace(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\package.json" : "/package.json", "", StringComparison.Ordinal), tempString2);
                 }
