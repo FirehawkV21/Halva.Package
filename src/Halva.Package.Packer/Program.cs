@@ -1,5 +1,4 @@
-﻿using Halva.Package.Core;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -187,8 +186,8 @@ namespace Halva.Package.Packer
                         encryptedDatabasePackage.Dispose();
                         Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
                         encryptedEnginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
-                        encryptedEnginePackage.AddFileToList(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "index.html");
-                        encryptedEnginePackage.AddFileToList(projectLocation, "package.json");
+                        encryptedEnginePackage.AddFileToList(gameFolder, "index.html");
+                        encryptedEnginePackage.AddFileToList(gameFolder, "package.json");
                         encryptedEnginePackage.CloseArchive();
                         encryptedEnginePackage.Dispose();
                     }
@@ -225,8 +224,8 @@ namespace Halva.Package.Packer
                         databasePackage.Dispose();
                         Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
                         enginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
-                        enginePackage.AddFileToList(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "index.html");
-                        enginePackage.AddFileToList(projectLocation, "package.json");
+                        enginePackage.AddFileToList(gameFolder, "index.html");
+                        enginePackage.AddFileToList(gameFolder, "package.json");
                         enginePackage.CloseArchive();
                         enginePackage.Dispose();
                     }

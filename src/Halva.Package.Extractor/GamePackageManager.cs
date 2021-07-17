@@ -75,7 +75,7 @@ namespace Halva.Package.Bootstrapper
 
         private void ExtractPackage(string PackageName)
         {
-            if (PackagePassword != null) EncryptedPackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), PackagePassword);
+            if (PackagePassword != "") EncryptedPackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), PackagePassword);
             else PackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"));
         }
 
