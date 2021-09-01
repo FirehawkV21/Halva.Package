@@ -9,9 +9,9 @@
 		<Product>Halva Package</Product>
 		<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 		<PackageId>Halva.Package.Bootstrapper</PackageId>
-		<Version>1.0.1-20210717</Version>
-		<AssemblyVersion>1.0.1.21198</AssemblyVersion>
-		<FileVersion>1.0.1.21198</FileVersion>
+		<Version>1.0.2-20210901</Version>
+		<AssemblyVersion>1.0.2.21244</AssemblyVersion>
+		<FileVersion>1.0.2.21244</FileVersion>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishTrimmed>true</PublishTrimmed>
