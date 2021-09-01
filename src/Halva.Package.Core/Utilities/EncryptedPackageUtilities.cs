@@ -21,12 +21,11 @@ namespace Halva.Package.Core.Utilities
         public static void CompressArchive(in string inputArchive, in string outputArchive, in string password)
         {
 
-            AesManaged encryptionKit = new AesManaged
-            {
-                KeySize = 256, Padding = PaddingMode.PKCS7
-            };
+            Aes encryptionKit = Aes.Create();
+            encryptionKit.KeySize = 256;
+            encryptionKit.Padding = PaddingMode.PKCS7;
             byte[] hashCode;
-            using (HashAlgorithm hash = new SHA512Managed())
+            using (HashAlgorithm hash = SHA512.Create())
             {
                 hashCode = hash.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
@@ -52,13 +51,11 @@ namespace Halva.Package.Core.Utilities
         /// <param name="password">The password of the archive.</param>
         public static void DecompressArchive(in string inputArchive, in string password)
         {
-            AesManaged encryptionKit = new AesManaged
-            {
-                KeySize = 256,
-                Padding = PaddingMode.PKCS7
-            };
+            Aes encryptionKit = Aes.Create();
+            encryptionKit.KeySize = 256;
+            encryptionKit.Padding = PaddingMode.PKCS7;
             byte[] hashCode;
-            using (HashAlgorithm hash = new SHA512Managed())
+            using (HashAlgorithm hash = SHA512.Create())
             {
                 hashCode = hash.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
@@ -79,13 +76,11 @@ namespace Halva.Package.Core.Utilities
 
         public static void DecompressArchive(in string inputArchive, in string password, in string workerArchive)
         {
-            AesManaged encryptionKit = new AesManaged
-            {
-                KeySize = 256,
-                Padding = PaddingMode.PKCS7
-            };
+            Aes encryptionKit = Aes.Create();
+            encryptionKit.KeySize = 256;
+            encryptionKit.Padding = PaddingMode.PKCS7;
             byte[] hashCode;
-            using (HashAlgorithm hash = new SHA512Managed())
+            using (HashAlgorithm hash = SHA512.Create())
             {
                 hashCode = hash.ComputeHash(Encoding.UTF8.GetBytes(password));
             }

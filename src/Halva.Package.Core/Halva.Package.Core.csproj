@@ -9,10 +9,10 @@
 	<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 	<PackageTags>compression, package, Brotli, game-package</PackageTags>
 	<PackageLicenseFile>LICENSE</PackageLicenseFile>
-	<AssemblyVersion>1.1.4.21198</AssemblyVersion>
-	<FileVersion>1.1.4.21198</FileVersion>
+	<AssemblyVersion>1.1.5.21244</AssemblyVersion>
+	<FileVersion>1.1.5.21244</FileVersion>
 	<PackageId>Halva.Package.Core</PackageId>
-	<Version>1.1.4</Version>
+	<Version>1.1.5</Version>
 	<Description>Halva (Χαλβάς in Greek) is a small .NET Standard 2.1 library that implements Google's Brotli compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
 	<PackageReleaseNotes>- Fixed a bug where Dispose would crash the app if some variables weren't initialized.</PackageReleaseNotes>
 	<Copyright>2021 © Studio ACE</Copyright>
@@ -21,6 +21,7 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<LangVersion>preview</LangVersion>
 		<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
 	</PropertyGroup>
 

@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿global using System;
+global using System.IO;
 using System.Reflection;
 using System.Text;
 using Halva.Package.Core.Manager;
@@ -187,7 +187,7 @@ namespace Halva.Package.Packer
                         Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
                         encryptedEnginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
                         encryptedEnginePackage.AddFileToList(gameFolder, "index.html");
-                        encryptedEnginePackage.AddFileToList(gameFolder, "package.json");
+                        encryptedEnginePackage.AddFileToList(projectLocation, "package.json");
                         encryptedEnginePackage.CloseArchive();
                         encryptedEnginePackage.Dispose();
                     }
@@ -225,7 +225,7 @@ namespace Halva.Package.Packer
                         Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
                         enginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
                         enginePackage.AddFileToList(gameFolder, "index.html");
-                        enginePackage.AddFileToList(gameFolder, "package.json");
+                        enginePackage.AddFileToList(projectLocation, "package.json");
                         enginePackage.CloseArchive();
                         enginePackage.Dispose();
                     }

@@ -8,14 +8,15 @@
 		<Product>Halva Package</Product>
 		<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 		<PackageId>Halva.Package.Packer</PackageId>
-		<Version>1.0.5-20210717</Version>
+		<Version>1.0.6-20210717</Version>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishTrimmed>true</PublishTrimmed>
 		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 		<TieredCompilation>true</TieredCompilation>
-		<AssemblyVersion>1.0.5.21198</AssemblyVersion>
-		<FileVersion>1.0.5.21198</FileVersion>
+		<AssemblyVersion>1.0.6.21244</AssemblyVersion>
+		<FileVersion>1.0.6.21244</FileVersion>
+		<LangVersion>preview</LangVersion>
 	<Copyright>2021 © Studio ACE</Copyright>
 	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
 	<PackageReleaseNotes>- Splitted the audio files to a separate package.
