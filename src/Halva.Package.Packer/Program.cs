@@ -229,7 +229,12 @@ namespace Halva.Package.Packer
                         databasePackage.Dispose();
                         Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
                         enginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
-                        enginePackage.AddFileToList(gameFolder, "index.html");
+                        if (gameFolder == projectLocation) enginePackage.AddFileToList(gameFolder, "index.html");
+                        else
+                        {
+                            var relativeLocation = gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "");
+                            enginePackage.AddFileToList(projectLocation, Path.Combine(relativeLocation, "index.html"));
+                        }
                         enginePackage.AddFileToList(projectLocation, "package.json");
                         enginePackage.CloseArchive();
                         enginePackage.Dispose();
