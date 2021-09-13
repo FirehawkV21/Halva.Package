@@ -61,8 +61,8 @@ namespace Halva.Package.Core.Manager
         /// <param name="fileRelativeLocation">The relative location of the file.</param>
         public void AddFileToList(string source, string fileRelativeLocation)
         {
-            FileList.Add(fileRelativeLocation);
-            ArchiveMemoryStream.CreateEntryFromFile(Path.Combine(source, fileRelativeLocation), fileRelativeLocation, CompressionLevel.NoCompression);
+                FileList.Add(fileRelativeLocation);
+                ArchiveMemoryStream.CreateEntryFromFile(Path.Combine(source, fileRelativeLocation), fileRelativeLocation, CompressionLevel.NoCompression);
         }
 
         /// <summary>

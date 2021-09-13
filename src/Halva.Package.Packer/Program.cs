@@ -186,7 +186,12 @@ namespace Halva.Package.Packer
                         encryptedDatabasePackage.Dispose();
                         Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
                         encryptedEnginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
-                        encryptedEnginePackage.AddFileToList(gameFolder, "index.html");
+                        if (gameFolder == projectLocation) encryptedEnginePackage.AddFileToList(gameFolder, "index.html");
+                        else
+                        {
+                            var relativeLocation = gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "");
+                            encryptedEnginePackage.AddFileToList(projectLocation, Path.Combine(relativeLocation, "index.html"));
+                        }
                         encryptedEnginePackage.AddFileToList(projectLocation, "package.json");
                         encryptedEnginePackage.CloseArchive();
                         encryptedEnginePackage.Dispose();
