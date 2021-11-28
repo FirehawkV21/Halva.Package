@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -10,7 +9,7 @@ namespace Halva.Package.Core.Utilities
     /// </summary>
     public static class EncryptedPackageUtilities
     {
-        public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive.tmp");
+        public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive_");
 
         /// <summary>
         /// Compresses the encrypted archive.
@@ -49,31 +48,7 @@ namespace Halva.Package.Core.Utilities
         /// </summary>
         /// <param name="inputArchive">The input archive.</param>
         /// <param name="password">The password of the archive.</param>
-        public static void DecompressArchive(in string inputArchive, in string password)
-        {
-            Aes encryptionKit = Aes.Create();
-            encryptionKit.KeySize = 256;
-            encryptionKit.Padding = PaddingMode.PKCS7;
-            byte[] hashCode;
-            using (HashAlgorithm hash = SHA512.Create())
-            {
-                hashCode = hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
-
-            var key = new Rfc2898DeriveBytes(password, hashCode, 50000, HashAlgorithmName.SHA512);
-            encryptionKit.Key = key.GetBytes(encryptionKit.KeySize / 8);
-            encryptionKit.IV = key.GetBytes(encryptionKit.BlockSize / 8);
-            key.Dispose();
-            using (FileStream inputStream = File.OpenRead(inputArchive))
-            using (FileStream outputStream = File.Create(TempArchive))
-            using (CryptoStream cryptStream = new(inputStream, encryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
-            using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
-            {
-                decompressorStream.CopyTo(outputStream);
-            }
-            encryptionKit.Dispose();
-        }
-
+        /// <param name="workerArchive">The location for the temp file (that will hold the decompressed archive).</param>
         public static void DecompressArchive(in string inputArchive, in string password, in string workerArchive)
         {
             Aes encryptionKit = Aes.Create();
@@ -107,10 +82,12 @@ namespace Halva.Package.Core.Utilities
         /// <param name="password">The archive's password.</param>
         public static void CreateArchiveFromFolder(in string input, in string archiveLocation, in string password)
         {
-            if (File.Exists(TempArchive)) File.Delete(TempArchive);
-            ZipFile.CreateFromDirectory(input, TempArchive, CompressionLevel.NoCompression, false);
-            CompressArchive(TempArchive, archiveLocation, password);
-            File.Delete(TempArchive);
+            Random random = new();
+            string archive = TempArchive + random.Next(9999) + ".tmp";
+            if (File.Exists(archive)) File.Delete(archive);
+            ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
+            CompressArchive(archive, archiveLocation, password);
+            File.Delete(archive);
         }
 
         /// <summary>
@@ -121,10 +98,12 @@ namespace Halva.Package.Core.Utilities
         /// <param name="password">The archive's password.</param>
         public static void ExportFromArchive(in string inputArchive, in string exportDestination, in string password)
         {
-            if (File.Exists(TempArchive)) File.Delete(TempArchive);
-            DecompressArchive(inputArchive, password);
-            ZipFile.ExtractToDirectory(TempArchive, exportDestination, true);
-            File.Delete(TempArchive);
+            Random random = new();
+            string archive = TempArchive + random.Next(9999) + ".tmp";
+            if (File.Exists(archive)) File.Delete(archive);
+            DecompressArchive(inputArchive, password, archive);
+            ZipFile.ExtractToDirectory(archive, exportDestination, true);
+            File.Delete(archive);
 
         }
     }

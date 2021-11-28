@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Text;
 using Halva.Package.Core.Utilities;
 
@@ -82,7 +80,7 @@ namespace Halva.Package.Core.Manager
         /// </summary>
         public void ReloadArchive()
         {
-            EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), Password);
+            EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), Password, WorkingArchive);
             ArchiveMemoryStream = ZipFile.Open(PackageUtilities.TempArchive, ZipArchiveMode.Update);
         }
 

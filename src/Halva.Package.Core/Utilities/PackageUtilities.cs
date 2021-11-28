@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 
 namespace Halva.Package.Core.Utilities
 {
@@ -8,7 +7,7 @@ namespace Halva.Package.Core.Utilities
     /// </summary>
     public static class PackageUtilities
     {
-        public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive.tmp");
+        public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive_");
 
         /// <summary>
         /// Creates a Halva package from a folder.
@@ -17,8 +16,10 @@ namespace Halva.Package.Core.Utilities
         /// <param name="archiveLocation">The location of the package.</param>
         public static void CreateArchiveFromFolder(in string input, in string archiveLocation)
         {
-            if (File.Exists(TempArchive)) File.Delete(TempArchive);
-            ZipFile.CreateFromDirectory(input, TempArchive, CompressionLevel.NoCompression, false);
+            Random random = new();
+            string archive = TempArchive + random.Next(9999) + ".tmp";
+            if (File.Exists(archive)) File.Delete(archive);
+            ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
             CompressArchive(TempArchive, archiveLocation);
             File.Delete(TempArchive);
         }
@@ -45,10 +46,12 @@ namespace Halva.Package.Core.Utilities
         /// <param name="destination">The location for extracting the files.</param>
         public static void ExportFromArchive(in string inputArchive, in string destination)
         {
-            if (File.Exists(TempArchive)) File.Delete(TempArchive);
-            DecompressArchive(inputArchive);
-            ZipFile.ExtractToDirectory(TempArchive, destination, true);
-            File.Delete(TempArchive);
+            Random random = new();
+            string archive = TempArchive + random.Next(9999) + ".tmp";
+            if (File.Exists(archive)) File.Delete(archive);
+            DecompressArchive(inputArchive, archive);
+            ZipFile.ExtractToDirectory(archive, destination, true);
+            File.Delete(archive);
 
         }
 
@@ -56,16 +59,7 @@ namespace Halva.Package.Core.Utilities
         /// Decompresses the archive.
         /// </summary>
         /// <param name="inputArchive">The input archive.</param>
-        public static void DecompressArchive(in string inputArchive)
-        {
-            using (FileStream inputStream = File.OpenRead(inputArchive))
-            using (FileStream outputStream = File.Create(TempArchive))
-            using (BrotliStream decompressorStream = new(inputStream, CompressionMode.Decompress))
-            {
-                decompressorStream.CopyTo(outputStream);
-            }
-        }
-
+        /// <param name="workerArchive">The location for the temp file (that will hold the decompressed archive).</param>
         public static void DecompressArchive(string inputArchive, string workerArchive)
         {
             using (FileStream inputStream = File.OpenRead(inputArchive))

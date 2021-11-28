@@ -163,4 +163,16 @@
   <data name="CompressingAudioFilesText" xml:space="preserve">
     <value>Compressing audio files...</value>
   </data>
+  <data name="AssetsCompressedText" xml:space="preserve">
+    <value>Compressed the assets.</value>
+  </data>
+  <data name="AudioCompressedText" xml:space="preserve">
+    <value>Compressed the audio files.</value>
+  </data>
+  <data name="DatabaseCompressedText" xml:space="preserve">
+    <value>Compressed the database files.</value>
+  </data>
+  <data name="EngineCompressedText" xml:space="preserve">
+    <value>Compressed the engine files.</value>
+  </data>
 </root>

@@ -19,7 +19,7 @@ namespace Halva.Package.Packer.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -57,6 +57,24 @@ namespace Halva.Package.Packer.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compressed the assets..
+        /// </summary>
+        internal static string AssetsCompressedText {
+            get {
+                return ResourceManager.GetString("AssetsCompressedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compressed the audio files..
+        /// </summary>
+        internal static string AudioCompressedText {
+            get {
+                return ResourceManager.GetString("AudioCompressedText", resourceCulture);
             }
         }
         
@@ -106,11 +124,29 @@ namespace Halva.Package.Packer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compressed the database files..
+        /// </summary>
+        internal static string DatabaseCompressedText {
+            get {
+                return ResourceManager.GetString("DatabaseCompressedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you need to encrypt the archives? (Y/N, default is No).
         /// </summary>
         internal static string EncryptionQuestion {
             get {
                 return ResourceManager.GetString("EncryptionQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compressed the engine files..
+        /// </summary>
+        internal static string EngineCompressedText {
+            get {
+                return ResourceManager.GetString("EngineCompressedText", resourceCulture);
             }
         }
         
