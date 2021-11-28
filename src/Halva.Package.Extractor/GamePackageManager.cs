@@ -27,8 +27,8 @@ namespace Halva.Package.Bootstrapper
         }
         //If you have a password for the archives, place it here or read from a file.
         private string PackagePassword = "";
-        private readonly Dictionary<string, int> TargetPackageVersion = new Dictionary<string, int>();
-        private Dictionary<string, int> CurrentPackageVersion = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> TargetPackageVersion = new();
+        private Dictionary<string, int> CurrentPackageVersion = new();
 
         /// <summary>
         /// Creates a package manager.
@@ -48,12 +48,12 @@ namespace Halva.Package.Bootstrapper
                 int databaseVersion;
                 int engineVersion;
                 char[] JsonIn;
-                using (StreamReader settingsLoader = new StreamReader(Path.Combine(ExctractLocation, "PackageData.json")))
+                using (StreamReader settingsLoader = new(Path.Combine(ExctractLocation, "PackageData.json")))
                 {
                     JsonIn = new Char[(int)settingsLoader.BaseStream.Length];
                     settingsLoader.Read(JsonIn, 0, (int)settingsLoader.BaseStream.Length);
                 }
-                string JsonString = new string(JsonIn);
+                string JsonString = new(JsonIn);
                 var packageMetadata = JObject.Parse(JsonString);
                 assetsVersion = (int)packageMetadata["packages"]["assets"];
                 if (packageMetadata["packages"]["audio"] != null)
@@ -69,7 +69,7 @@ namespace Halva.Package.Bootstrapper
 
         public static bool IsRunningInCentennial()
         {
-            DesktopBridge.Helpers checker = new DesktopBridge.Helpers();
+            DesktopBridge.Helpers checker = new();
             return checker.IsRunningAsUwp();
         }
 
@@ -144,14 +144,14 @@ namespace Halva.Package.Bootstrapper
             CurrentPackageVersion.TryGetValue("audioVersion", out int audioVersion);
             CurrentPackageVersion.TryGetValue("databaseVersion", out int databaseVersion);
             CurrentPackageVersion.TryGetValue("engineVersion", out int engineVersion);
-            JObject gameMetadata = new JObject(
+            JObject gameMetadata = new(
                 new JProperty("packages",
                     new JObject(
                         new JProperty("assets", assetsVersion),
                         new JProperty("audio", audioVersion),
                         new JProperty("database", databaseVersion),
                         new JProperty("engine", engineVersion))));
-            using StreamWriter packageDataFile = new StreamWriter(Path.Combine(ExctractLocation, "PackageData.json"));
+            using StreamWriter packageDataFile = new(Path.Combine(ExctractLocation, "PackageData.json"));
             packageDataFile.Write(gameMetadata);
         }
     }

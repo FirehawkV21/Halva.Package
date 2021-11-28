@@ -34,7 +34,7 @@ namespace Halva.Package.Core.Manager
         public static string ReserveRandomArchive()
         {
             string tempString = "TempArchive_";
-            Random _random = new Random();
+            Random _random = new();
             int check;
             do
             {
@@ -130,7 +130,7 @@ namespace Halva.Package.Core.Manager
         /// <returns>A list of files in the archive.</returns>
         public static List<string> PullFiles(ZipArchive inputStream)
         {
-            List<string> foundFiles = new List<string>();
+            List<string> foundFiles = new();
             foreach (ZipArchiveEntry entry in inputStream.Entries)
             {
                 foundFiles.Add(entry.FullName);
@@ -195,7 +195,7 @@ namespace Halva.Package.Core.Manager
         /// <param name="SourceFolder">The folder specified.</param>
         public void UpdateArchive (string SourceFolder)
         {
-            List<String> SourceFiles = new List<String>();
+            List<String> SourceFiles = new();
             SourceFiles = PullFiles(SourceFolder);
             foreach (string file in SourceFiles)
             {

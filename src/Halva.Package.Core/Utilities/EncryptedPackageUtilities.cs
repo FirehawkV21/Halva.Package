@@ -36,8 +36,8 @@ namespace Halva.Package.Core.Utilities
             key.Dispose();
             using (FileStream inputStream = File.OpenRead(inputArchive))
             using (FileStream outputStream = File.Create(outputArchive))
-            using (CryptoStream cryptStream = new CryptoStream(outputStream, encryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
-            using (BrotliStream compressorStream = new BrotliStream(cryptStream, CompressionLevel.Optimal))
+            using (CryptoStream cryptStream = new(outputStream, encryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
+            using (BrotliStream compressorStream = new(cryptStream, CompressionLevel.Optimal))
             {
                 inputStream.CopyTo(compressorStream);
             }
@@ -66,8 +66,8 @@ namespace Halva.Package.Core.Utilities
             key.Dispose();
             using (FileStream inputStream = File.OpenRead(inputArchive))
             using (FileStream outputStream = File.Create(TempArchive))
-            using (CryptoStream cryptStream = new CryptoStream(inputStream, encryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
-            using (BrotliStream decompressorStream = new BrotliStream(cryptStream, CompressionMode.Decompress))
+            using (CryptoStream cryptStream = new(inputStream, encryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+            using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
             {
                 decompressorStream.CopyTo(outputStream);
             }
@@ -91,8 +91,8 @@ namespace Halva.Package.Core.Utilities
             key.Dispose();
             using (FileStream inputStream = File.OpenRead(inputArchive))
             using (FileStream outputStream = File.Create(workerArchive))
-            using (CryptoStream cryptStream = new CryptoStream(inputStream, encryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
-            using (BrotliStream decompressorStream = new BrotliStream(cryptStream, CompressionMode.Decompress))
+            using (CryptoStream cryptStream = new(inputStream, encryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+            using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
             {
                 decompressorStream.CopyTo(outputStream);
             }

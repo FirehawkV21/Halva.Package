@@ -24,7 +24,7 @@ namespace Halva.Package.Core.Tests
         public void ArchiveBuilderTest()
         {
             Cleanup();
-            EncryptedHalvaPackage package = new EncryptedHalvaPackage(sourceFolder, destinationArchive, testPassword);
+            EncryptedHalvaPackage package = new(sourceFolder, destinationArchive, testPassword);
             package.CloseArchive();
             EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword);
         }
@@ -32,14 +32,14 @@ namespace Halva.Package.Core.Tests
         [Fact]
         public void CanArchiveBuilderExtract()
         {
-            EncryptedHalvaPackage package = new EncryptedHalvaPackage(destinationArchive, testPassword);
+            EncryptedHalvaPackage package = new(destinationArchive, testPassword);
             package.ExtractFile("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
         }
 
         [Fact]
         public void CanArchiveRemoveEntry()
         {
-            EncryptedHalvaPackage package = new EncryptedHalvaPackage(destinationArchive, testPassword);
+            EncryptedHalvaPackage package = new(destinationArchive, testPassword);
             package.RemoveFileFromList("TestImage.webp");
             package.CloseArchive();
             if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
@@ -50,7 +50,7 @@ namespace Halva.Package.Core.Tests
         [Fact]
         public void CanArchiveAddEntry()
         {
-            EncryptedHalvaPackage package = new EncryptedHalvaPackage(destinationArchive, testPassword);
+            EncryptedHalvaPackage package = new(destinationArchive, testPassword);
             package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
             package.CloseArchive();
             if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
@@ -61,7 +61,7 @@ namespace Halva.Package.Core.Tests
         [Fact]
         public void CanLibrarySaveChanges()
         {
-            EncryptedHalvaPackage package = new EncryptedHalvaPackage(destinationArchive, testPassword);
+            EncryptedHalvaPackage package = new(destinationArchive, testPassword);
             package.RemoveFileFromList("TestImage.webp");
             package.Save();
             package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
@@ -71,7 +71,7 @@ namespace Halva.Package.Core.Tests
         [Fact]
         public void CanLibraryCheckForDifferencesInEncryptedArchives()
         {
-            EncryptedHalvaPackage package = new EncryptedHalvaPackage(destinationArchive, testPassword);
+            EncryptedHalvaPackage package = new(destinationArchive, testPassword);
             package.UpdateFromArchive(destinationFolder);
         }
 

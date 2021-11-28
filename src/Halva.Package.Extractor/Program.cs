@@ -11,9 +11,9 @@ namespace Halva.Package.Bootstrapper
 
         static void Main()
         {
-            Process GameProcess = new Process();
+            Process GameProcess = new();
             // Edit this part to point over to the game's executable.
-            ProcessStartInfo GameInfo = new ProcessStartInfo(Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, "Binaries", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Game.exe" : "Game"));
+            ProcessStartInfo GameInfo = new(Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, "Binaries", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Game.exe" : "Game"));
 
             Console.WriteLine(Properties.Resources.SplitterText);
             Console.WriteLine(Properties.Resources.ProgramTitle);
@@ -23,7 +23,7 @@ namespace Halva.Package.Bootstrapper
             Console.WriteLine(Properties.Resources.SplitterText);
             Console.WriteLine();
 
-            GamePackageManager packageManager = new GamePackageManager();
+            GamePackageManager packageManager = new();
             if (GamePackageManager.IsPackageMetadataPresent()) { 
                  int updatedPackages = 0;
                 if (!packageManager.IsInstalledPackageLatest("assetsVersion")) {

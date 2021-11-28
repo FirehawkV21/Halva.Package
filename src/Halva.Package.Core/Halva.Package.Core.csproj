@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-	<TargetFrameworks>netstandard2.1;net5.0;net6.0</TargetFrameworks>
+	<TargetFrameworks>net5.0;net6.0</TargetFrameworks>
 	<AssemblyTitle>Halva Package Core</AssemblyTitle>
 	<Authors>AceOfAces</Authors>
 	<Company>Studio ACE</Company>
@@ -24,6 +24,9 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<LangVersion>preview</LangVersion>
 		<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>latest</AnalysisLevel>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -47,6 +50,30 @@
 	<PackageVersionSettings>AssemblyVersion.None.Alpha</PackageVersionSettings>
 	<AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
 	<InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
+	  <FileAlignment>4096</FileAlignment>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.1|AnyCPU'">
+	  <FileAlignment>4096</FileAlignment>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net5.0|AnyCPU'">
+	  <FileAlignment>4096</FileAlignment>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net5.0|AnyCPU'">
+	  <FileAlignment>4096</FileAlignment>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
+	  <FileAlignment>4096</FileAlignment>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
+	  <FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 
 	<ItemGroup>

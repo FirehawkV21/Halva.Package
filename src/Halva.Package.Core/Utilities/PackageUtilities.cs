@@ -32,7 +32,7 @@ namespace Halva.Package.Core.Utilities
         {
             using (FileStream inputStream = File.OpenRead(inputArchive))
             using (FileStream outputStream = File.Create(outputArchive))
-            using (BrotliStream compressorStream = new BrotliStream(outputStream, CompressionLevel.Optimal))
+            using (BrotliStream compressorStream = new(outputStream, CompressionLevel.Optimal))
             {
                 inputStream.CopyTo(compressorStream);
             }
@@ -60,7 +60,7 @@ namespace Halva.Package.Core.Utilities
         {
             using (FileStream inputStream = File.OpenRead(inputArchive))
             using (FileStream outputStream = File.Create(TempArchive))
-            using (BrotliStream decompressorStream = new BrotliStream(inputStream, CompressionMode.Decompress))
+            using (BrotliStream decompressorStream = new(inputStream, CompressionMode.Decompress))
             {
                 decompressorStream.CopyTo(outputStream);
             }
@@ -70,7 +70,7 @@ namespace Halva.Package.Core.Utilities
         {
             using (FileStream inputStream = File.OpenRead(inputArchive))
             using (FileStream outputStream = File.Create(workerArchive))
-            using (BrotliStream decompressorStream = new BrotliStream(inputStream, CompressionMode.Decompress))
+            using (BrotliStream decompressorStream = new(inputStream, CompressionMode.Decompress))
             {
                 decompressorStream.CopyTo(outputStream);
             }
