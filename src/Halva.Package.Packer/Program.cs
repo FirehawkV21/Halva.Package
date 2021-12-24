@@ -2,7 +2,6 @@
 global using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Halva.Package.Core.Manager;
 
 namespace Halva.Package.Packer

@@ -16,12 +16,12 @@
 		<TieredCompilation>true</TieredCompilation>
 		<AssemblyVersion>1.0.7.21256</AssemblyVersion>
 		<FileVersion>1.0.7.21256</FileVersion>
-		<LangVersion>preview</LangVersion>
 	<Copyright>2021 © Studio ACE</Copyright>
 	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
 	<PackageReleaseNotes>- Splitted the audio files to a separate package.
 - Fixed a bug where the icon file was ommited from the assets package.</PackageReleaseNotes>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 	<PropertyGroup Condition="$(TargetFramework)=='net6.0'">
 		<PublishReadyToRunComposite>true</PublishReadyToRunComposite>

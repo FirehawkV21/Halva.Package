@@ -1,11 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 using WinSystem = Windows;
 using Halva.Package.Core.Utilities;
 using Halva.Package.Core.Manager;
+using System.Text.Json;
 
 namespace Halva.Package.Bootstrapper
 {
@@ -27,43 +24,23 @@ namespace Halva.Package.Bootstrapper
         }
         //If you have a password for the archives, place it here or read from a file.
         private string PackagePassword = "";
-        private readonly Dictionary<string, int> TargetPackageVersion = new();
-        private Dictionary<string, int> CurrentPackageVersion = new();
+        private PackageMetadata TargetPackageVersion = new();
+        private PackageMetadata CurrentPackageVersion = new();
 
         /// <summary>
         /// Creates a package manager.
         /// </summary>
         public GamePackageManager()
         {
-            // Edit these to show the correct package version (or offload it to a JSON file).
-            TargetPackageVersion.Add("assetsVersion", 20201003);
-            TargetPackageVersion.Add("audioVersion", 20201003);
-            TargetPackageVersion.Add("databaseVersion", 20201003);
-            TargetPackageVersion.Add("engineVersion", 202001003);
+            TargetPackageVersion.PackageList.AssetsVersion = 20211016;
+            TargetPackageVersion.PackageList.AudioVersion = 20211204;
+            TargetPackageVersion.PackageList.DatabaseVersion = 20211204;
+            TargetPackageVersion.PackageList.EngineVersion = 20211204;
             if (!Directory.Exists(Path.Combine(ExctractLocation, "GameData"))) Directory.CreateDirectory(Path.Combine(ExctractLocation, "GameData"));
             if (File.Exists(Path.Combine(ExctractLocation, "PackageData.json")))
             {
-                int assetsVersion;
-                int audioVersion;
-                int databaseVersion;
-                int engineVersion;
-                char[] JsonIn;
-                using (StreamReader settingsLoader = new(Path.Combine(ExctractLocation, "PackageData.json")))
-                {
-                    JsonIn = new Char[(int)settingsLoader.BaseStream.Length];
-                    settingsLoader.Read(JsonIn, 0, (int)settingsLoader.BaseStream.Length);
-                }
-                string JsonString = new(JsonIn);
-                var packageMetadata = JObject.Parse(JsonString);
-                assetsVersion = (int)packageMetadata["packages"]["assets"];
-                if (packageMetadata["packages"]["audio"] != null)
-                    audioVersion = (int)packageMetadata["packages"]["audio"];
-                else audioVersion = 0;
-                databaseVersion = (int)packageMetadata["packages"]["database"];
-                engineVersion = (int)packageMetadata["packages"]["engine"];
-                CurrentPackageVersion.Add("assetsVersion", assetsVersion);
-                CurrentPackageVersion.Add("databaseVersion", databaseVersion);
-                CurrentPackageVersion.Add("engineVersion", engineVersion);
+                var inputFile = File.ReadAllText(Path.Combine(ExctractLocation, "PackageData.json"));
+                CurrentPackageVersion = JsonSerializer.Deserialize<PackageMetadata>(inputFile);
             }
         }
 
@@ -82,17 +59,20 @@ namespace Halva.Package.Bootstrapper
         public void ExtractPackage(string PackageName, string PackageVersionKey)
         {
             ExtractPackage(PackageName);
-            int packageVersion;
-            if (CurrentPackageVersion.TryGetValue(PackageVersionKey, out _))
+            switch (PackageVersionKey)
             {
-                CurrentPackageVersion.Remove(PackageVersionKey);
-                TargetPackageVersion.TryGetValue(PackageVersionKey, out packageVersion);
-                CurrentPackageVersion.Add(PackageVersionKey, packageVersion);
-            }
-            else
-            {
-                TargetPackageVersion.TryGetValue(PackageVersionKey, out packageVersion);
-                CurrentPackageVersion.Add(PackageVersionKey, packageVersion);
+                case "assetsVersion":
+                    CurrentPackageVersion.PackageList.AssetsVersion = TargetPackageVersion.PackageList.AssetsVersion;
+                    break;
+                case "audioVersion":
+                    CurrentPackageVersion.PackageList.AudioVersion = TargetPackageVersion.PackageList.AudioVersion;
+                    break;
+                case "databaseVersion":
+                    CurrentPackageVersion.PackageList.DatabaseVersion = TargetPackageVersion.PackageList.DatabaseVersion;
+                    break;
+                case "engineVersion":
+                    CurrentPackageVersion.PackageList.EngineVersion = TargetPackageVersion.PackageList.EngineVersion;
+                    break;
             }
         }
 
@@ -110,27 +90,33 @@ namespace Halva.Package.Bootstrapper
                 package.UpdateFromArchive(Path.Combine(ExctractLocation, "GameData"));
                 package.Dispose();
             }
-            int packageVersion;
-            if (CurrentPackageVersion.TryGetValue(PackageVersionKey, out _))
+            switch (PackageVersionKey)
             {
-                CurrentPackageVersion.Remove(PackageVersionKey);
-                TargetPackageVersion.TryGetValue(PackageVersionKey, out packageVersion);
-                CurrentPackageVersion.Add(PackageVersionKey, packageVersion);
-            }
-            else
-            {
-                TargetPackageVersion.TryGetValue(PackageVersionKey, out packageVersion);
-                CurrentPackageVersion.Add(PackageVersionKey, packageVersion);
+                case "assetsVersion":
+                    CurrentPackageVersion.PackageList.AssetsVersion = TargetPackageVersion.PackageList.AssetsVersion;
+                    break;
+                case "audioVersion":
+                    CurrentPackageVersion.PackageList.AudioVersion = TargetPackageVersion.PackageList.AudioVersion;
+                    break;
+                case "databaseVersion":
+                    CurrentPackageVersion.PackageList.DatabaseVersion = TargetPackageVersion.PackageList.DatabaseVersion;
+                    break;
+                case "engineVersion":
+                    CurrentPackageVersion.PackageList.EngineVersion = TargetPackageVersion.PackageList.EngineVersion;
+                    break;
             }
         }
 
         public bool IsInstalledPackageLatest(string PackageVersionKey)
         {
-            bool sameVersion;
-            sameVersion = CurrentPackageVersion.TryGetValue(PackageVersionKey, out int packageVersion)
-                && TargetPackageVersion.TryGetValue(PackageVersionKey, out int targetVersion)
-                && targetVersion == packageVersion;
-            return sameVersion;
+            return PackageVersionKey switch
+            {
+                "assetsVersion" => CurrentPackageVersion.PackageList.AssetsVersion == TargetPackageVersion.PackageList.AssetsVersion,
+                "audioVersion" => CurrentPackageVersion.PackageList.AudioVersion == TargetPackageVersion.PackageList.AudioVersion,
+                "databaseVersion" => CurrentPackageVersion.PackageList.DatabaseVersion == TargetPackageVersion.PackageList.DatabaseVersion,
+                "engineVersion" => CurrentPackageVersion.PackageList.EngineVersion == TargetPackageVersion.PackageList.EngineVersion,
+                _ => true,
+            };
         }
 
         public static bool IsPackageMetadataPresent()
@@ -140,19 +126,8 @@ namespace Halva.Package.Bootstrapper
 
         public void SavePackageMetadata()
         {
-            CurrentPackageVersion.TryGetValue("assetsVersion", out int assetsVersion);
-            CurrentPackageVersion.TryGetValue("audioVersion", out int audioVersion);
-            CurrentPackageVersion.TryGetValue("databaseVersion", out int databaseVersion);
-            CurrentPackageVersion.TryGetValue("engineVersion", out int engineVersion);
-            JObject gameMetadata = new(
-                new JProperty("packages",
-                    new JObject(
-                        new JProperty("assets", assetsVersion),
-                        new JProperty("audio", audioVersion),
-                        new JProperty("database", databaseVersion),
-                        new JProperty("engine", engineVersion))));
-            using StreamWriter packageDataFile = new(Path.Combine(ExctractLocation, "PackageData.json"));
-            packageDataFile.Write(gameMetadata);
+            string output = JsonSerializer.Serialize<PackageMetadata>(CurrentPackageVersion);
+            File.WriteAllText(Path.Combine(ExctractLocation, "PackageData.json"), output);
         }
     }
 }

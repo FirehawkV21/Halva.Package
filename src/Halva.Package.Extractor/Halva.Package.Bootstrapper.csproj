@@ -2,16 +2,16 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net5.0-windows10.0.19041.0;net6.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net6.0-windows10.0.19041.0;net6.0-linux</TargetFrameworks>
 		<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
 		<AssemblyTitle>Halva Package Bootstrapper</AssemblyTitle>
 		<Company>Studio ACE</Company>
 		<Product>Halva Package</Product>
 		<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 		<PackageId>Halva.Package.Bootstrapper</PackageId>
-		<Version>1.0.2-20210901</Version>
-		<AssemblyVersion>1.0.2.21244</AssemblyVersion>
-		<FileVersion>1.0.2.21244</FileVersion>
+		<Version>1.0.3-20211128</Version>
+		<AssemblyVersion>1.0.3.21332</AssemblyVersion>
+		<FileVersion>1.0.3.21332</FileVersion>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishTrimmed>true</PublishTrimmed>
@@ -21,6 +21,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<EnableNETAnalyzers>True</EnableNETAnalyzers>
 		<AnalysisLevel>latest</AnalysisLevel>
+		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 	<PropertyGroup Condition="$(TargetFramework)!='netcoreapp3.1'">
 		<GenerateTestProjection>true</GenerateTestProjection>
@@ -50,14 +51,9 @@
 			</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="DesktopBridge.Helpers" Version="1.2.2" />
-		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="1.4.1" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
 	<ItemGroup Condition="$(TargetFramework)=='netcoreapp3.1'">
 		<PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
-	</ItemGroup>
-	<ItemGroup Condition="$(TargetFramework)!='netcoreapp3.1'">
-		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="1.4.1" />
 	</ItemGroup>
 	
 
