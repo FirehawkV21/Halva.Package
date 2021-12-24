@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net6.0-windows10.0.19041.0;net6.0-linux</TargetFrameworks>
+		<TargetFrameworks>net6.0-windows10.0.19041.0;net6.0</TargetFrameworks>
 		<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
 		<AssemblyTitle>Halva Package Bootstrapper</AssemblyTitle>
 		<Company>Studio ACE</Company>

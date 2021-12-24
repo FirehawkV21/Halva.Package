@@ -9,17 +9,22 @@ namespace Halva.Package.Bootstrapper
     public class GamePackageManager
     {
         private string PackageLocation = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).ToString(), "GamePackages");
+        private static string LocalFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
         public static string ExctractLocation
         {
             get
             {
-                if (IsRunningInCentennial())
+                if (OperatingSystem.IsWindowsVersionAtLeast(10,0,10240,0))
                 {
-                    var LocalStorageFolderUWP = WinSystem.Storage.ApplicationData.Current.LocalFolder;
-                    return LocalStorageFolderUWP.Path;
+                    if (IsRunningInCentennial())
+                    {
+                        var LocalStorageFolderUWP = WinSystem.Storage.ApplicationData.Current.LocalFolder;
+                        return LocalStorageFolderUWP.Path;
+                    }
+                    else return LocalFolder;
                 }
                 //Change this to set a different folder.
-                else return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
+                else return LocalFolder;
             }
         }
         //If you have a password for the archives, place it here or read from a file.
