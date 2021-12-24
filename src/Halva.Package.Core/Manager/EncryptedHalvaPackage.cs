@@ -52,7 +52,7 @@ namespace Halva.Package.Core.Manager
             SourceLocation = new StringBuilder(source);
             DestinationLocation = new StringBuilder(destination);
             Password = pwsd;
-            List<string> foundFilesList = PullFiles(source);
+            List<string> foundFilesList = HalvaPackageBase.PullFilesFromFolder(source);
             ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
             foreach (string file in foundFilesList)
             {

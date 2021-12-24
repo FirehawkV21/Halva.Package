@@ -86,7 +86,7 @@ namespace Halva.Package.Core.Manager
         /// <param name="source">The location of the source folder.</param>
         public void AddFilesFromAFolder(string source)
         {
-            var tempList = PullFiles(source);
+            var tempList = HalvaPackageBase.PullFilesFromFolder(source);
 
             foreach(string fileEntry in tempList)
             {
@@ -104,7 +104,7 @@ namespace Halva.Package.Core.Manager
         /// <param name="SourceFolderRelativeLocation">The relatice location of the source folder.</param>
         public void AddFilesFromAFolder(string sourceLocation, string SourceFolderRelativeLocation)
         {
-            var tempList = PullFiles(Path.Combine(sourceLocation, SourceFolderRelativeLocation));
+            var tempList = HalvaPackageBase.PullFilesFromFolder(Path.Combine(sourceLocation, SourceFolderRelativeLocation));
 
             foreach (string fileEntry in tempList)
             {
@@ -132,7 +132,7 @@ namespace Halva.Package.Core.Manager
         /// </summary>
         /// <param name="source">The folder to scan for files.</param>
         /// <returns>A list of files in the specified folder.</returns>
-        public List<string> PullFiles(string source)
+        public static List<string> PullFilesFromFolder(string source)
         {
             IEnumerable<string> foundFiles = Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories);
             return foundFiles.ToList();
@@ -210,9 +210,8 @@ namespace Halva.Package.Core.Manager
         /// <param name="SourceFolder">The folder specified.</param>
         public void UpdateArchive (string SourceFolder)
         {
-            List<String> SourceFiles = new();
-            SourceFiles = PullFiles(SourceFolder);
-            foreach (string file in SourceFiles)
+            List<string> SourceFolderFiles = HalvaPackageBase.PullFilesFromFolder(SourceFolder);
+            foreach (string file in SourceFolderFiles)
             {
                 var entry = ArchiveMemoryStream.GetEntry(file.Replace(SourceFolder + GetFolderCharacter(), ""));
                 if (entry != null)

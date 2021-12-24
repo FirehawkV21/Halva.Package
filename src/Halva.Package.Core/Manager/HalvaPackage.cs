@@ -19,7 +19,7 @@ namespace Halva.Package.Core.Manager
             SourceLocation = new StringBuilder(source);
             WorkingArchive = ReserveRandomArchive();
             DestinationLocation = new StringBuilder(destination);
-            List<string> foundFilesList = PullFiles(source);
+            List<string> foundFilesList = PullFilesFromFolder(source);
             ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
             foreach (string file in foundFilesList)
             {

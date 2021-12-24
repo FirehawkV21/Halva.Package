@@ -9,13 +9,14 @@
 	<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 	<PackageTags>compression, package, Brotli, game-package</PackageTags>
 	<PackageLicenseFile></PackageLicenseFile>
-	<AssemblyVersion>1.1.6.21332</AssemblyVersion>
-	<FileVersion>1.1.6.21332</FileVersion>
+	<AssemblyVersion>1.2.0.21358</AssemblyVersion>
+	<FileVersion>1.2.0.21358</FileVersion>
 	<PackageId>Halva.Package.Core</PackageId>
-	<Version>1.1.6</Version>
+	<Version>1.2.0</Version>
 	<Description>Halva (Χαλβάς in Greek) is a small .NET 5+ library that implements Google's Brotli compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
-	<PackageReleaseNotes>-Dropped .NET Standard 2.1 support, in order to take advantage of .NET 5+ features.
--Tweaked the Utilities code to allow multi-threading.</PackageReleaseNotes>
+	<PackageReleaseNotes>-Trimming support.
+-[Breaking]Changed the PullFiles(string) to PullFilesFromFolder(string) so it's easier to understand.
+-Minor performance improvements.</PackageReleaseNotes>
 	<Copyright>2021 © Studio ACE</Copyright>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -29,8 +30,9 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-    <IsTrimmable>true</IsTrimmable>
-    <LangVersion>latest</LangVersion>
+		<IsTrimmable>true</IsTrimmable>
+		<LangVersion>latest</LangVersion>
+		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -57,27 +59,27 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
-	  <FileAlignment>4096</FileAlignment>
+		<FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.1|AnyCPU'">
-	  <FileAlignment>4096</FileAlignment>
+		<FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net5.0|AnyCPU'">
-	  <FileAlignment>4096</FileAlignment>
+		<FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net5.0|AnyCPU'">
-	  <FileAlignment>4096</FileAlignment>
+		<FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
-	  <FileAlignment>4096</FileAlignment>
+		<FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
-	  <FileAlignment>4096</FileAlignment>
+		<FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -86,8 +88,8 @@
 		<PackagePath></PackagePath>
 	</None>
 	<None Include="..\..\README.md">
-	  <Pack>True</Pack>
-	  <PackagePath>\</PackagePath>
+		<Pack>True</Pack>
+		<PackagePath>\</PackagePath>
 	</None>
 	</ItemGroup>
 
