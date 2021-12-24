@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -6,7 +7,7 @@ namespace Halva.Package.Bootstrapper
 {
     class Program
     {
-
+        [RequiresUnreferencedCode("Calls Halva.Package.Bootstrapper.GamePackageManager.GamePackageManager()")]
         static void Main()
         {
             Process GameProcess = new();

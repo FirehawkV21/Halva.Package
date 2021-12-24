@@ -3,12 +3,14 @@ using WinSystem = Windows;
 using Halva.Package.Core.Utilities;
 using Halva.Package.Core.Manager;
 using System.Text.Json;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Halva.Package.Bootstrapper
 {
     public class GamePackageManager
     {
         private string PackageLocation = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).ToString(), "GamePackages");
+        //Change this to set a different folder.
         private static string LocalFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
         public static string ExctractLocation
         {
@@ -23,7 +25,6 @@ namespace Halva.Package.Bootstrapper
                     }
                     else return LocalFolder;
                 }
-                //Change this to set a different folder.
                 else return LocalFolder;
             }
         }
@@ -35,6 +36,7 @@ namespace Halva.Package.Bootstrapper
         /// <summary>
         /// Creates a package manager.
         /// </summary>
+        [RequiresUnreferencedCode("Uses JSON Source Generator")]
         public GamePackageManager()
         {
             TargetPackageVersion.PackageList.AssetsVersion = 20211016;
@@ -129,6 +131,7 @@ namespace Halva.Package.Bootstrapper
             return File.Exists(Path.Combine(ExctractLocation, "PackageData.json"));
         }
 
+        [RequiresUnreferencedCode("Uses JSON Source Generator")]
         public void SavePackageMetadata()
         {
             string output = JsonSerializer.Serialize<PackageMetadata>(CurrentPackageVersion);
