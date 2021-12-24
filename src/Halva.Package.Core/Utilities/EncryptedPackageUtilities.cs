@@ -9,6 +9,9 @@ namespace Halva.Package.Core.Utilities
     /// </summary>
     public static class EncryptedPackageUtilities
     {
+        /// <summary>
+        /// The location of the temporary archive.
+        /// </summary>
         public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive_");
 
         /// <summary>

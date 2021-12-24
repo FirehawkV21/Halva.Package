@@ -12,10 +12,25 @@ namespace Halva.Package.Core.Manager
     {
         private bool disposedValue;
 
+        /// <summary>
+        /// The location of the source files.
+        /// </summary>
         protected StringBuilder SourceLocation { get; set; } 
+        /// <summary>
+        /// The location of the final acrhive.
+        /// </summary>
         public StringBuilder DestinationLocation { get; set; }
+        /// <summary>
+        /// The list of files of the archive.
+        /// </summary>
         public List<string> FileList { get; set; } = new List<string>();
+        /// <summary>
+        /// The memory stream that handles the archive.
+        /// </summary>
         protected ZipArchive ArchiveMemoryStream { get; set; }
+        /// <summary>
+        /// The temporary archive where changes are being worked on.
+        /// </summary>
         public string WorkingArchive { get; set; }
 
         /// <summary>
@@ -27,6 +42,10 @@ namespace Halva.Package.Core.Manager
             return (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ? "\\" : "/";
         }
 
+        /// <summary>
+        /// Retrieves the name of the temporary archive.
+        /// </summary>
+        /// <returns>The name of the temporary archive.</returns>
         public static string ReserveRandomArchive()
         {
             string tempString = "TempArchive_";
@@ -224,6 +243,10 @@ namespace Halva.Package.Core.Manager
             }
         }
 
+        /// <summary>
+        /// Removes the archive object and deletes the temp archive if requested.
+        /// </summary>
+        /// <param name="disposing">Set to true to delete the temp archive.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -242,6 +265,9 @@ namespace Halva.Package.Core.Manager
             }
         }
 
+        /// <summary>
+        /// Removes the archive and deletes the temp archive.
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

@@ -10,6 +10,9 @@ namespace Halva.Package.Core.Manager
     public class EncryptedHalvaPackage : HalvaPackageBase
     {
         
+        /// <summary>
+        /// The password for the archive.
+        /// </summary>
         public string Password { get; set; }
 
         /// <summary>
