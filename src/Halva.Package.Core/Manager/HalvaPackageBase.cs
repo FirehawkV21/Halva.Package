@@ -182,13 +182,12 @@ namespace Halva.Package.Core.Manager
                     using (var algo = SHA256.Create())
                     {
                         var archivedFile = entry.Open();
-                        var targetFile = File.OpenRead(Path.Combine(TargetFolder, entry.FullName));
+                        var targetFile = File.ReadAllBytes(Path.Combine(TargetFolder, entry.FullName));
                         var originalFileSignature = algo.ComputeHash(archivedFile);
                         originalFileHash = BitConverter.ToString(originalFileSignature);
-                        originalFileSignature = algo.ComputeHash(targetFile);
+                        originalFileSignature = SHA256.HashData(targetFile);
                         targetFileHash = BitConverter.ToString(originalFileSignature);
-                        archivedFile.Dispose();
-                        targetFile.Close();                        
+                        archivedFile.Dispose();                       
                     }
                     if (originalFileHash != targetFileHash) 
                     {

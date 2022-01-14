@@ -26,12 +26,7 @@ namespace Halva.Package.Core.Utilities
             Aes encryptionKit = Aes.Create();
             encryptionKit.KeySize = 256;
             encryptionKit.Padding = PaddingMode.PKCS7;
-            byte[] hashCode;
-            using (HashAlgorithm hash = SHA512.Create())
-            {
-                hashCode = hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
-
+            byte[] hashCode = SHA512.HashData(Encoding.UTF8.GetBytes(password));
             var key = new Rfc2898DeriveBytes(password, hashCode, 50000, HashAlgorithmName.SHA512);
             encryptionKit.Key = key.GetBytes(encryptionKit.KeySize / 8);
             encryptionKit.IV = key.GetBytes(encryptionKit.BlockSize / 8);
@@ -57,12 +52,7 @@ namespace Halva.Package.Core.Utilities
             Aes encryptionKit = Aes.Create();
             encryptionKit.KeySize = 256;
             encryptionKit.Padding = PaddingMode.PKCS7;
-            byte[] hashCode;
-            using (HashAlgorithm hash = SHA512.Create())
-            {
-                hashCode = hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
-
+            byte[] hashCode = SHA512.HashData(Encoding.UTF8.GetBytes(password));
             var key = new Rfc2898DeriveBytes(password, hashCode, 50000, HashAlgorithmName.SHA512);
             encryptionKit.Key = key.GetBytes(encryptionKit.KeySize / 8);
             encryptionKit.IV = key.GetBytes(encryptionKit.BlockSize / 8);

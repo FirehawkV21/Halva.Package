@@ -33,6 +33,7 @@
 		<IsTrimmable>true</IsTrimmable>
 		<LangVersion>latest</LangVersion>
 		<RepositoryType>git</RepositoryType>
+    <FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -56,30 +57,6 @@
 	<PackageVersionSettings>AssemblyVersion.None.Alpha</PackageVersionSettings>
 	<AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
 	<InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
-		<FileAlignment>4096</FileAlignment>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.1|AnyCPU'">
-		<FileAlignment>4096</FileAlignment>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net5.0|AnyCPU'">
-		<FileAlignment>4096</FileAlignment>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net5.0|AnyCPU'">
-		<FileAlignment>4096</FileAlignment>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
-		<FileAlignment>4096</FileAlignment>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
-		<FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 
 	<ItemGroup>

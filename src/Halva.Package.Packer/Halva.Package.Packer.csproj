@@ -8,23 +8,20 @@
 		<Product>Halva Package</Product>
 		<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 		<PackageId>Halva.Package.Packer</PackageId>
-		<Version>1.0.7-20210913</Version>
+		<Version>1.0.7-20211224</Version>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishTrimmed>true</PublishTrimmed>
 		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 		<TieredCompilation>true</TieredCompilation>
-		<AssemblyVersion>1.0.7.21256</AssemblyVersion>
-		<FileVersion>1.0.7.21256</FileVersion>
+		<AssemblyVersion>1.0.7.21358</AssemblyVersion>
+		<FileVersion>1.0.7.21358</FileVersion>
 	<Copyright>2021 © Studio ACE</Copyright>
 	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
-	<PackageReleaseNotes>- Splitted the audio files to a separate package.
-- Fixed a bug where the icon file was ommited from the assets package.</PackageReleaseNotes>
+	<PackageReleaseNotes>- Implemented multi-threading for packing.</PackageReleaseNotes>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
-	<PropertyGroup Condition="$(TargetFramework)=='net6.0'">
-		<PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+  <FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 
 	<ItemGroup>
