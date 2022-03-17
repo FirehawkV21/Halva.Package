@@ -93,6 +93,31 @@ namespace Halva.Package.Core.Manager
             }
         }
 
+        public HalvaPackage (in string pswd, string source)
+        {
+            WorkingArchive = ReserveRandomArchive();
+            SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
+            DestinationLocation = new StringBuilder(source);
+            Password = pswd;
+            EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
+            FileList = PullFiles(ArchiveMemoryStream);
+        }
+
+        public HalvaPackage (in string pswd, string source, string destination)
+        {
+            SourceLocation = new StringBuilder(source);
+            WorkingArchive = ReserveRandomArchive();
+            DestinationLocation = new StringBuilder(destination);
+            Password = pswd;
+            List<string> foundFilesList = PullFilesFromFolder(source);
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
+            foreach (string file in foundFilesList)
+            {
+                AddFileToList(file);
+            }
+        }
+
         /// <summary>
         /// Retrieves the name of the temporary archive.
         /// </summary>
@@ -213,7 +238,6 @@ namespace Halva.Package.Core.Manager
         public void ExtractFile(string entry, string exportLocation)
         {
             var candidateFile = ArchiveMemoryStream.GetEntry(entry);
-
             candidateFile.ExtractToFile(exportLocation, true);
 
         }
