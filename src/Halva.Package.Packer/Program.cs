@@ -100,13 +100,13 @@ namespace Halva.Package.Packer
                                 if (int.TryParse(stringBuffer, out assetCompress) && assetCompress <= 3)
                                 {
                                     Console.ForegroundColor = ConsoleColor.DarkGreen;
-                                    Console.WriteLine("Compression level for assets is now set.");
+                                    Console.WriteLine(Properties.Resources.AssetsCompressionLevelSet);
                                     Console.ResetColor();
                                 }
                                 else
                                 {
                                     Console.ForegroundColor = ConsoleColor.DarkYellow;
-                                    Console.WriteLine("Compression level for assets is not set. Using the default setting");
+                                    Console.WriteLine(Properties.Resources.AssetsCompressionLevelNotSet);
                                     Console.ResetColor();
                                 }
                             }
@@ -119,13 +119,13 @@ namespace Halva.Package.Packer
                                 if (int.TryParse(stringBuffer, out assetCompress) && assetCompress <= 3)
                                 {
                                     Console.ForegroundColor = ConsoleColor.DarkGreen;
-                                    Console.WriteLine("Compression level for database and engine code is now set.");
+                                    Console.WriteLine(Halva.Package.Packer.Properties.Resources.BinCompressionLevelSet);
                                     Console.ResetColor();
                                 }
                                 else
                                 {
                                     Console.ForegroundColor = ConsoleColor.DarkYellow;
-                                    Console.WriteLine("Compression level for database and engine code is not set. Using the default setting");
+                                    Console.WriteLine(Halva.Package.Packer.Properties.Resources.BinCompressionLevelNotSet);
                                     Console.ResetColor();
                                 }
                             }

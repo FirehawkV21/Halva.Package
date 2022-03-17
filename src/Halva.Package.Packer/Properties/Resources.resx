@@ -104,7 +104,7 @@
     <value>= Halva Packer Tool</value>
   </data>
   <data name="ProgramVersion" xml:space="preserve">
-    <value>= Version R1.00 ({0})</value>
+    <value>= Version R1.01 ({0})</value>
   </data>
   <data name="AuthorSignature" xml:space="preserve">
     <value>= Developed by Studio ACE</value>
@@ -174,5 +174,17 @@
   </data>
   <data name="EngineCompressedText" xml:space="preserve">
     <value>Compressed the engine files.</value>
+  </data>
+  <data name="AssetsCompressionLevelSet" xml:space="preserve">
+    <value>Compression level for assets is now set.</value>
+  </data>
+  <data name="AssetsCompressionLevelNotSet" xml:space="preserve">
+    <value>Compression level for assets is not set. Using the default setting.</value>
+  </data>
+  <data name="BinCompressionLevelSet" xml:space="preserve">
+    <value>Compression level for database and engine code is now set.</value>
+  </data>
+  <data name="BinCompressionLevelNotSet" xml:space="preserve">
+    <value>Compression level for database and engine code is not set. Using the default setting</value>
   </data>
 </root>

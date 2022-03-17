@@ -70,6 +70,24 @@ namespace Halva.Package.Packer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compression level for assets is not set. Using the default setting..
+        /// </summary>
+        internal static string AssetsCompressionLevelNotSet {
+            get {
+                return ResourceManager.GetString("AssetsCompressionLevelNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compression level for assets is now set..
+        /// </summary>
+        internal static string AssetsCompressionLevelSet {
+            get {
+                return ResourceManager.GetString("AssetsCompressionLevelSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Compressed the audio files..
         /// </summary>
         internal static string AudioCompressedText {
@@ -84,6 +102,24 @@ namespace Halva.Package.Packer.Properties {
         internal static string AuthorSignature {
             get {
                 return ResourceManager.GetString("AuthorSignature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compression level for database and engine code is not set. Using the default setting.
+        /// </summary>
+        internal static string BinCompressionLevelNotSet {
+            get {
+                return ResourceManager.GetString("BinCompressionLevelNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compression level for database and engine code is now set..
+        /// </summary>
+        internal static string BinCompressionLevelSet {
+            get {
+                return ResourceManager.GetString("BinCompressionLevelSet", resourceCulture);
             }
         }
         
@@ -241,7 +277,7 @@ namespace Halva.Package.Packer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to = Version R1.00 ({0}).
+        ///   Looks up a localized string similar to = Version R1.01 ({0}).
         /// </summary>
         internal static string ProgramVersion {
             get {
