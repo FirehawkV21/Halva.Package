@@ -1,5 +1,6 @@
 ﻿global using System;
 global using System.IO;
+using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using Halva.Package.Core.Manager;
@@ -15,6 +16,9 @@ namespace Halva.Package.Packer
             string archiveDestination = null;
             string password = null;
             bool settingsSet = false;
+            bool compatMode = false;
+            int assetCompress = 0;
+            int binCompress = 0;
             string stringBuffer;
             Console.WriteLine(Properties.Resources.SplitterText);
             Console.WriteLine(Properties.Resources.ProgramTitle);
@@ -83,6 +87,44 @@ namespace Halva.Package.Packer
                                 Console.WriteLine(Properties.Resources.NoOutputSetText);
                                 Console.ResetColor();
 
+                            }
+                            break;
+                        case "--AssetsCompression":
+                            if (argnum <= args.Length - 1 && !args[argnum + 1].Contains("--"))
+                            {
+
+                                stringBuffer = args[argnum + 1];
+                                if (int.TryParse(stringBuffer, out assetCompress) && assetCompress <= 3)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                    Console.WriteLine("Compression level for assets is now set.");
+                                    Console.ResetColor();
+                                }
+                                else
+                                {
+                                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                    Console.WriteLine("Compression level for assets is not set. Using the default setting");
+                                    Console.ResetColor();
+                                }
+                            }
+                            break;
+                        case "--BinCompression":
+                            if (argnum <= args.Length - 1 && !args[argnum + 1].Contains("--"))
+                            {
+
+                                stringBuffer = args[argnum + 1];
+                                if (int.TryParse(stringBuffer, out assetCompress) && assetCompress <= 3)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                    Console.WriteLine("Compression level for database and engine code is now set.");
+                                    Console.ResetColor();
+                                }
+                                else
+                                {
+                                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                    Console.WriteLine("Compression level for database and engine code is not set. Using the default setting");
+                                    Console.ResetColor();
+                                }
                             }
                             break;
 
@@ -191,6 +233,7 @@ namespace Halva.Package.Packer
                         Task buildEncryptedDatabase = Task.Run(() =>
                         {
                             Console.WriteLine(Properties.Resources.CompressingDatabaseText);
+                            encryptedDatabasePackage.CompressionOption = CheckLevel(binCompress);
                             encryptedDatabasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "data");
                             encryptedDatabasePackage.CloseArchive();
                             encryptedDatabasePackage.Dispose();
@@ -199,6 +242,7 @@ namespace Halva.Package.Packer
                         Task buildEncryptedEngine = Task.Run(() =>
                         {
                             Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
+                            encryptedEnginePackage.CompressionOption = CheckLevel(binCompress);
                             encryptedEnginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
                             if (gameFolder == projectLocation) encryptedEnginePackage.AddFileToList(gameFolder, "index.html");
                             else
@@ -251,6 +295,7 @@ namespace Halva.Package.Packer
                         Task buildDatabase = Task.Run(() =>
                         {
                             Console.WriteLine(Properties.Resources.CompressingDatabaseText);
+                            databasePackage.CompressionOption = CheckLevel(binCompress);
                             databasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "data");
                             databasePackage.CloseArchive();
                             databasePackage.Dispose();
@@ -259,6 +304,7 @@ namespace Halva.Package.Packer
                         Task buildEngine = Task.Run(() =>
                         {
                             Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
+                            enginePackage.CompressionOption = CheckLevel(binCompress);
                             enginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
                             if (gameFolder == projectLocation) enginePackage.AddFileToList(gameFolder, "index.html");
                             else
@@ -283,6 +329,20 @@ namespace Halva.Package.Packer
 
             }
 
+        }
+
+        static CompressionLevel CheckLevel (int level)
+        {
+            switch (level){
+                case 3:
+                    return CompressionLevel.NoCompression;
+                case 2:
+                    return CompressionLevel.Fastest;
+                case 1:
+                    return CompressionLevel.SmallestSize;
+                default:
+                    return CompressionLevel.Optimal;
+            }
         }
     }
 }

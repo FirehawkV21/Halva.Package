@@ -41,12 +41,10 @@ namespace Halva.Package.Core.Manager
         {
             return (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ? "\\" : "/";
         }
-#if NET6_0_OR_GREATER
         /// <summary>
-        /// If this flag is true, use Brotli's highest compression. Creates a smaller archive at the cost of compression and decompression time.
+        /// Adjusts the compression of the final archive.
         /// </summary>
-        public bool UseAggresiveCompression { get; set; }
-#endif
+        public CompressionLevel CompressionOption { get; set; } = CompressionLevel.Optimal;
 
         /// <summary>
         /// Retrieves the name of the temporary archive.
