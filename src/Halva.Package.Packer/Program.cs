@@ -1,9 +1,9 @@
 ﻿global using System;
 global using System.IO;
+using Halva.Package.Core.Manager;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text;
-using Halva.Package.Core.Manager;
 
 namespace Halva.Package.Packer
 {
@@ -16,10 +16,13 @@ namespace Halva.Package.Packer
             string archiveDestination = null;
             string password = null;
             bool settingsSet = false;
-            bool compatMode = false;
             int assetCompress = 0;
             int binCompress = 0;
             string stringBuffer;
+            IHalvaPackage audioPackage;
+            IHalvaPackage assetsPackage;
+            IHalvaPackage databasePackage;
+            IHalvaPackage enginePackage;
             Console.WriteLine(Properties.Resources.SplitterText);
             Console.WriteLine(Properties.Resources.ProgramTitle);
             Console.WriteLine(Properties.Resources.ProgramVersion, Assembly.GetExecutingAssembly().GetName().Version);
@@ -187,153 +190,88 @@ namespace Halva.Package.Packer
             {
                 if (!Directory.Exists(archiveDestination) && !string.IsNullOrEmpty(archiveDestination)) Directory.CreateDirectory(archiveDestination);
                 string destinationPath = !string.IsNullOrEmpty(archiveDestination) ? archiveDestination : gameFolder;
+                audioPackage = new HalvaPackage();
+                assetsPackage = new HalvaPackage();
+                databasePackage = new HalvaPackage();
+                enginePackage = new HalvaPackage();
+                if (mustEncrypt && password != null)
+                {
+                    audioPackage.Password = password;
+                    assetsPackage.Password = password;
+                    databasePackage.Password = password;
+                    enginePackage.Password = password;
+                }
+                assetsPackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "AssetsPackage.halva"));
+                assetsPackage.CompressionOption = CheckLevel(assetCompress);
+                audioPackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "AudioPackage.halva"));
+                audioPackage.CompressionOption = CheckLevel(assetCompress);
+                databasePackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "DatabasePackage.halva"));
+                databasePackage.CompressionOption = CheckLevel(assetCompress);
+                enginePackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "EnginePackage.halva"));
+                enginePackage.CompressionOption = CheckLevel(assetCompress);
                 try
                 {
-                    if (mustEncrypt && password != null)
+                    Task buildAssets = Task.Run(() =>
                     {
-                        var encryptedAssetsPackage =
-                            new EncryptedHalvaPackage();
-                        var encryptedAudioAssetsPackage = new EncryptedHalvaPackage();
-                        var encryptedDatabasePackage =
-                            new EncryptedHalvaPackage();
-                        var encryptedEnginePackage =
-                            new EncryptedHalvaPackage();
-                        encryptedAssetsPackage.Password = password;
-                        encryptedAudioAssetsPackage.Password = password;
-                        encryptedDatabasePackage.Password = password;
-                        encryptedEnginePackage.Password = password;
-                        encryptedAssetsPackage.DestinationLocation =
-                            new StringBuilder(Path.Combine(destinationPath, "AssetsPackage.halva"));
-                        encryptedAudioAssetsPackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "AudioPackage.halva"));
-                        encryptedDatabasePackage.DestinationLocation =
-                            new StringBuilder(Path.Combine(destinationPath, "DatabasePackage.halva"));
-                        encryptedEnginePackage.DestinationLocation =
-                            new StringBuilder(Path.Combine(destinationPath, "EnginePackage.halva"));
-                        Task buildEncryptedAssets = Task.Run(() =>
-                        {
-                            Console.WriteLine(Properties.Resources.CompressingAssetsText);
-                            encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "img");
-                            if (Directory.Exists(Path.Combine(gameFolder, "fonts"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "fonts");
-                            if (Directory.Exists(Path.Combine(gameFolder, "css"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "css");
-                            if (Directory.Exists(Path.Combine(gameFolder, "effects"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "effects");
-                            if (Directory.Exists(Path.Combine(gameFolder, "movies"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "movies");
-                            if (Directory.Exists(Path.Combine(gameFolder, "icon"))) encryptedAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "icon");
-                            encryptedAssetsPackage.CloseArchive();
-                            encryptedAssetsPackage.Dispose();
-                            Console.WriteLine(Properties.Resources.AssetsCompressedText);
-                        });
-                        Task buildEncryptedAudio = Task.Run(() =>
-                        {
-                            Console.WriteLine(Properties.Resources.CompressingAudioFilesText);
-                            encryptedAudioAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "audio");
-                            encryptedAudioAssetsPackage.CloseArchive();
-                            encryptedAudioAssetsPackage.Dispose();
-                            Console.WriteLine(Properties.Resources.AudioCompressedText);
-                        });
-                        Task buildEncryptedDatabase = Task.Run(() =>
-                        {
-                            Console.WriteLine(Properties.Resources.CompressingDatabaseText);
-                            encryptedDatabasePackage.CompressionOption = CheckLevel(binCompress);
-                            encryptedDatabasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "data");
-                            encryptedDatabasePackage.CloseArchive();
-                            encryptedDatabasePackage.Dispose();
-                            Console.WriteLine(Properties.Resources.DatabaseCompressedText);
-                        });
-                        Task buildEncryptedEngine = Task.Run(() =>
-                        {
-                            Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
-                            encryptedEnginePackage.CompressionOption = CheckLevel(binCompress);
-                            encryptedEnginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
-                            if (gameFolder == projectLocation) encryptedEnginePackage.AddFileToList(gameFolder, "index.html");
-                            else
-                            {
-                                var relativeLocation = gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "");
-                                encryptedEnginePackage.AddFileToList(projectLocation, Path.Combine(relativeLocation, "index.html"));
-                            }
-                            encryptedEnginePackage.AddFileToList(projectLocation, "package.json");
-                            encryptedEnginePackage.CloseArchive();
-                            encryptedEnginePackage.Dispose();
-                            Console.WriteLine(Properties.Resources.EngineCompressedText);
-                        });
-                        await Task.WhenAll(buildEncryptedAssets, buildEncryptedAudio, buildEncryptedDatabase, buildEncryptedEngine);
-                    }
-                    else
+                        Console.WriteLine(Properties.Resources.CompressingAssetsText);
+                        assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "img");
+                        if (Directory.Exists(Path.Combine(gameFolder, "fonts"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "fonts");
+                        if (Directory.Exists(Path.Combine(gameFolder, "css"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "css");
+                        if (Directory.Exists(Path.Combine(gameFolder, "effects"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "effects");
+                        if (Directory.Exists(Path.Combine(gameFolder, "movies"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "movies");
+                        if (Directory.Exists(Path.Combine(gameFolder, "icon"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "icon");
+                        assetsPackage.CloseArchive();
+                        assetsPackage.Dispose();
+                        Console.WriteLine(Properties.Resources.AssetsCompressedText);
+                    });
+                    Task buildAudio = Task.Run(() =>
                     {
-                        var assetsPackage = new HalvaPackage();
-                        var databasePackage = new HalvaPackage();
-                        var enginePackage = new HalvaPackage();
-                        var audioAssetsPackage = new HalvaPackage();
-                        assetsPackage.DestinationLocation =
-                            new StringBuilder(Path.Combine(destinationPath, "AssetsPackage.halva"));
-                        audioAssetsPackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "audioPackage.halva"));
-                        databasePackage.DestinationLocation =
-                            new StringBuilder(Path.Combine(destinationPath, "DatabasePackage.halva"));
-                        enginePackage.DestinationLocation =
-                            new StringBuilder(Path.Combine(destinationPath, "EnginePackage.halva"));
-                        Task buildAssets = Task.Run(() =>
+                        Console.WriteLine(Properties.Resources.CompressingAudioFilesText);
+                        audioPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "audio");
+                        audioPackage.CloseArchive();
+                        audioPackage.Dispose();
+                        Console.WriteLine(Properties.Resources.AudioCompressedText);
+                    });
+                    Task buildDatabase = Task.Run(() =>
+                    {
+                        Console.WriteLine(Properties.Resources.CompressingDatabaseText);
+                        databasePackage.CompressionOption = CheckLevel(binCompress);
+                        databasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "data");
+                        databasePackage.CloseArchive();
+                        databasePackage.Dispose();
+                        Console.WriteLine(Properties.Resources.DatabaseCompressedText);
+                    });
+                    Task buildEngine = Task.Run(() =>
+                    {
+                        Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
+                        enginePackage.CompressionOption = CheckLevel(binCompress);
+                        enginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "js");
+                        if (gameFolder == projectLocation) enginePackage.AddFileToList(gameFolder, "index.html");
+                        else
                         {
-                            Console.WriteLine(Properties.Resources.CompressingAssetsText);
-                            assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "img");
-                            assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "icon");
-                            if (Directory.Exists(Path.Combine(gameFolder, "fonts"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "fonts");
-                            if (Directory.Exists(Path.Combine(gameFolder, "css"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "css");
-                            if (Directory.Exists(Path.Combine(gameFolder, "effects"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "effects");
-                            if (Directory.Exists(Path.Combine(gameFolder, "movies"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "movies");
-                            if (Directory.Exists(projectLocation + Path.Combine(gameFolder, "icon"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "icon");
-                            assetsPackage.CloseArchive();
-                            assetsPackage.Dispose();
-                            Console.WriteLine(Properties.Resources.AssetsCompressedText);
-                        });
-                        Task buildAudio = Task.Run(() =>
-                        {
-                            Console.WriteLine(Properties.Resources.CompressingAudioFilesText);
-                            audioAssetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "audio");
-                            audioAssetsPackage.CloseArchive();
-                            audioAssetsPackage.Dispose();
-                            Console.WriteLine(Properties.Resources.AudioCompressedText);
-                        });
-                        Task buildDatabase = Task.Run(() =>
-                        {
-                            Console.WriteLine(Properties.Resources.CompressingDatabaseText);
-                            databasePackage.CompressionOption = CheckLevel(binCompress);
-                            databasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "data");
-                            databasePackage.CloseArchive();
-                            databasePackage.Dispose();
-                            Console.WriteLine(Properties.Resources.DatabaseCompressedText);
-                        });
-                        Task buildEngine = Task.Run(() =>
-                        {
-                            Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
-                            enginePackage.CompressionOption = CheckLevel(binCompress);
-                            enginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "") + HalvaPackageBase.GetFolderCharacter() + "js");
-                            if (gameFolder == projectLocation) enginePackage.AddFileToList(gameFolder, "index.html");
-                            else
-                            {
-                                var relativeLocation = gameFolder.Replace(projectLocation + HalvaPackageBase.GetFolderCharacter(), "");
-                                enginePackage.AddFileToList(projectLocation, Path.Combine(relativeLocation, "index.html"));
-                            }
-                            enginePackage.AddFileToList(projectLocation, "package.json");
-                            enginePackage.CloseArchive();
-                            enginePackage.Dispose();
-                            Console.WriteLine(Properties.Resources.EngineCompressedText);
-                        });
-                        await Task.WhenAll(buildAssets, buildAudio, buildDatabase, buildEngine);
-                    }
+                            var relativeLocation = gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "");
+                            enginePackage.AddFileToList(projectLocation, Path.Combine(relativeLocation, "index.html"));
+                        }
+                        enginePackage.AddFileToList(projectLocation, "package.json");
+                        enginePackage.CloseArchive();
+                        enginePackage.Dispose();
+                        Console.WriteLine(Properties.Resources.EngineCompressedText);
+                    });
+                    await Task.WhenAll(buildAssets, buildAudio, buildDatabase, buildEngine);
+
                 }
                 catch (Exception e)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine(e);
                 }
-
-
             }
-
         }
 
-        static CompressionLevel CheckLevel (int level)
+        static CompressionLevel CheckLevel(int level)
         {
-            switch (level){
+            switch (level)
+            {
                 case 3:
                     return CompressionLevel.NoCompression;
                 case 2:
