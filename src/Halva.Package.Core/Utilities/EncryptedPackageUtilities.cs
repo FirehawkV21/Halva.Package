@@ -58,7 +58,7 @@ namespace Halva.Package.Core.Utilities
         /// <param name="inputArchive">The input archive.</param>
         /// <param name="password">The password of the archive.</param>
         /// <param name="workerArchive">The location for the temp file (that will hold the decompressed archive).</param>
-        public static void DecompressArchive(in string inputArchive, in string password, in string workerArchive)
+        public static void DecompressArchive(in string inputArchive, in string workerArchive, in string password)
         {
             Aes encryptionKit = Aes.Create();
             encryptionKit.KeySize = 256;
@@ -105,7 +105,7 @@ namespace Halva.Package.Core.Utilities
             Random random = new();
             string archive = TempArchive + random.Next(9999) + ".tmp";
             if (File.Exists(archive)) File.Delete(archive);
-            DecompressArchive(inputArchive, password, archive);
+            DecompressArchive(inputArchive, archive, password);
             ZipFile.ExtractToDirectory(archive, exportDestination, true);
             File.Delete(archive);
 

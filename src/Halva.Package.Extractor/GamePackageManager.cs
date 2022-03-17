@@ -59,7 +59,7 @@ namespace Halva.Package.Bootstrapper
 
         private void ExtractPackage(string PackageName)
         {
-            if (PackagePassword != "") EncryptedPackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), PackagePassword);
+            if (!String.IsNullOrEmpty(PackagePassword) && !String.IsNullOrWhiteSpace(PackagePassword)) EncryptedPackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), PackagePassword);
             else PackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"));
         }
 
@@ -85,8 +85,10 @@ namespace Halva.Package.Bootstrapper
 
         public void UpdateDataFromArchive(string PackageName, string PackageVersionKey)
         {
-                var package = new HalvaPackage(Path.Combine(PackageLocation, PackageName));
-            if (!String.IsNullOrEmpty(PackagePassword) && !String.IsNullOrWhiteSpace(PackagePassword)) package.Password = PackagePassword;
+            HalvaPackage package;
+            if (!String.IsNullOrEmpty(PackagePassword) && !String.IsNullOrWhiteSpace(PackagePassword)) package = new HalvaPackage(PassKey: PackagePassword, Path.Combine(PackageLocation, PackageName));
+            else package = new HalvaPackage(Path.Combine(PackageLocation, PackageName));
+                package.Password = PackagePassword;
                 package.UpdateFromArchive(Path.Combine(ExctractLocation, "GameData"));
                 package.Dispose();
             switch (PackageVersionKey)

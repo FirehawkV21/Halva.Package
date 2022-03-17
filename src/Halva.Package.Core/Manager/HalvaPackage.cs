@@ -61,10 +61,9 @@ namespace Halva.Package.Core.Manager
         }
 
         /// <summary>
-        /// Creates a Halva package using the source folder as the input. It will automatically put the files in the input folder to a temporary archive.
+        /// Opens a Halva Package for editing and/or extracting files.
         /// </summary>
-        /// <param name="source">The source folder.</param>
-        /// <param name="destination">The location of the archive.</param>
+        /// <param name="source">The source archive.</param>
         public HalvaPackage(string source)
         {
             WorkingArchive = ReserveRandomArchive();
@@ -79,7 +78,7 @@ namespace Halva.Package.Core.Manager
         /// Creates a Halva package using the source folder as the input and sets the destination folder for the final package. It will automatically put the files in the input folder to a temporary archive.
         /// </summary>
         /// <param name="source">The source folder.</param>
-        /// <param name="destination">The location of the archive.</param>
+        /// <param name="destination">The location of the final archive.</param>
         public HalvaPackage(string source, string destination)
         {
             SourceLocation = new StringBuilder(source);
@@ -92,24 +91,33 @@ namespace Halva.Package.Core.Manager
                 AddFileToList(file);
             }
         }
-
-        public HalvaPackage (in string pswd, string source)
+        /// <summary>
+        /// Opens an encrypted Halva Package for editing and/or extracting files.
+        /// </summary>
+        /// <param name="PassKey">The password for the archive.</param>
+        /// <param name="source">The source archive.</param>
+        public HalvaPackage (in string PassKey, string source)
         {
             WorkingArchive = ReserveRandomArchive();
             SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
             DestinationLocation = new StringBuilder(source);
-            Password = pswd;
+            Password = PassKey;
             EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
             ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
             FileList = PullFiles(ArchiveMemoryStream);
         }
-
-        public HalvaPackage (in string pswd, string source, string destination)
+        /// <summary>
+        /// Creates an encrypted Halva package using the source folder as the input and sets the destination folder for the final package. It will automatically put the files in the input folder to a temporary archive.
+        /// </summary>
+        /// <param name="PassKey">The password for the archive.</param>
+        /// <param name="source">The source folder.</param>
+        /// <param name="destination">The location of the final archive.</param>
+        public HalvaPackage (in string PassKey, string source, string destination)
         {
             SourceLocation = new StringBuilder(source);
             WorkingArchive = ReserveRandomArchive();
             DestinationLocation = new StringBuilder(destination);
-            Password = pswd;
+            Password = PassKey;
             List<string> foundFilesList = PullFilesFromFolder(source);
             ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
             foreach (string file in foundFilesList)
