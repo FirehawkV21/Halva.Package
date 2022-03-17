@@ -65,7 +65,11 @@ namespace Halva.Package.Core.Manager
         public void CloseArchive()
         {
             ArchiveMemoryStream.Dispose();
+#if NET6_0_OR_GREATER
+            PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), UseAggresiveCompression);
+#else
             PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString());
+#endif
         }
 
         /// <summary>

@@ -42,6 +42,23 @@ namespace Halva.Package.Core.Utilities
             }
         }
 
+        public static void CompressArchive(in string inputArchive, in string outputArchive, bool AgressiveCompression)
+        {
+            using (FileStream inputStream = File.OpenRead(inputArchive))
+            using (FileStream outputStream = File.Create(outputArchive))
+#if NET6_0_OR_GREATER
+            using (BrotliStream compressorStream = new(outputStream, (AgressiveCompression) ? CompressionLevel.SmallestSize : CompressionLevel.Optimal))
+            {
+                inputStream.CopyTo(compressorStream);
+            }
+#else
+            using (BrotliStream compressorStream = new(outputStream, CompressionLevel.Optimal))
+            {
+                inputStream.CopyTo(compressorStream);
+            }
+#endif
+        }
+
         /// <summary>
         /// Exports all files from a Halva package.
         /// </summary>

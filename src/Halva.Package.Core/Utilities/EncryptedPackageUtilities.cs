@@ -22,7 +22,11 @@ namespace Halva.Package.Core.Utilities
         /// <param name="password">The archive's password.</param>
         public static void CompressArchive(in string inputArchive, in string outputArchive, in string password)
         {
+            CompressArchive(inputArchive, outputArchive, password, false);
+        }
 
+        public static void CompressArchive(in string inputArchive, in string outputArchive, in string password, bool AgressiveCompression)
+        {
             Aes encryptionKit = Aes.Create();
             encryptionKit.KeySize = 256;
             encryptionKit.Padding = PaddingMode.PKCS7;
@@ -34,10 +38,17 @@ namespace Halva.Package.Core.Utilities
             using (FileStream inputStream = File.OpenRead(inputArchive))
             using (FileStream outputStream = File.Create(outputArchive))
             using (CryptoStream cryptStream = new(outputStream, encryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
+#if NET6_0_OR_GREATER
+            using (BrotliStream compressorStream = new(cryptStream, (AgressiveCompression) ? CompressionLevel.SmallestSize : CompressionLevel.Optimal))
+            {
+                inputStream.CopyTo(compressorStream);
+            }
+#else
             using (BrotliStream compressorStream = new(cryptStream, CompressionLevel.Optimal))
             {
                 inputStream.CopyTo(compressorStream);
             }
+#endif
             encryptionKit.Dispose();
         }
 
