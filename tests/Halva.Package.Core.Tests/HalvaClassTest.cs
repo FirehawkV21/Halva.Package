@@ -10,9 +10,9 @@ namespace Halva.Package.Core.Tests
     public class HalvaClassTest
     {
 
-        private string sourceFolder = "SampleFiles";
-        private string destinationArchive = "SampleFiles2.halva";
-        private string destinationFolder = "SampleFiles2";
+        private readonly string sourceFolder = "SampleFiles";
+        private readonly string destinationArchive = "SampleFiles2.halva";
+        private readonly string destinationFolder = "SampleFiles2";
 
         private void Cleanup()
         {

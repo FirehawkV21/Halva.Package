@@ -8,10 +8,10 @@ namespace Halva.Package.Core.Tests
 {
     public class EncryptedHalvaTest
     {
-        private string sourceFolder = "SampleFiles";
-        private string destinationArchive = "SampleFiles4.halva";
-        private string destinationFolder = "SampleFiles4";
-        private string testPassword = "1234567890abcdefghijklm";
+        private readonly string sourceFolder = "SampleFiles";
+        private readonly string destinationArchive = "SampleFiles4.halva";
+        private readonly string destinationFolder = "SampleFiles4";
+        private readonly string testPassword = "1234567890abcdefghijklm";
 
         private void Cleanup()
         {
