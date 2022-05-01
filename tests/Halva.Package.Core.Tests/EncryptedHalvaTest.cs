@@ -12,6 +12,7 @@ namespace Halva.Package.Core.Tests
         private readonly string destinationArchive = "SampleFiles4.halva";
         private readonly string destinationFolder = "SampleFiles4";
         private readonly string testPassword = "1234567890abcdefghijklm";
+        private readonly string ivKey = "mlkjihgfedcba0987654321";
 
         private void Cleanup()
         {
@@ -30,6 +31,15 @@ namespace Halva.Package.Core.Tests
         }
 
         [Fact]
+        public void ArchiveBuilderTest2()
+        {
+            Cleanup();
+            HalvaPackage package = new(PassKey: testPassword, IV: ivKey, sourceFolder, destinationArchive);
+            package.CloseArchive();
+            EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword, ivKey);
+        }
+
+        [Fact]
         public void CanArchiveBuilderExtract()
         {
             HalvaPackage package = new(PassKey: testPassword, destinationArchive);
@@ -37,9 +47,27 @@ namespace Halva.Package.Core.Tests
         }
 
         [Fact]
+        public void CanArchiveBuilderExtractWithIV()
+        {
+            HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive);
+            package.ExtractFile("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
+        }
+
+        [Fact]
         public void CanArchiveRemoveEntry()
         {
             HalvaPackage package = new(PassKey: testPassword, destinationArchive);
+            package.RemoveFileFromList("TestImage.webp");
+            package.CloseArchive();
+            if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
+            EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword);
+            Assert.Equal(2, Directory.EnumerateFiles(destinationFolder).Count());
+        }
+
+        [Fact]
+        public void CanArchiveRemoveEntryWithIV()
+        {
+            HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive);
             package.RemoveFileFromList("TestImage.webp");
             package.CloseArchive();
             if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
@@ -59,6 +87,17 @@ namespace Halva.Package.Core.Tests
         }
 
         [Fact]
+        public void CanArchiveAddEntryWithIV()
+        {
+            HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive);
+            package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
+            package.CloseArchive();
+            if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
+            EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword);
+            Assert.Equal(3, Directory.EnumerateFiles(destinationFolder).Count());
+        }
+
+        [Fact]
         public void CanLibrarySaveChanges()
         {
             HalvaPackage package = new(PassKey: testPassword, destinationArchive);
@@ -69,9 +108,26 @@ namespace Halva.Package.Core.Tests
         }
 
         [Fact]
+        public void CanLibrarySaveChangesWithIV()
+        {
+            HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive);
+            package.RemoveFileFromList("TestImage.webp");
+            package.Save();
+            package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
+            package.Save();
+        }
+
+        [Fact]
         public void CanLibraryCheckForDifferencesInEncryptedArchives()
         {
             HalvaPackage package = new(PassKey: testPassword, destinationArchive);
+            package.UpdateFromArchive(destinationFolder);
+        }
+
+        [Fact]
+        public void CanLibraryCheckForDifferencesInEncryptedArchivesWithIV()
+        {
+            HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive);
             package.UpdateFromArchive(destinationFolder);
         }
 

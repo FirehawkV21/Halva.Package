@@ -23,6 +23,8 @@ public static class EncryptedPackageUtilities
     /// <param name="password">The archive's password.</param>
     public static void CompressArchive(in string inputArchive, in string outputArchive, in string password) => CompressArchive(inputArchive, outputArchive, password, CompressionLevel.Optimal);
 
+    public static void CompressArchive(in string inputArchive, in string outputArchive, in string password, in string ivKey) => CompressArchive(inputArchive, outputArchive, password, ivKey, CompressionLevel.Optimal);
+
     /// <summary>
     /// Compresses the encrypted archive.
     /// </summary>
@@ -144,6 +146,16 @@ public static class EncryptedPackageUtilities
         File.Delete(archive);
     }
 
+    public static void CreateArchiveFromFolder(in string input, in string archiveLocation, in string password, in string iv)
+    {
+        Random random = new();
+        string archive = TempArchive + random.Next(9999) + ".tmp";
+        if (File.Exists(archive)) File.Delete(archive);
+        ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
+        CompressArchive(archive, archiveLocation, password, iv);
+        File.Delete(archive);
+    }
+
     /// <summary>
     /// Exports all files from an encrypted Halva package.
     /// </summary>
@@ -156,6 +168,17 @@ public static class EncryptedPackageUtilities
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
         DecompressArchive(inputArchive, archive, password);
+        ZipFile.ExtractToDirectory(archive, exportDestination, true);
+        File.Delete(archive);
+
+    }
+
+    public static void ExportFromArchive(in string inputArchive, in string exportDestination, in string password, in string ivKey)
+    {
+        Random random = new();
+        string archive = TempArchive + random.Next(9999) + ".tmp";
+        if (File.Exists(archive)) File.Delete(archive);
+        DecompressArchive(inputArchive, archive, password, ivKey);
         ZipFile.ExtractToDirectory(archive, exportDestination, true);
         File.Delete(archive);
 

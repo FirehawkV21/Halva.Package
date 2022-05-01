@@ -403,7 +403,8 @@ public class HalvaPackage : IDisposable, IHalvaPackage
     {
 
         if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-            EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
+            if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password, IVKey);
+            else EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
         else PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive);
         ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
     }
