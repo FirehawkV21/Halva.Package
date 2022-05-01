@@ -105,6 +105,19 @@ public class HalvaPackage : IDisposable, IHalvaPackage
         ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
         FileList = PullFiles(ArchiveMemoryStream);
     }
+
+    public HalvaPackage (in string PassKey, in string IV, string source)
+    {
+        WorkingArchive = ReserveRandomArchive();
+        SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
+        DestinationLocation = new StringBuilder(source);
+        IVKey = IV;
+        Password = PassKey;
+        EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password, IVKey);
+        ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
+        FileList = PullFiles(ArchiveMemoryStream);
+    }
+
     /// <summary>
     /// Creates an encrypted Halva package using the source folder as the input and sets the destination folder for the final package. It will automatically put the files in the input folder to a temporary archive.
     /// </summary>
@@ -117,6 +130,21 @@ public class HalvaPackage : IDisposable, IHalvaPackage
         WorkingArchive = ReserveRandomArchive();
         DestinationLocation = new StringBuilder(destination);
         Password = PassKey;
+        List<string> foundFilesList = PullFilesFromFolder(source);
+        ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
+        foreach (string file in foundFilesList)
+        {
+            AddFileToList(file);
+        }
+    }
+
+    public HalvaPackage(in string PassKey, in string IV, string source, string destination)
+    {
+        SourceLocation = new StringBuilder(source);
+        WorkingArchive = ReserveRandomArchive();
+        DestinationLocation = new StringBuilder(destination);
+        Password = PassKey;
+        IVKey = IV;
         List<string> foundFilesList = PullFilesFromFolder(source);
         ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
         foreach (string file in foundFilesList)
@@ -363,7 +391,8 @@ public class HalvaPackage : IDisposable, IHalvaPackage
     {
         ArchiveMemoryStream.Dispose();
         if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-            EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password, CompressionOption);
+            if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password, IVKey, CompressionOption); 
+            else EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password, CompressionOption);
         else PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption);
     }
 
