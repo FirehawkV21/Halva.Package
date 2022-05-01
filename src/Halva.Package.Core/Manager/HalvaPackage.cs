@@ -48,6 +48,8 @@ public class HalvaPackage : IDisposable, IHalvaPackage
     /// </summary>
     public string Password { get; set; }
 
+    public string IVKey { get; set; }
+
     /// <summary>
     /// Creates an empty Encrypted Halva Package.
     /// </summary>

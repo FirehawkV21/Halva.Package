@@ -14,8 +14,8 @@
 		<PublishTrimmed>true</PublishTrimmed>
 		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 		<TieredCompilation>true</TieredCompilation>
-		<AssemblyVersion>1.1.1.22078</AssemblyVersion>
-		<FileVersion>1.1.1.22078</FileVersion>
+		<AssemblyVersion>1.1.1.22121</AssemblyVersion>
+		<FileVersion>1.1.1.22121</FileVersion>
 	<Copyright>2022 © Studio ACE</Copyright>
 	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
 	<PackageReleaseNotes>- Implemented multi-threading for packing.</PackageReleaseNotes>
