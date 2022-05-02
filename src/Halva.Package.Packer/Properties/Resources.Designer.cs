@@ -187,6 +187,15 @@ namespace Halva.Package.Packer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Initialisation Vector is now set. It will be used with the password to encrypt and decrypt the packages..
+        /// </summary>
+        internal static string InitVectorSetText {
+            get {
+                return ResourceManager.GetString("InitVectorSetText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to = Licesned under the MIT license..
         /// </summary>
         internal static string LicenseText {
@@ -201,6 +210,15 @@ namespace Halva.Package.Packer.Properties {
         internal static string LocationDoesNotExistText {
             get {
                 return ResourceManager.GetString("LocationDoesNotExistText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Initialisation Vector set. Only the password will be used to encrypt and decrypt the packages..
+        /// </summary>
+        internal static string NoInitVectorSetText {
+            get {
+                return ResourceManager.GetString("NoInitVectorSetText", resourceCulture);
             }
         }
         

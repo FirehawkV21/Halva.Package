@@ -16,6 +16,7 @@ internal class Program
         bool mustEncrypt = false;
         string archiveDestination = null;
         string password = null;
+        string ivKey = null;
         bool settingsSet = false;
         int assetCompress = 0;
         int binCompress = 0;
@@ -75,6 +76,23 @@ internal class Program
                             Console.ResetColor();
                         }
                         break;
+                    case "--InitVector":
+                        if (argnum <= args.Length - 1 && !args[argnum + 1].Contains("--"))
+                        {
+                            ivKey = args[argnum + 1].Replace("\"", "");
+                            mustEncrypt = true;
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine(Halva.Package.Packer.Properties.Resources.InitVectorSetText);
+                            Console.ResetColor();
+
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine(Halva.Package.Packer.Properties.Resources.NoInitVectorSetText);
+                            Console.ResetColor();
+                        }
+                        break;
                     case "--OutputLocation":
                         if (argnum <= args.Length - 1 && !args[argnum + 1].Contains("--"))
                         {
@@ -120,13 +138,13 @@ internal class Program
                             if (int.TryParse(stringBuffer, out assetCompress) && assetCompress <= 3)
                             {
                                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                                Console.WriteLine(Halva.Package.Packer.Properties.Resources.BinCompressionLevelSet);
+                                Console.WriteLine(Properties.Resources.BinCompressionLevelSet);
                                 Console.ResetColor();
                             }
                             else
                             {
                                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                                Console.WriteLine(Halva.Package.Packer.Properties.Resources.BinCompressionLevelNotSet);
+                                Console.WriteLine(Properties.Resources.BinCompressionLevelNotSet);
                                 Console.ResetColor();
                             }
                         }
@@ -201,6 +219,13 @@ internal class Program
                 assetsPackage.Password = password;
                 databasePackage.Password = password;
                 enginePackage.Password = password;
+                if (!string.IsNullOrEmpty(ivKey) && !string.IsNullOrWhiteSpace(ivKey))
+                {
+                    audioPackage.IVKey = ivKey;
+                    assetsPackage.IVKey = ivKey;
+                    databasePackage.IVKey = ivKey;
+                    enginePackage.IVKey = ivKey;
+                }
             }
             assetsPackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "AssetsPackage.halva"));
             assetsPackage.CompressionOption = CheckLevel(assetCompress);

@@ -8,17 +8,17 @@
 		<Product>Halva Package</Product>
 		<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 		<PackageId>Halva.Package.Packer</PackageId>
-		<Version>1.1.1-20220402</Version>
+		<Version>1.1.2-20220502</Version>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishTrimmed>true</PublishTrimmed>
 		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 		<TieredCompilation>true</TieredCompilation>
-		<AssemblyVersion>1.1.1.22121</AssemblyVersion>
-		<FileVersion>1.1.1.22121</FileVersion>
+		<AssemblyVersion>1.1.2.22122</AssemblyVersion>
+		<FileVersion>1.1.2.22122</FileVersion>
 	<Copyright>2022 © Studio ACE</Copyright>
 	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
-	<PackageReleaseNotes>- Implemented multi-threading for packing.</PackageReleaseNotes>
+	<PackageReleaseNotes>- Added support for user provided Initialisation Vector.</PackageReleaseNotes>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<ImplicitUsings>enable</ImplicitUsings>
   <FileAlignment>4096</FileAlignment>

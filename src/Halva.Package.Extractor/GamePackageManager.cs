@@ -36,6 +36,8 @@ namespace Halva.Package.Bootstrapper
         }
         //If you have a password for the archives, place it here or read from a file.
         private readonly string PackagePassword = "";
+        //If you have set a IV for the archives, place it here or read from a file.
+        private readonly string PackageIV = "";
         private readonly PackageMetadata TargetPackageVersion = new();
         private readonly PackageMetadata CurrentPackageVersion = new();
 
@@ -65,7 +67,11 @@ namespace Halva.Package.Bootstrapper
 
         private void ExtractPackage(string PackageName)
         {
-            if (!string.IsNullOrEmpty(PackagePassword) && !string.IsNullOrWhiteSpace(PackagePassword)) EncryptedPackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), PackagePassword);
+            if (!string.IsNullOrEmpty(PackagePassword) && !string.IsNullOrWhiteSpace(PackagePassword)) {
+                if (!string.IsNullOrEmpty(PackageIV) && !string.IsNullOrWhiteSpace(PackageIV))
+                    EncryptedPackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), PackagePassword, PackageIV);
+                else  EncryptedPackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), PackagePassword);
+            }
             else PackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"));
         }
 
@@ -92,7 +98,11 @@ namespace Halva.Package.Bootstrapper
         public void UpdateDataFromArchive(string PackageName, string PackageVersionKey)
         {
             HalvaPackage package;
-            if (!string.IsNullOrEmpty(PackagePassword) && !string.IsNullOrWhiteSpace(PackagePassword)) package = new HalvaPackage(PassKey: PackagePassword, Path.Combine(PackageLocation, PackageName));
+            if (!string.IsNullOrEmpty(PackagePassword) && !string.IsNullOrWhiteSpace(PackagePassword)) {
+                if (!string.IsNullOrEmpty(PackageIV) && !string.IsNullOrWhiteSpace(PackageIV)) package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword, PackageIV);
+                else package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword);
+                package = new HalvaPackage(PassKey: PackagePassword, Path.Combine(PackageLocation, PackageName));
+            }
             else package = new HalvaPackage(Path.Combine(PackageLocation, PackageName));
                 package.Password = PackagePassword;
                 package.UpdateFromArchive(Path.Combine(ExctractLocation, "GameData"));

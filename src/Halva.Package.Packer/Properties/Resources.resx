@@ -187,4 +187,10 @@
   <data name="BinCompressionLevelNotSet" xml:space="preserve">
     <value>Compression level for database and engine code is not set. Using the default setting</value>
   </data>
+  <data name="InitVectorSetText" xml:space="preserve">
+    <value>Initialisation Vector is now set. It will be used with the password to encrypt and decrypt the packages.</value>
+  </data>
+  <data name="NoInitVectorSetText" xml:space="preserve">
+    <value>No Initialisation Vector set. Only the password will be used to encrypt and decrypt the packages.</value>
+  </data>
 </root>
