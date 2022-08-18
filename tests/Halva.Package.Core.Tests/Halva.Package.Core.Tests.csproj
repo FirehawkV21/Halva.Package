@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0</TargetFrameworks>
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyVersion>2.0.0.22122</AssemblyVersion>
+    <AssemblyVersion>2.0.0.22230</AssemblyVersion>
 
-    <FileVersion>2.0.0.22122</FileVersion>
+    <FileVersion>2.0.0.22230</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

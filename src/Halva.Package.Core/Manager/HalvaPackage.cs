@@ -287,19 +287,17 @@ public class HalvaPackage : IDisposable, IHalvaPackage
         {
             if (File.Exists(Path.Combine(TargetFolder, entry.FullName)))
             {
-                string originalFileHash;
-                string targetFileHash;
+                ReadOnlySpan<byte> originalFileSignature;
+                ReadOnlySpan<byte> targetFileSignature;
                 using (SHA256 algo = SHA256.Create())
                 {
                     Stream archivedFile = entry.Open();
-                    byte[] targetFile = File.ReadAllBytes(Path.Combine(TargetFolder, entry.FullName));
-                    byte[] originalFileSignature = algo.ComputeHash(archivedFile);
-                    originalFileHash = BitConverter.ToString(originalFileSignature);
-                    originalFileSignature = SHA256.HashData(targetFile);
-                    targetFileHash = BitConverter.ToString(originalFileSignature);
+                    ReadOnlySpan<byte> targetFile = File.ReadAllBytes(Path.Combine(TargetFolder, entry.FullName));
+                    originalFileSignature = algo.ComputeHash(archivedFile);
+                    targetFileSignature = SHA256.HashData(targetFile);
                     archivedFile.Dispose();
                 }
-                if (originalFileHash != targetFileHash)
+                if (originalFileSignature != targetFileSignature)
                 {
                     ExtractFile(entry.FullName, Path.Combine(TargetFolder, entry.FullName));
                 }
@@ -325,20 +323,18 @@ public class HalvaPackage : IDisposable, IHalvaPackage
             ZipArchiveEntry entry = ArchiveMemoryStream.GetEntry(file.Replace(SourceFolder + GetFolderCharacter(), ""));
             if (entry != null)
             {
-                string originalFileHash;
-                string targetFileHash;
+                ReadOnlySpan<byte> originalFileSignature;
+                ReadOnlySpan<byte> targetFileSignature;
                 using (SHA256 algo = SHA256.Create())
                 {
                     Stream archivedFile = entry.Open();
                     FileStream targetFile = File.OpenRead(file);
-                    byte[] originalFileSignature = algo.ComputeHash(archivedFile);
-                    originalFileHash = BitConverter.ToString(originalFileSignature);
-                    originalFileSignature = algo.ComputeHash(targetFile);
-                    targetFileHash = BitConverter.ToString(originalFileSignature);
+                    originalFileSignature = algo.ComputeHash(archivedFile);
+                    targetFileSignature = algo.ComputeHash(targetFile);
                     archivedFile.Dispose();
                     targetFile.Close();
                 }
-                if (originalFileHash != targetFileHash)
+                if (originalFileSignature != targetFileSignature)
                 {
                     RemoveFileFromList(entry.FullName);
                     AddFileToList(SourceFolder, file.Replace(SourceFolder + GetFolderCharacter(), ""));

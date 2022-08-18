@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-	<TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+	<TargetFrameworks>net6.0</TargetFrameworks>
 	<AssemblyTitle>Halva Package Core</AssemblyTitle>
 	<Authors>AceOfAces</Authors>
 	<Company>Studio ACE</Company>
@@ -9,14 +9,13 @@
 	<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 	<PackageTags>compression, package, Brotli, game-package</PackageTags>
 	<PackageLicenseFile></PackageLicenseFile>
-	<AssemblyVersion>2.1.0.22122</AssemblyVersion>
-	<FileVersion>2.1.0.22122</FileVersion>
+	<AssemblyVersion>2.1.1.22230</AssemblyVersion>
+	<FileVersion>2.1.1.22230</FileVersion>
 	<PackageId>Halva.Package.Core</PackageId>
-	<Version>2.1.0</Version>
+	<Version>2.1.1</Version>
 	<Description>Halva (Χαλβάς in Greek) is a small .NET 5+ library that implements Google's Brotli compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
     <PackageReleaseNotes>
-      - Slight code re-factoring.
-      - Added support for user provided Initialization Vector (IV).
+      - Minor performance improvements on file checking.
     </PackageReleaseNotes>
 	<Copyright>2022 © Studio ACE</Copyright>
 		<NeutralLanguage>en</NeutralLanguage>

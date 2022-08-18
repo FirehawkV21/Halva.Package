@@ -8,7 +8,6 @@ public interface IHalvaPackage
     CompressionLevel CompressionOption { get; set; }
     StringBuilder DestinationLocation { get; set; }
     List<string> FileList { get; set; }
-    string WorkingArchive { get; set; }
     string Password { get; set; }
 
     void AddFilesFromAFolder(string source);
