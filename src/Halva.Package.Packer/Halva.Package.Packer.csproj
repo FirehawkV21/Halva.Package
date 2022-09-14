@@ -14,8 +14,10 @@
 		<PublishTrimmed>true</PublishTrimmed>
 		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 		<TieredCompilation>true</TieredCompilation>
-		<AssemblyVersion>1.2.0.22230</AssemblyVersion>
-		<FileVersion>1.2.0.22230</FileVersion>
+		<AssemblyVersion>1.2.0.22257</AssemblyVersion>
+		<FileVersion>1.2.0.22257</FileVersion>
+		<PublishAot>true</PublishAot>
+	<StripSymbols>true</StripSymbols>
 	<Copyright>2022 © Studio ACE</Copyright>
 	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
 	<PackageReleaseNotes>- Added support for user provided Initialisation Vector.</PackageReleaseNotes>

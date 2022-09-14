@@ -9,14 +9,14 @@ namespace Halva.Package.Core.Manager;
 /// <summary>
 /// This is the base class for the Halva Package. You should use either HalvaPackage or EncryptedHalvaPackage.
 /// </summary>
-public class HalvaPackage : IDisposable, IHalvaPackage
+public sealed class HalvaPackage : IDisposable, IHalvaPackage
 {
     private bool disposedValue;
 
     /// <summary>
     /// The location of the source files.
     /// </summary>
-    protected StringBuilder SourceLocation { get; set; }
+    public StringBuilder SourceLocation { get; set; }
     /// <summary>
     /// The location of the final acrhive.
     /// </summary>
@@ -28,7 +28,7 @@ public class HalvaPackage : IDisposable, IHalvaPackage
     /// <summary>
     /// The memory stream that handles the archive.
     /// </summary>
-    protected ZipArchive ArchiveMemoryStream { get; set; }
+    public ZipArchive ArchiveMemoryStream { get; set; }
     /// <summary>
     /// The temporary archive where changes are being worked on.
     /// </summary>
@@ -351,7 +351,7 @@ public class HalvaPackage : IDisposable, IHalvaPackage
     /// Removes the archive object and deletes the temp archive if requested.
     /// </summary>
     /// <param name="disposing">Set to true to delete the temp archive.</param>
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (!disposedValue)
         {
