@@ -2,20 +2,20 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 	 <AssemblyTitle>Halva Package Packing Tool</AssemblyTitle>
 		<Company>Studio ACE</Company>
 		<Product>Halva Package</Product>
 		<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 		<PackageId>Halva.Package.Packer</PackageId>
-		<Version>1.1.3-20220816</Version>
+		<Version>1.2.0-20220914</Version>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishTrimmed>true</PublishTrimmed>
 		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 		<TieredCompilation>true</TieredCompilation>
-		<AssemblyVersion>1.1.3.22230</AssemblyVersion>
-		<FileVersion>1.1.3.22230</FileVersion>
+		<AssemblyVersion>1.2.0.22230</AssemblyVersion>
+		<FileVersion>1.2.0.22230</FileVersion>
 	<Copyright>2022 © Studio ACE</Copyright>
 	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
 	<PackageReleaseNotes>- Added support for user provided Initialisation Vector.</PackageReleaseNotes>
