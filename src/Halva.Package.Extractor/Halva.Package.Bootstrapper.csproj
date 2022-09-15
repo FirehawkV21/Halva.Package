@@ -2,19 +2,18 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net6.0-windows10.0.19041.0;net6.0</TargetFrameworks>
+		<TargetFrameworks>net7.0-windows10.0.19041.0;net7.0</TargetFrameworks>
 		<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
 		<AssemblyTitle>Halva Package Bootstrapper</AssemblyTitle>
 		<Company>Studio ACE</Company>
 		<Product>Halva Package</Product>
 		<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 		<PackageId>Halva.Package.Bootstrapper</PackageId>
-		<Version>1.0.10-20220816</Version>
+		<Version>1.0.10-20220914</Version>
 		<AssemblyVersion>1.0.10.22257</AssemblyVersion>
 		<FileVersion>1.0.10.22257</FileVersion>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PublishReadyToRun>true</PublishReadyToRun>
-		<PublishTrimmed>true</PublishTrimmed>
 		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 		<TieredCompilation>true</TieredCompilation>
 		<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
@@ -22,6 +21,8 @@
 		<EnableNETAnalyzers>True</EnableNETAnalyzers>
 		<AnalysisLevel>latest</AnalysisLevel>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<PublishAot>true</PublishAot>
+	<StripSymbols>true</StripSymbols>
     <FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 	<ItemGroup>

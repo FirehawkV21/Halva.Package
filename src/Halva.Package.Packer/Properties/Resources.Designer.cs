@@ -295,7 +295,7 @@ namespace Halva.Package.Packer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to = Version R1.01 ({0}).
+        ///   Looks up a localized string similar to = Version R1.02 ({0}).
         /// </summary>
         internal static string ProgramVersion {
             get {

@@ -97,7 +97,7 @@ namespace Halva.Package.Bootstrapper.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to = Version D1.00 ({0}).
+        ///   Looks up a localized string similar to = Version R1.01 ({0}).
         /// </summary>
         internal static string ProgramVersion {
             get {
