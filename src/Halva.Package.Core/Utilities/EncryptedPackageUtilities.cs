@@ -167,6 +167,7 @@ public static class EncryptedPackageUtilities
         Random random = new();
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
+        if (!Directory.Exists(exportDestination)) Directory.CreateDirectory(exportDestination);
         DecompressArchive(inputArchive, archive, password);
         TarFile.ExtractToDirectory(archive, exportDestination, true);
         File.Delete(archive);
@@ -178,6 +179,7 @@ public static class EncryptedPackageUtilities
         Random random = new();
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
+        if (!Directory.Exists(exportDestination)) Directory.CreateDirectory(exportDestination);
         DecompressArchive(inputArchive, archive, password, ivKey);
         TarFile.ExtractToDirectory(archive, exportDestination, true);
         File.Delete(archive);

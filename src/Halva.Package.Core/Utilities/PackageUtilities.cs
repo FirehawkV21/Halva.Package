@@ -25,9 +25,8 @@ public static class PackageUtilities
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
         TarFile.CreateFromDirectory(input, archive, false);
-        //ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
-        CompressArchive(TempArchive, archiveLocation);
-        File.Delete(TempArchive);
+        CompressArchive(archive, archiveLocation);
+        File.Delete(archive);
     }
 
     /// <summary>
@@ -65,6 +64,7 @@ public static class PackageUtilities
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
         DecompressArchive(inputArchive, archive);
+        if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
         TarFile.ExtractToDirectory(archive, destination, true);
         File.Delete(archive);
 
