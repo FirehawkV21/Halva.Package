@@ -1,7 +1,7 @@
 ﻿using System.IO.Compression;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Formats.Tar;
 
 namespace Halva.Package.Core.Utilities;
 
@@ -141,7 +141,7 @@ public static class EncryptedPackageUtilities
         Random random = new();
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
-        ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
+        TarFile.CreateFromDirectory(input, archive, false);
         CompressArchive(archive, archiveLocation, password);
         File.Delete(archive);
     }
@@ -151,7 +151,7 @@ public static class EncryptedPackageUtilities
         Random random = new();
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
-        ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
+        TarFile.CreateFromDirectory(input, archive, false);
         CompressArchive(archive, archiveLocation, password, iv);
         File.Delete(archive);
     }
@@ -168,7 +168,7 @@ public static class EncryptedPackageUtilities
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
         DecompressArchive(inputArchive, archive, password);
-        ZipFile.ExtractToDirectory(archive, exportDestination, true);
+        TarFile.ExtractToDirectory(archive, exportDestination, true);
         File.Delete(archive);
 
     }
@@ -179,7 +179,7 @@ public static class EncryptedPackageUtilities
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
         DecompressArchive(inputArchive, archive, password, ivKey);
-        ZipFile.ExtractToDirectory(archive, exportDestination, true);
+        TarFile.ExtractToDirectory(archive, exportDestination, true);
         File.Delete(archive);
 
     }

@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using System.Formats.Tar;
 
 namespace Halva.Package.Core.Utilities;
 
@@ -23,7 +24,8 @@ public static class PackageUtilities
         Random random = new();
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
-        ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
+        TarFile.CreateFromDirectory(input, archive, false);
+        //ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
         CompressArchive(TempArchive, archiveLocation);
         File.Delete(TempArchive);
     }
@@ -63,7 +65,7 @@ public static class PackageUtilities
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
         DecompressArchive(inputArchive, archive);
-        ZipFile.ExtractToDirectory(archive, destination, true);
+        TarFile.ExtractToDirectory(archive, destination, true);
         File.Delete(archive);
 
     }
