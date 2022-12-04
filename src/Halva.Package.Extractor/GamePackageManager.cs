@@ -11,7 +11,7 @@ namespace Halva.Package.Bootstrapper
 {
     public class GamePackageManager
     {
-        private readonly string PackageLocation = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).ToString(), "GamePackages");
+        private readonly string PackageLocation = Path.Combine(Directory.GetParent(System.AppContext.BaseDirectory).ToString(), "GamePackages");
         //Change this to set a different folder.
         private static readonly string LocalFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
         public static string ExctractLocation
@@ -55,7 +55,7 @@ namespace Halva.Package.Bootstrapper
             if (File.Exists(Path.Combine(ExctractLocation, "PackageData.json")))
             {
                 string inputFile = File.ReadAllText(Path.Combine(ExctractLocation, "PackageData.json"));
-                CurrentPackageVersion = JsonSerializer.Deserialize<PackageMetadata>(inputFile);
+                CurrentPackageVersion = JsonSerializer.Deserialize(inputFile, PackageMetadataSerializer.Default.PackageMetadata);
             }
         }
 
@@ -138,7 +138,7 @@ namespace Halva.Package.Bootstrapper
         [RequiresUnreferencedCode("Uses JSON Source Generator")]
         public void SavePackageMetadata()
         {
-            string output = JsonSerializer.Serialize(CurrentPackageVersion);
+            string output = JsonSerializer.Serialize(CurrentPackageVersion, PackageMetadataSerializer.Default.PackageMetadata);
             File.WriteAllText(Path.Combine(ExctractLocation, "PackageData.json"), output);
         }
     }

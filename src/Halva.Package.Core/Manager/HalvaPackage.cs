@@ -357,7 +357,7 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
         {
             if (disposing)
             {
-                if (DestinationLocation != null) DestinationLocation.Clear();
+                DestinationLocation?.Clear();
                 if (SourceLocation != null) SourceLocation.Clear();
                 FileList.Clear();
                 FileList = null;
