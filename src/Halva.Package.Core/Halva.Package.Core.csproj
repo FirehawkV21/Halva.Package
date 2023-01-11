@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-	<TargetFrameworks>net7.0</TargetFrameworks>
+	<TargetFrameworks>net7.0;net6.0</TargetFrameworks>
 	<AssemblyTitle>Halva Package Core</AssemblyTitle>
 	<Authors>AceOfAces</Authors>
 	<Company>Studio ACE</Company>
@@ -9,13 +9,14 @@
 	<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
 	<PackageTags>compression, package, Brotli, game-package</PackageTags>
 	<PackageLicenseFile></PackageLicenseFile>
-	<AssemblyVersion>3.0.0.22308</AssemblyVersion>
-	<FileVersion>3.0.0.22308</FileVersion>
+	<AssemblyVersion>2.2.1.23011</AssemblyVersion>
+	<FileVersion>2.2.1.23011</FileVersion>
 	<PackageId>Halva.Package.Core</PackageId>
-	<Version>3.0.0</Version>
-	<Description>Halva (Χαλβάς in Greek) is a small .NET 7+ library that implements Google's Brotli compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
-    <PackageReleaseNotes>- Overhauled API to use TAR archives as a base.   </PackageReleaseNotes>
-	<Copyright>2022 © Studio ACE</Copyright>
+	<Version>2.2.1</Version>
+	<Description>Halva (Χαλβάς in Greek) is a small .NET 6+ library that implements Google's Brotli compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
+		<PackageReleaseNotes>- Fixed issues with the Utilities not creating/extracting from packages. 
+- Minor change to improve handling of nullability. </PackageReleaseNotes>
+	<Copyright>2023 © Studio ACE</Copyright>
 		<NeutralLanguage>en</NeutralLanguage>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -30,7 +31,7 @@
 		<IsTrimmable>true</IsTrimmable>
 		<LangVersion>latest</LangVersion>
 		<RepositoryType>git</RepositoryType>
-    <FileAlignment>4096</FileAlignment>
+		<FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
