@@ -1,7 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
-using System.Formats.Tar;
 
 namespace Halva.Package.Core.Utilities;
 
@@ -141,7 +140,7 @@ public static class EncryptedPackageUtilities
         Random random = new();
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
-        TarFile.CreateFromDirectory(input, archive, false);
+        ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
         CompressArchive(archive, archiveLocation, password);
         File.Delete(archive);
     }
@@ -151,7 +150,7 @@ public static class EncryptedPackageUtilities
         Random random = new();
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
-        TarFile.CreateFromDirectory(input, archive, false);
+        ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
         CompressArchive(archive, archiveLocation, password, iv);
         File.Delete(archive);
     }
@@ -169,7 +168,7 @@ public static class EncryptedPackageUtilities
         if (File.Exists(archive)) File.Delete(archive);
         if (!Directory.Exists(exportDestination)) Directory.CreateDirectory(exportDestination);
         DecompressArchive(inputArchive, archive, password);
-        TarFile.ExtractToDirectory(archive, exportDestination, true);
+        ZipFile.ExtractToDirectory(archive, exportDestination, true);
         File.Delete(archive);
 
     }
@@ -181,7 +180,7 @@ public static class EncryptedPackageUtilities
         if (File.Exists(archive)) File.Delete(archive);
         if (!Directory.Exists(exportDestination)) Directory.CreateDirectory(exportDestination);
         DecompressArchive(inputArchive, archive, password, ivKey);
-        TarFile.ExtractToDirectory(archive, exportDestination, true);
+        ZipFile.ExtractToDirectory(archive, exportDestination, true);
         File.Delete(archive);
 
     }
