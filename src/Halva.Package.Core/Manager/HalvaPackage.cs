@@ -292,17 +292,19 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
                 using (Stream archivedFile = entry.Open())
                 {
 #if NET7_0_OR_GREATER
-                    originalFileSignature = SHA256.HashData(archivedFile);
                     using (FileStream targetFile = new(Path.Combine(TargetFolder, entry.FullName), FileMode.Open, FileAccess.Read))
                     {
+                        originalFileSignature = SHA256.HashData(archivedFile);
                         targetFileSignature = SHA256.HashData(targetFile);
                     }
 #else
                     using (SHA256 algo = SHA256.Create())
                     {
-                        ReadOnlySpan<byte> targetFile = File.ReadAllBytes(Path.Combine(TargetFolder, entry.FullName));
-                        originalFileSignature = algo.ComputeHash(archivedFile);
-                        targetFileSignature = SHA256.HashData(targetFile);
+                        using (FileStream targetFile = new(Path.Combine(TargetFolder, entry.FullName), FileMode.Open, FileAccess.Read))
+                        {
+                            originalFileSignature = algo.ComputeHash(archivedFile);
+                            targetFileSignature = algo.ComputeHash(targetFile);
+                        }
                     }
 #endif
                 }
@@ -345,11 +347,11 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
 #else
                     using (SHA256 algo = SHA256.Create())
                     {
-                        FileStream targetFile = File.OpenRead(file);
-                        originalFileSignature = algo.ComputeHash(archivedFile);
-                        targetFileSignature = algo.ComputeHash(targetFile);
-                        archivedFile.Dispose();
-                        targetFile.Close();
+                        using (FileStream targetFile = new(file, FileMode.Open, FileAccess.Read))
+                        {
+                            originalFileSignature = algo.ComputeHash(archivedFile);
+                            targetFileSignature = algo.ComputeHash(targetFile);
+                        }
                     }
 #endif
                 }
