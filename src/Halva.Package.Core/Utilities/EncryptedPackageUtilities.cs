@@ -33,8 +33,7 @@ public static class EncryptedPackageUtilities
     /// <param name="compression">Sets the compression level.</param>
     public static void CompressArchive(in string inputArchive, in string outputArchive, in string password, CompressionLevel compression)
     {
-        Aes encryptionKit;
-        CreateKey(out encryptionKit, password);
+        CreateKey(out Aes encryptionKit, password);
         using (FileStream inputStream = File.OpenRead(inputArchive))
         using (FileStream outputStream = File.Create(outputArchive))
         using (CryptoStream cryptStream = new(outputStream, encryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
@@ -47,8 +46,7 @@ public static class EncryptedPackageUtilities
 
     public static void CompressArchive(in string inputArchive, in string outputArchive, in string password, in string IVkey, CompressionLevel compression)
     {
-        Aes encryptionKit;
-        CreateKey(out encryptionKit, password, IVkey);
+        CreateKey(out Aes encryptionKit, password, IVkey);
         using (FileStream inputStream = File.OpenRead(inputArchive))
         using (FileStream outputStream = File.Create(outputArchive))
         using (CryptoStream cryptStream = new(outputStream, encryptionKit.CreateEncryptor(), CryptoStreamMode.Write))

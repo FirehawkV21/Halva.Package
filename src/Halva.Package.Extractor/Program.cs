@@ -12,7 +12,7 @@ internal class Program
     {
         Process GameProcess = new();
         // Edit this part to point over to the game's executable.
-        ProcessStartInfo GameInfo = new(Path.Combine(Directory.GetParent(AppContext.BaseDirectory).FullName, "Binaries", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Game.exe" : "Game"));
+        ProcessStartInfo GameInfo = new(Path.Combine(AppContext.BaseDirectory, "Binaries", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Game.exe" : "Game"));
 
         Console.WriteLine(Properties.Resources.SplitterText);
         Console.WriteLine(Properties.Resources.ProgramTitle);

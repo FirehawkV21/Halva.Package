@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-#if WINDOWS10_0_17763_0_OR_GREATER
+﻿#if WINDOWS10_0_17763_0_OR_GREATER
 using WinSystem = Windows;
 #endif
 using Halva.Package.Core.Utilities;
@@ -11,7 +10,7 @@ namespace Halva.Package.Bootstrapper;
 
 public class GamePackageManager
 {
-    private readonly string PackageLocation = Path.Combine(Directory.GetParent(System.AppContext.BaseDirectory).ToString(), "GamePackages");
+    private readonly string PackageLocation = Path.Combine(AppContext.BaseDirectory, "GamePackages");
     //Change this to set a different folder.
     private static readonly string LocalFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
     public static string ExctractLocation
@@ -101,7 +100,6 @@ public class GamePackageManager
         if (!string.IsNullOrEmpty(PackagePassword) && !string.IsNullOrWhiteSpace(PackagePassword)) {
             if (!string.IsNullOrEmpty(PackageIV) && !string.IsNullOrWhiteSpace(PackageIV)) package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword, PackageIV);
             else package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword);
-            package = new HalvaPackage(PassKey: PackagePassword, Path.Combine(PackageLocation, PackageName));
         }
         else package = new HalvaPackage(Path.Combine(PackageLocation, PackageName));
             package.Password = PackagePassword;
