@@ -299,12 +299,10 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
                     }
 #else
                     using (SHA256 algo = SHA256.Create())
+                    using (FileStream targetFile = new(Path.Combine(TargetFolder, entry.FullName), FileMode.Open, FileAccess.Read))
                     {
-                        using (FileStream targetFile = new(Path.Combine(TargetFolder, entry.FullName), FileMode.Open, FileAccess.Read))
-                        {
-                            originalFileSignature = algo.ComputeHash(archivedFile);
-                            targetFileSignature = algo.ComputeHash(targetFile);
-                        }
+                        originalFileSignature = algo.ComputeHash(archivedFile);
+                        targetFileSignature = algo.ComputeHash(targetFile);
                     }
 #endif
                 }
@@ -346,12 +344,10 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
                     }
 #else
                     using (SHA256 algo = SHA256.Create())
+                    using (FileStream targetFile = new(file, FileMode.Open, FileAccess.Read))
                     {
-                        using (FileStream targetFile = new(file, FileMode.Open, FileAccess.Read))
-                        {
-                            originalFileSignature = algo.ComputeHash(archivedFile);
-                            targetFileSignature = algo.ComputeHash(targetFile);
-                        }
+                        originalFileSignature = algo.ComputeHash(archivedFile);
+                        targetFileSignature = algo.ComputeHash(targetFile);
                     }
 #endif
                 }
