@@ -50,41 +50,72 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
 
     public string IVKey { get; set; }
 
+    private bool isMemoryStream;
+    private MemoryStream ZipStream;
+
     /// <summary>
     /// Creates an empty Encrypted Halva Package.
     /// </summary>
-    public HalvaPackage()
+    public HalvaPackage(bool useMemoryStream)
     {
-        WorkingArchive = ReserveRandomArchive();
-        ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
+        if (useMemoryStream)
+        {
+            isMemoryStream = true;
+            ZipStream = new();
+            ArchiveMemoryStream = new(ZipStream, ZipArchiveMode.Create, true);
+        }
+        else
+        {
+            WorkingArchive = ReserveRandomArchive();
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
+        }
     }
 
     /// <summary>
     /// Opens a Halva Package for editing and/or extracting files.
     /// </summary>
     /// <param name="source">The source archive.</param>
-    public HalvaPackage(string source)
+    public HalvaPackage(string source, bool useMemoryStream)
     {
         WorkingArchive = ReserveRandomArchive();
         SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
         DestinationLocation = new StringBuilder(source);
-        PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive);
-        ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
+        if (useMemoryStream)
+        {
+            isMemoryStream = true;
+            PackageUtilities.DecompressArchive(File.OpenRead(source), out ZipStream);
+            ArchiveMemoryStream = new(ZipStream, ZipArchiveMode.Update, true);
+        }
+        else
+        {
+            PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive);
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
+        }
         FileList = PullFiles(ArchiveMemoryStream);
     }
+
 
     /// <summary>
     /// Creates a Halva package using the source folder as the input and sets the destination folder for the final package. It will automatically put the files in the input folder to a temporary archive.
     /// </summary>
     /// <param name="source">The source folder.</param>
     /// <param name="destination">The location of the final archive.</param>
-    public HalvaPackage(string source, string destination)
+    public HalvaPackage(string source, string destination, bool useMemoryStream)
     {
         SourceLocation = new StringBuilder(source);
-        WorkingArchive = ReserveRandomArchive();
         DestinationLocation = new StringBuilder(destination);
         List<string> foundFilesList = PullFilesFromFolder(source);
-        ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
+        if (useMemoryStream)
+        {
+            isMemoryStream = true;
+            ZipStream = new();
+            ArchiveMemoryStream = new(ZipStream, ZipArchiveMode.Create, true);
+        }
+        else
+        {
+            WorkingArchive = ReserveRandomArchive();
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
+        }
         foreach (string file in foundFilesList)
         {
             AddFileToList(file);
@@ -95,26 +126,44 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
     /// </summary>
     /// <param name="PassKey">The password for the archive.</param>
     /// <param name="source">The source archive.</param>
-    public HalvaPackage(in string PassKey, string source)
+    public HalvaPackage(in string PassKey, string source, bool useMemoryStream)
     {
         WorkingArchive = ReserveRandomArchive();
         SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
         DestinationLocation = new StringBuilder(source);
         Password = PassKey;
-        EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
-        ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
+        if (useMemoryStream)
+        {
+            isMemoryStream = true;
+            EncryptedPackageUtilities.DecompressArchive(File.OpenRead(source), out ZipStream, PassKey);
+            ArchiveMemoryStream = new(ZipStream, ZipArchiveMode.Update, true);
+        }
+        else
+        {
+            EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
+        }
         FileList = PullFiles(ArchiveMemoryStream);
     }
 
-    public HalvaPackage(in string PassKey, in string IV, string source)
+    public HalvaPackage(in string PassKey, in string IV, string source, bool useMemoryStream)
     {
         WorkingArchive = ReserveRandomArchive();
         SourceLocation = new StringBuilder(Path.GetDirectoryName(source));
         DestinationLocation = new StringBuilder(source);
         IVKey = IV;
         Password = PassKey;
-        EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password, IVKey);
-        ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
+        if (useMemoryStream)
+        {
+            isMemoryStream = true;
+            EncryptedPackageUtilities.DecompressArchive(File.OpenRead(source), out ZipStream, PassKey, IV);
+            ArchiveMemoryStream = new(ZipStream, ZipArchiveMode.Update, true);
+        }
+        else
+        {
+            EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password, IVKey);
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
+        }
         FileList = PullFiles(ArchiveMemoryStream);
     }
 
@@ -124,29 +173,46 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
     /// <param name="PassKey">The password for the archive.</param>
     /// <param name="source">The source folder.</param>
     /// <param name="destination">The location of the final archive.</param>
-    public HalvaPackage(in string PassKey, string source, string destination)
+    public HalvaPackage(in string PassKey, string source, string destination, bool useMemoryStream)
     {
         SourceLocation = new StringBuilder(source);
-        WorkingArchive = ReserveRandomArchive();
         DestinationLocation = new StringBuilder(destination);
         Password = PassKey;
         List<string> foundFilesList = PullFilesFromFolder(source);
-        ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
+        if (useMemoryStream)
+        {
+            isMemoryStream = true;
+            ZipStream = new();
+            ArchiveMemoryStream = new(ZipStream, ZipArchiveMode.Create, true);
+        }
+        else {
+            WorkingArchive = ReserveRandomArchive();
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create); 
+        }
         foreach (string file in foundFilesList)
         {
             AddFileToList(file);
         }
     }
 
-    public HalvaPackage(in string PassKey, in string IV, string source, string destination)
+    public HalvaPackage(in string PassKey, in string IV, string source, string destination, bool useMemoryStream)
     {
         SourceLocation = new StringBuilder(source);
-        WorkingArchive = ReserveRandomArchive();
         DestinationLocation = new StringBuilder(destination);
         Password = PassKey;
         IVKey = IV;
         List<string> foundFilesList = PullFilesFromFolder(source);
-        ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
+        if (useMemoryStream)
+        {
+            isMemoryStream = true;
+            ZipStream = new();
+            ArchiveMemoryStream = new(ZipStream, ZipArchiveMode.Create, true);
+        }
+        else
+        {
+            WorkingArchive = ReserveRandomArchive();
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
+        }
         foreach (string file in foundFilesList)
         {
             AddFileToList(file);
@@ -326,7 +392,7 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
     /// <param name="SourceFolder">The folder specified.</param>
     public void UpdateArchive(string SourceFolder)
     {
-        List<string> SourceFolderFiles = HalvaPackage.PullFilesFromFolder(SourceFolder);
+        List<string> SourceFolderFiles = PullFilesFromFolder(SourceFolder);
         foreach (string file in SourceFolderFiles)
         {
             ZipArchiveEntry entry = ArchiveMemoryStream.GetEntry(file.Replace(SourceFolder + GetFolderCharacter(), ""));
@@ -379,6 +445,7 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
                 FileList.Clear();
                 FileList = null;
                 ArchiveMemoryStream.Dispose();
+                ZipStream?.Close();
                 if (File.Exists(WorkingArchive)) File.Delete(WorkingArchive);
             }
 
@@ -398,36 +465,68 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
     }
 
     /// <summary>
-    /// Saves current changes to the destination archive.
+    /// Saves current changes to the destination archive. Note: If you use MemoryStream for the archive, it will no-op. Use Save() instead.
     /// </summary>
-    public void CloseArchive()
+    private void CloseArchive()
     {
         ArchiveMemoryStream.Dispose();
-        if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-            if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password, IVKey, CompressionOption);
-            else EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password, CompressionOption);
-        else PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption);
+        if (isMemoryStream)
+        {
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), Password, IVKey, CompressionOption);
+                else EncryptedPackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), Password, CompressionOption);
+            else PackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), CompressionOption);
+            ZipStream.Close();
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password, IVKey, CompressionOption);
+                else EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password, CompressionOption);
+            else PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption);
+        }
     }
 
     /// <summary>
-    /// Reloads the archive. If you have a password set, it will attempt to decrypt the package first.
+    /// Reloads the archive. If you have a password set, it will attempt to decrypt the package first. Note: If you use MemoryStream archive, it will no-op. Use Save() instead.
     /// </summary>
-    public void ReloadArchive()
+    private void ReloadArchive()
     {
-
-        if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-            if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password, IVKey);
-            else EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
-        else PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive);
-        ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
+        if (isMemoryStream)
+        {
+            if (!ZipStream.CanRead)
+            {
+                FileStream fileLoader = File.Open(DestinationLocation.ToString(), FileMode.Open);
+                if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                    if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.DecompressArchive(fileLoader, out ZipStream, Password, IVKey);
+                    else EncryptedPackageUtilities.DecompressArchive(fileLoader, out ZipStream, Password);
+                else PackageUtilities.DecompressArchive(fileLoader, out ZipStream);
+                fileLoader.Close();
+            }
+            ArchiveMemoryStream = new ZipArchive(ZipStream, ZipArchiveMode.Update, true);
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password, IVKey);
+                else EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
+            else PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive);
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Update);
+        }
     }
 
     /// <summary>
-    /// Saves the changes to the destination archive. If password is set, it will attempt to encrypt it.
+    /// Saves the changes to the destination archive. If password is set, it will attempt to encrypt it. 
     /// </summary>
     public void Save()
     {
+            CloseArchive();
+            ReloadArchive();
+    }
+
+    public void Finalize()
+    {
         CloseArchive();
-        ReloadArchive();
+        if (isMemoryStream) ZipStream.Close();
     }
 }

@@ -48,6 +48,45 @@ public static class PackageUtilities
 #endif
     }
 
+    /// <summary>
+    /// Compresses the archive.
+    /// </summary>
+    /// <param name="inputArchive">The input archive.</param>
+    /// <param name="outputArchive">The output archive.</param>
+    public static void CompressArchive(in MemoryStream inputArchive, in string outputArchive) => CompressArchive(inputArchive, outputArchive, CompressionLevel.Optimal);
+
+
+    /// <summary>
+    /// Compresses the archive, with a selected compression level.
+    /// </summary>
+    /// <param name="inputArchive"></param>
+    /// <param name="outputArchive"></param>
+    /// <param name="Compression"></param>
+    public static void CompressArchive(in MemoryStream inputArchive, in string outputArchive, CompressionLevel Compression)
+    {
+        inputArchive.Position = 0;
+        using (FileStream outputStream = File.Create(outputArchive))
+        using (BrotliStream compressorStream = new(outputStream, Compression))
+        {
+            inputArchive.CopyTo(compressorStream);
+        }
+    }
+
+    /// <summary>
+    /// Decompresses the archive.
+    /// </summary>
+    /// <param name="inputStream">The input archive in a stream.</param>
+    /// <param name="uncompressedStream">The stream that will accept the uncompressed Stream.</param>
+    public static void DecompressArchive(in Stream inputStream, out MemoryStream uncompressedStream)
+    {
+        inputStream.Position = 0;
+        uncompressedStream = new MemoryStream();
+        using (BrotliStream decompressorStream = new(inputStream, CompressionMode.Decompress))
+        {
+            decompressorStream.CopyTo(uncompressedStream);
+        }
+    }
+
 #if NET8_0_OR_GREATER
 
     /// <summary>
@@ -76,30 +115,6 @@ public static class PackageUtilities
     }
 
     /// <summary>
-    /// Compresses the archive.
-    /// </summary>
-    /// <param name="inputArchive">The input archive.</param>
-    /// <param name="outputArchive">The output archive.</param>
-    public static void CompressArchive(in MemoryStream inputArchive, in string outputArchive) => CompressArchive(inputArchive, outputArchive, CompressionLevel.Optimal);
-
-
-    /// <summary>
-    /// Compresses the archive, with a selected compression level.
-    /// </summary>
-    /// <param name="inputArchive"></param>
-    /// <param name="outputArchive"></param>
-    /// <param name="Compression"></param>
-    public static void CompressArchive(in MemoryStream inputArchive, in string outputArchive, CompressionLevel Compression)
-    {
-        inputArchive.Position = 0;
-        using (FileStream outputStream = File.Create(outputArchive))
-        using (BrotliStream compressorStream = new(outputStream, Compression))
-        {
-            inputArchive.CopyTo(compressorStream);
-        }
-    }
-
-    /// <summary>
     /// Exports all files from a Halva package.
     /// </summary>
     /// <param name="inputArchive">The Halva package for input.</param>
@@ -124,21 +139,6 @@ public static class PackageUtilities
             Directory.CreateDirectory(destination);
             ZipFile.ExtractToDirectory(archive, destination, true);
             File.Delete(archive);
-        }
-    }
-
-    /// <summary>
-    /// Decompresses the archive.
-    /// </summary>
-    /// <param name="inputStream">The input archive in a stream.</param>
-    /// <param name="uncompressedStream">The stream that will accept the uncompressed Stream.</param>
-    public static void DecompressArchive(in Stream inputStream, out MemoryStream uncompressedStream)
-    {
-        inputStream.Position = 0;
-        uncompressedStream = new MemoryStream();
-        using (BrotliStream decompressorStream = new(inputStream, CompressionMode.Decompress))
-        {
-            decompressorStream.CopyTo(uncompressedStream);
         }
     }
 

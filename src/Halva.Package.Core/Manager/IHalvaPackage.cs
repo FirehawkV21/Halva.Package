@@ -18,7 +18,6 @@ public interface IHalvaPackage
     void RemoveFileFromList(string fileLocation);
     void UpdateArchive(string SourceFolder);
     void UpdateFromArchive(string TargetFolder);
-    void CloseArchive();
-    void ReloadArchive();
     void Save();
+    void Finalize();
 }

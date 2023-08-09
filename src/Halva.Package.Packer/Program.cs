@@ -14,6 +14,7 @@ internal sealed class Program
     {
         string projectLocation = null;
         bool mustEncrypt = false;
+        bool useMemoryStream = true;
         string archiveDestination = null;
         string password = null;
         string ivKey = null;
@@ -149,6 +150,9 @@ internal sealed class Program
                             }
                         }
                         break;
+                    case "--RequireFS":
+                        useMemoryStream = false;
+                        break;
 
                 }
             }
@@ -209,10 +213,10 @@ internal sealed class Program
         {
             if (!Directory.Exists(archiveDestination) && !string.IsNullOrEmpty(archiveDestination)) Directory.CreateDirectory(archiveDestination);
             string destinationPath = !string.IsNullOrEmpty(archiveDestination) ? archiveDestination : gameFolder;
-            audioPackage = new HalvaPackage();
-            assetsPackage = new HalvaPackage();
-            databasePackage = new HalvaPackage();
-            enginePackage = new HalvaPackage();
+            audioPackage = new HalvaPackage(useMemoryStream);
+            assetsPackage = new HalvaPackage(useMemoryStream);
+            databasePackage = new HalvaPackage(useMemoryStream);
+            enginePackage = new HalvaPackage(useMemoryStream);
             if (mustEncrypt && password != null)
             {
                 audioPackage.Password = password;
@@ -246,7 +250,7 @@ internal sealed class Program
                     if (Directory.Exists(Path.Combine(gameFolder, "effects"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "effects");
                     if (Directory.Exists(Path.Combine(gameFolder, "movies"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "movies");
                     if (Directory.Exists(Path.Combine(gameFolder, "icon"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "icon");
-                    assetsPackage.CloseArchive();
+                    assetsPackage.Finalize();
                     assetsPackage.Dispose();
                     Console.WriteLine(Properties.Resources.AssetsCompressedText);
                 });
@@ -254,7 +258,7 @@ internal sealed class Program
                 {
                     Console.WriteLine(Properties.Resources.CompressingAudioFilesText);
                     audioPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "audio");
-                    audioPackage.CloseArchive();
+                    audioPackage.Finalize();
                     audioPackage.Dispose();
                     Console.WriteLine(Properties.Resources.AudioCompressedText);
                 });
@@ -263,7 +267,7 @@ internal sealed class Program
                     Console.WriteLine(Properties.Resources.CompressingDatabaseText);
                     databasePackage.CompressionOption = CheckLevel(binCompress);
                     databasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "data");
-                    databasePackage.CloseArchive();
+                    databasePackage.Finalize();
                     databasePackage.Dispose();
                     Console.WriteLine(Properties.Resources.DatabaseCompressedText);
                 });
@@ -279,7 +283,7 @@ internal sealed class Program
                         enginePackage.AddFileToList(projectLocation, Path.Combine(relativeLocation, "index.html"));
                     }
                     enginePackage.AddFileToList(projectLocation, "package.json");
-                    enginePackage.CloseArchive();
+                    enginePackage.Finalize();
                     enginePackage.Dispose();
                     Console.WriteLine(Properties.Resources.EngineCompressedText);
                 });

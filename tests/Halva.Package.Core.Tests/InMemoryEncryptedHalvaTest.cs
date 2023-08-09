@@ -6,7 +6,7 @@ using Halva.Package.Core.Manager;
 
 namespace Halva.Package.Core.Tests;
 
-public class EncryptedHalvaTest
+public class InMemoryEncryptedHalvaTest
 {
     private readonly string sourceFolder = "SampleFiles";
     private readonly string destinationArchive = "SampleFiles4.halva";
@@ -25,7 +25,7 @@ public class EncryptedHalvaTest
     public void ArchiveBuilderTest()
     {
         Cleanup();
-        HalvaPackage package = new(PassKey: testPassword, sourceFolder, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, sourceFolder, destinationArchive, true);
         package.Finalize();
         EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword);
     }
@@ -34,7 +34,7 @@ public class EncryptedHalvaTest
     public void ArchiveBuilderTest2()
     {
         Cleanup();
-        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, sourceFolder, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, sourceFolder, destinationArchive, true);
         package.Finalize();
         EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword, ivKey);
     }
@@ -42,21 +42,21 @@ public class EncryptedHalvaTest
     [Fact]
     public void CanArchiveBuilderExtract()
     {
-        HalvaPackage package = new(PassKey: testPassword, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, destinationArchive, true);
         package.ExtractFile("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
     }
 
     [Fact]
     public void CanArchiveBuilderExtractWithIV()
     {
-        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, true);
         package.ExtractFile("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
     }
 
     [Fact]
     public void CanArchiveRemoveEntry()
     {
-        HalvaPackage package = new(PassKey: testPassword, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, destinationArchive, true);
         package.RemoveFileFromList("TestImage.webp");
         package.Finalize();
         if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
@@ -67,7 +67,7 @@ public class EncryptedHalvaTest
     [Fact]
     public void CanArchiveRemoveEntryWithIV()
     {
-        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, true);
         package.RemoveFileFromList("TestImage.webp");
         package.Finalize();
         if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
@@ -78,7 +78,7 @@ public class EncryptedHalvaTest
     [Fact]
     public void CanArchiveAddEntry()
     {
-        HalvaPackage package = new(PassKey: testPassword, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, destinationArchive, true);
         package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
         package.Finalize();
         if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
@@ -89,7 +89,7 @@ public class EncryptedHalvaTest
     [Fact]
     public void CanArchiveAddEntryWithIV()
     {
-        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, true);
         package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
         package.Finalize();
         if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
@@ -100,7 +100,7 @@ public class EncryptedHalvaTest
     [Fact]
     public void CanLibrarySaveChanges()
     {
-        HalvaPackage package = new(PassKey: testPassword, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, destinationArchive, true);
         package.RemoveFileFromList("TestImage.webp");
         package.Save();
         package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
@@ -110,7 +110,7 @@ public class EncryptedHalvaTest
     [Fact]
     public void CanLibrarySaveChangesWithIV()
     {
-        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, true);
         package.RemoveFileFromList("TestImage.webp");
         package.Save();
         package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
@@ -120,14 +120,14 @@ public class EncryptedHalvaTest
     [Fact]
     public void CanLibraryCheckForDifferencesInEncryptedArchives()
     {
-        HalvaPackage package = new(PassKey: testPassword, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, destinationArchive, true);
         package.UpdateFromArchive(destinationFolder);
     }
 
     [Fact]
     public void CanLibraryCheckForDifferencesInEncryptedArchivesWithIV()
     {
-        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, false);
+        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, true);
         package.UpdateFromArchive(destinationFolder);
     }
 

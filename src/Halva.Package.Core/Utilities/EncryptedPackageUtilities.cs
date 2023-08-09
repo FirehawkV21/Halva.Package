@@ -88,9 +88,6 @@ public static class EncryptedPackageUtilities
         }
         encryptionKit.Dispose();
     }
-
-#if NET8_0_OR_GREATER
-
     public static void CompressArchive(in MemoryStream inputArchive, in string outputArchive, in string password) => CompressArchive(inputArchive, outputArchive, password, CompressionLevel.Optimal);
 
     public static void CompressArchive(in MemoryStream inputArchive, in string outputArchive, in string password, in string ivKey) => CompressArchive(inputArchive, outputArchive, password, ivKey, CompressionLevel.Optimal);
@@ -159,7 +156,6 @@ public static class EncryptedPackageUtilities
         }
         encryptionKit.Dispose();
     }
-#endif
 
     /// <summary>
     /// Sets up the AES Encryptor/Decryptor

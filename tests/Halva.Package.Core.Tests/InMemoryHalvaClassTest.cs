@@ -6,7 +6,7 @@ using Halva.Package.Core.Manager;
 
 namespace Halva.Package.Core.Tests;
 
-public class HalvaClassTest
+public class InMemoryHalvaClassTest
 {
 
     private readonly string sourceFolder = "SampleFiles";
@@ -23,8 +23,8 @@ public class HalvaClassTest
     public void ArchiveBuilderTest()
     {
         Cleanup();
-        HalvaPackage package = new(sourceFolder, destinationArchive, false);
-        package.Finalize();
+        HalvaPackage package = new(sourceFolder, destinationArchive, true);
+        package.Save();
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
         package.Dispose();
     }
@@ -32,7 +32,7 @@ public class HalvaClassTest
     [Fact]
     public void CanArchiveBuilderExtract()
     {
-        HalvaPackage package = new(PackageUtilities.TempArchive, destinationArchive, false);
+        HalvaPackage package = new(PackageUtilities.TempArchive, destinationArchive, true);
         package.ExtractFile("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
         package.Dispose();
     }
@@ -40,7 +40,7 @@ public class HalvaClassTest
     [Fact]
     public void CanArchiveRemoveEntry()
     {
-        HalvaPackage package = new(PackageUtilities.TempArchive,  destinationArchive, false);
+        HalvaPackage package = new(PackageUtilities.TempArchive,  destinationArchive, true);
         package.RemoveFileFromList("TestImage.webp");
         package.Finalize();
         if(Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
@@ -52,7 +52,7 @@ public class HalvaClassTest
     [Fact]
     public void CanArchiveAddEntry()
     {
-        HalvaPackage package = new(PackageUtilities.TempArchive, destinationArchive, false);
+        HalvaPackage package = new(PackageUtilities.TempArchive, destinationArchive, true);
         package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
         package.Finalize();
         if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
@@ -64,7 +64,7 @@ public class HalvaClassTest
     [Fact]
     public void CanLibrarySaveChanges()
     {
-        HalvaPackage package = new(destinationArchive, false);
+        HalvaPackage package = new(destinationArchive, true);
         package.RemoveFileFromList("TestImage.webp");
         package.Save();
         package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
@@ -74,7 +74,7 @@ public class HalvaClassTest
     [Fact]
     public void CanLibraryCheckForDifferences()
     {
-        HalvaPackage package = new(destinationArchive, false);
+        HalvaPackage package = new(destinationArchive, true);
         package.UpdateFromArchive(destinationFolder);
         package.Dispose();
     }
@@ -82,7 +82,7 @@ public class HalvaClassTest
     [Fact]
     public void CanLibraryUpdateArhive()
     {
-        HalvaPackage package = new(destinationArchive, false);
+        HalvaPackage package = new(destinationArchive, true);
         package.UpdateArchive(sourceFolder);
         package.Dispose();
     }
