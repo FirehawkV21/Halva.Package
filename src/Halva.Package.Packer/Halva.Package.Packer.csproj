@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 	 <AssemblyTitle>Halva Package Packing Tool</AssemblyTitle>
 		<Company>Studio ACE</Company>
 		<Product>Halva Package</Product>
@@ -13,8 +13,8 @@
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
 		<TieredCompilation>true</TieredCompilation>
-		<AssemblyVersion>1.2.0.23020</AssemblyVersion>
-		<FileVersion>1.2.0.23020</FileVersion>
+		<AssemblyVersion>1.2.0.23221</AssemblyVersion>
+		<FileVersion>1.2.0.23221</FileVersion>
 		<PublishAot>true</PublishAot>
 	<StripSymbols>true</StripSymbols>
 	<Copyright>2022 © Studio ACE</Copyright>

@@ -13,20 +13,136 @@ public static class PackageUtilities
     /// </summary>
     public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive_");
 
-    /// <summary>
-    /// Creates a Halva package from a folder.
-    /// </summary>
-    /// <param name="input">The folder that will be used as source.</param>
-    /// <param name="archiveLocation">The location of the package.</param>
+
     public static void CreateArchiveFromFolder(in string input, in string archiveLocation)
     {
+#if NET8_0_OR_GREATER
+        CreateArchive(input, archiveLocation, true);
+#else
         Random random = new();
         string archive = TempArchive + random.Next(9999) + ".tmp";
         if (File.Exists(archive)) File.Delete(archive);
         ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
         CompressArchive(archive, archiveLocation);
         File.Delete(archive);
+#endif
     }
+
+    /// <summary>
+    /// Exports all files from a Halva package.
+    /// </summary>
+    /// <param name="inputArchive">The Halva package for input.</param>
+    /// <param name="destination">The location for extracting the files.</param>
+    public static void ExportFromArchive(in string inputArchive, in string destination)
+    {
+#if NET8_0_OR_GREATER
+        ExportFiles(inputArchive, destination, true);
+#else
+        Random random = new();
+        string archive = TempArchive + random.Next(9999) + ".tmp";
+        if (File.Exists(archive)) File.Delete(archive);
+        DecompressArchive(inputArchive, archive);
+        if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
+        ZipFile.ExtractToDirectory(archive, destination, true);
+        File.Delete(archive);
+#endif
+    }
+
+#if NET8_0_OR_GREATER
+
+    /// <summary>
+    /// Creates a Halva package from a folder.
+    /// </summary>
+    /// <param name="input">The folder that will be used as source.</param>
+    /// <param name="archiveLocation">The location of the package.</param>
+    /// <param name="useStreams">Use MemoryStream for temp storage. Suitable for smaller archives (less than 4GB).</param>
+    public static void CreateArchive(in string input, in string archiveLocation, bool useStreams)
+    {
+        if(useStreams)
+        {
+            MemoryStream fileWrite = new MemoryStream();
+            ZipFile.CreateFromDirectory(input, fileWrite, CompressionLevel.NoCompression, false);
+            CompressArchive(fileWrite, archiveLocation);
+        }
+        else
+        {
+            Random random = new();
+            string archive = TempArchive + random.Next(9999) + ".tmp";
+            if (File.Exists(archive)) File.Delete(archive);
+            ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
+            CompressArchive(archive, archiveLocation);
+            File.Delete(archive);
+        }
+    }
+
+    /// <summary>
+    /// Compresses the archive.
+    /// </summary>
+    /// <param name="inputArchive">The input archive.</param>
+    /// <param name="outputArchive">The output archive.</param>
+    public static void CompressArchive(in MemoryStream inputArchive, in string outputArchive) => CompressArchive(inputArchive, outputArchive, CompressionLevel.Optimal);
+
+
+    /// <summary>
+    /// Compresses the archive, with a selected compression level.
+    /// </summary>
+    /// <param name="inputArchive"></param>
+    /// <param name="outputArchive"></param>
+    /// <param name="Compression"></param>
+    public static void CompressArchive(in MemoryStream inputArchive, in string outputArchive, CompressionLevel Compression)
+    {
+        inputArchive.Position = 0;
+        using (FileStream outputStream = File.Create(outputArchive))
+        using (BrotliStream compressorStream = new(outputStream, Compression))
+        {
+            inputArchive.CopyTo(compressorStream);
+        }
+    }
+
+    /// <summary>
+    /// Exports all files from a Halva package.
+    /// </summary>
+    /// <param name="inputArchive">The Halva package for input.</param>
+    /// <param name="destination">The location for extracting the files.</param>
+    public static void ExportFiles(in string inputArchive, in string destination, bool useMemoryStreams)
+    {
+        if (useMemoryStreams)
+        {
+            MemoryStream stream = new();
+            DecompressArchive(File.OpenRead(inputArchive), out stream);
+            if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
+            ZipFile.ExtractToDirectory(stream, destination, true);
+            stream.Close();
+        }
+        else
+        {
+            Random random = new();
+            string archive = TempArchive + random.Next(9999) + ".tmp";
+            if (File.Exists(archive)) File.Delete(archive);
+            DecompressArchive(inputArchive, archive);
+            if (!Directory.Exists(destination))
+            Directory.CreateDirectory(destination);
+            ZipFile.ExtractToDirectory(archive, destination, true);
+            File.Delete(archive);
+        }
+    }
+
+    /// <summary>
+    /// Decompresses the archive.
+    /// </summary>
+    /// <param name="inputStream">The input archive in a stream.</param>
+    /// <param name="uncompressedStream">The stream that will accept the uncompressed Stream.</param>
+    public static void DecompressArchive(in Stream inputStream, out MemoryStream uncompressedStream)
+    {
+        inputStream.Position = 0;
+        uncompressedStream = new MemoryStream();
+        using (BrotliStream decompressorStream = new(inputStream, CompressionMode.Decompress))
+        {
+            decompressorStream.CopyTo(uncompressedStream);
+        }
+    }
+
+#endif
 
     /// <summary>
     /// Compresses the archive.
@@ -50,23 +166,6 @@ public static class PackageUtilities
         {
             inputStream.CopyTo(compressorStream);
         }
-    }
-
-    /// <summary>
-    /// Exports all files from a Halva package.
-    /// </summary>
-    /// <param name="inputArchive">The Halva package for input.</param>
-    /// <param name="destination">The location for extracting the files.</param>
-    public static void ExportFromArchive(in string inputArchive, in string destination)
-    {
-        Random random = new();
-        string archive = TempArchive + random.Next(9999) + ".tmp";
-        if (File.Exists(archive)) File.Delete(archive);
-        DecompressArchive(inputArchive, archive);
-        if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
-        ZipFile.ExtractToDirectory(archive, destination, true);
-        File.Delete(archive);
-
     }
 
     /// <summary>
