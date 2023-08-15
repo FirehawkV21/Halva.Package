@@ -83,14 +83,14 @@ internal sealed class Program
                             ivKey = args[argnum + 1].Replace("\"", "");
                             mustEncrypt = true;
                             Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            Console.WriteLine(Halva.Package.Packer.Properties.Resources.InitVectorSetText);
+                            Console.WriteLine(Properties.Resources.InitVectorSetText);
                             Console.ResetColor();
 
                         }
                         else
                         {
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            Console.WriteLine(Halva.Package.Packer.Properties.Resources.NoInitVectorSetText);
+                            Console.WriteLine(Properties.Resources.NoInitVectorSetText);
                             Console.ResetColor();
                         }
                         break;
@@ -250,7 +250,7 @@ internal sealed class Program
                     if (Directory.Exists(Path.Combine(gameFolder, "effects"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "effects");
                     if (Directory.Exists(Path.Combine(gameFolder, "movies"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "movies");
                     if (Directory.Exists(Path.Combine(gameFolder, "icon"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "icon");
-                    assetsPackage.Finalize();
+                    assetsPackage.Finish();
                     assetsPackage.Dispose();
                     Console.WriteLine(Properties.Resources.AssetsCompressedText);
                 });
@@ -258,7 +258,7 @@ internal sealed class Program
                 {
                     Console.WriteLine(Properties.Resources.CompressingAudioFilesText);
                     audioPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "audio");
-                    audioPackage.Finalize();
+                    audioPackage.Finish();
                     audioPackage.Dispose();
                     Console.WriteLine(Properties.Resources.AudioCompressedText);
                 });
@@ -267,7 +267,7 @@ internal sealed class Program
                     Console.WriteLine(Properties.Resources.CompressingDatabaseText);
                     databasePackage.CompressionOption = CheckLevel(binCompress);
                     databasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "data");
-                    databasePackage.Finalize();
+                    databasePackage.Finish();
                     databasePackage.Dispose();
                     Console.WriteLine(Properties.Resources.DatabaseCompressedText);
                 });
@@ -283,7 +283,7 @@ internal sealed class Program
                         enginePackage.AddFileToList(projectLocation, Path.Combine(relativeLocation, "index.html"));
                     }
                     enginePackage.AddFileToList(projectLocation, "package.json");
-                    enginePackage.Finalize();
+                    enginePackage.Finish();
                     enginePackage.Dispose();
                     Console.WriteLine(Properties.Resources.EngineCompressedText);
                 });

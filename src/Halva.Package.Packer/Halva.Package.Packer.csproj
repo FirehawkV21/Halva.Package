@@ -1,28 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net8.0</TargetFramework>
-	 <AssemblyTitle>Halva Package Packing Tool</AssemblyTitle>
-		<Company>Studio ACE</Company>
-		<Product>Halva Package</Product>
-		<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
+		<AssemblyTitle>Halva Package Packing Tool</AssemblyTitle>
 		<PackageId>Halva.Package.Packer</PackageId>
 		<Version>1.2.0-20220914</Version>
-		<NeutralLanguage>en</NeutralLanguage>
-		<PublishReadyToRun>true</PublishReadyToRun>
-		<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
-		<TieredCompilation>true</TieredCompilation>
-		<AssemblyVersion>1.2.0.23221</AssemblyVersion>
-		<FileVersion>1.2.0.23221</FileVersion>
+		<AssemblyVersion>1.2.0.23223</AssemblyVersion>
+		<FileVersion>1.2.0.23223</FileVersion>
 		<PublishAot>true</PublishAot>
-	<StripSymbols>true</StripSymbols>
-	<Copyright>2022 © Studio ACE</Copyright>
-	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
-	<PackageReleaseNotes>- Added support for user provided Initialisation Vector.</PackageReleaseNotes>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<ImplicitUsings>enable</ImplicitUsings>
-  <FileAlignment>4096</FileAlignment>
+		<StripSymbols>true</StripSymbols>
+		<PackageReleaseNotes>- Added support for user provided Initialisation Vector.</PackageReleaseNotes>
+		<FileAlignment>4096</FileAlignment>
+		<TargetFrameworks>net8.0</TargetFrameworks>
+		<OptimizationPreference>Speed</OptimizationPreference>
 	</PropertyGroup>
 
 	<ItemGroup>

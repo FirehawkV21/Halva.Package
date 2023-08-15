@@ -19,5 +19,5 @@ public interface IHalvaPackage
     void UpdateArchive(string SourceFolder);
     void UpdateFromArchive(string TargetFolder);
     void Save();
-    void Finalize();
+    void Finish();
 }

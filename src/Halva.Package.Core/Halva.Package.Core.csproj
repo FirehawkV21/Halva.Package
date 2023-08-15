@@ -1,77 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-	<TargetFrameworks>net8.0;net7.0;net6.0</TargetFrameworks>
-	<AssemblyTitle>Halva Package Core</AssemblyTitle>
-	<Authors>AceOfAces</Authors>
-	<Company>Studio ACE</Company>
-	<Product>Halva Package</Product>
-	<RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
-	<PackageTags>compression, package, Brotli, game-package</PackageTags>
-	<PackageLicenseFile></PackageLicenseFile>
-	<AssemblyVersion>3.0.0.23221</AssemblyVersion>
-	<FileVersion>3.0.0.23221</FileVersion>
-	<PackageId>Halva.Package.Core</PackageId>
-	<Version>3.0.0</Version>
-	<Description>Halva (Χαλβάς in Greek) is a small .NET 6+ library that implements Google's Brotli compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
+		<AssemblyTitle>Halva Package Core</AssemblyTitle>
+		<Product>Halva Package</Product>
+		<AssemblyVersion>3.0.0.23227</AssemblyVersion>
+		<FileVersion>3.0.0.23227</FileVersion>
+		<PackageId>Halva.Package.Core</PackageId>
+		<Version>3.0.0</Version>
+		<Description>Halva (Χαλβάς in Greek) is a small .NET 6+ library that implements Google's
+			Brotli compression, alognside some encryption options. The Halva package is a general
+			purpose game data packaging system that provides good and fast compression, making it
+			suitable for storing the game files with the game, releasing patches, etc.</Description>
 		<PackageReleaseNotes>-Performance and memory improvements when comparing files. </PackageReleaseNotes>
-	<Copyright>2023 © Studio ACE</Copyright>
-		<NeutralLanguage>en</NeutralLanguage>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<EnableNETAnalyzers>True</EnableNETAnalyzers>
-		<AnalysisLevel>latest</AnalysisLevel>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<IsTrimmable>true</IsTrimmable>
 		<LangVersion>latest</LangVersion>
 		<RepositoryType>git</RepositoryType>
 		<FileAlignment>4096</FileAlignment>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	<ShouldCreateLogs>True</ShouldCreateLogs>
-	<AdvancedSettingsExpanded>False</AdvancedSettingsExpanded>
-	<UpdateAssemblyVersion>False</UpdateAssemblyVersion>
-	<UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
-	<UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
-	<UpdatePackageVersion>False</UpdatePackageVersion>
-	<AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
-	<InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	<ShouldCreateLogs>True</ShouldCreateLogs>
-	<AdvancedSettingsExpanded>False</AdvancedSettingsExpanded>
-	<UpdateAssemblyVersion>False</UpdateAssemblyVersion>
-	<UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
-	<UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
-	<UpdatePackageVersion>False</UpdatePackageVersion>
-	<PackageVersionSettings>AssemblyVersion.None.Alpha</PackageVersionSettings>
-	<AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
-	<InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
+		<IsAotCompatible>true</IsAotCompatible>
 	</PropertyGroup>
 
 	<ItemGroup>
-	<None Include="..\..\LICENSE">
-		<Pack>True</Pack>
-		<PackagePath></PackagePath>
-	</None>
-	<None Include="..\..\README.md">
-		<Pack>True</Pack>
-		<PackagePath>\</PackagePath>
-	</None>
+		<None Include="..\..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-	<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-		<PrivateAssets>all</PrivateAssets>
-		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	</PackageReference>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 </Project>

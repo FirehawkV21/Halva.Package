@@ -50,7 +50,7 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
 
     public string IVKey { get; set; }
 
-    private bool isMemoryStream;
+    private readonly bool isMemoryStream;
     private MemoryStream ZipStream;
 
     /// <summary>
@@ -524,7 +524,7 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
             ReloadArchive();
     }
 
-    public void Finalize()
+    public void Finish()
     {
         CloseArchive();
         if (isMemoryStream) ZipStream.Close();
