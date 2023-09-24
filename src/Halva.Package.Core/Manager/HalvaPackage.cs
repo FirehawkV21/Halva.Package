@@ -38,7 +38,7 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
     /// Gets the character used for path designation.
     /// </summary>
     /// <returns>Either "\\" (in Windows) or "/" (Unix systems).</returns>
-    public static string GetFolderCharacter() => (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) ? "\\" : "/";
+    private static string GetFolderCharacter() => Path.DirectorySeparatorChar.ToString();
     /// <summary>
     /// Adjusts the compression of the final archive.
     /// </summary>
