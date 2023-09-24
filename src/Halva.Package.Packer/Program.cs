@@ -244,12 +244,12 @@ internal sealed class Program
                 Task buildAssets = Task.Run(() =>
                 {
                     Console.WriteLine(Properties.Resources.CompressingAssetsText);
-                    assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "img");
-                    if (Directory.Exists(Path.Combine(gameFolder, "fonts"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "fonts");
-                    if (Directory.Exists(Path.Combine(gameFolder, "css"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "css");
-                    if (Directory.Exists(Path.Combine(gameFolder, "effects"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "effects");
-                    if (Directory.Exists(Path.Combine(gameFolder, "movies"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "movies");
-                    if (Directory.Exists(Path.Combine(gameFolder, "icon"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "icon");
+                    assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "img");
+                    if (Directory.Exists(Path.Combine(gameFolder, "fonts"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "fonts");
+                    if (Directory.Exists(Path.Combine(gameFolder, "css"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "css");
+                    if (Directory.Exists(Path.Combine(gameFolder, "effects"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "effects");
+                    if (Directory.Exists(Path.Combine(gameFolder, "movies"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "movies");
+                    if (Directory.Exists(Path.Combine(gameFolder, "icon"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "icon");
                     assetsPackage.Finish();
                     assetsPackage.Dispose();
                     Console.WriteLine(Properties.Resources.AssetsCompressedText);
@@ -257,7 +257,7 @@ internal sealed class Program
                 Task buildAudio = Task.Run(() =>
                 {
                     Console.WriteLine(Properties.Resources.CompressingAudioFilesText);
-                    audioPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "audio");
+                    audioPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "audio");
                     audioPackage.Finish();
                     audioPackage.Dispose();
                     Console.WriteLine(Properties.Resources.AudioCompressedText);
@@ -266,7 +266,7 @@ internal sealed class Program
                 {
                     Console.WriteLine(Properties.Resources.CompressingDatabaseText);
                     databasePackage.CompressionOption = CheckLevel(binCompress);
-                    databasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "data");
+                    databasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "data");
                     databasePackage.Finish();
                     databasePackage.Dispose();
                     Console.WriteLine(Properties.Resources.DatabaseCompressedText);
@@ -275,11 +275,11 @@ internal sealed class Program
                 {
                     Console.WriteLine(Properties.Resources.CompressingEngineFilesText);
                     enginePackage.CompressionOption = CheckLevel(binCompress);
-                    enginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "") + HalvaPackage.GetFolderCharacter() + "js");
+                    enginePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "js");
                     if (gameFolder == projectLocation) enginePackage.AddFileToList(gameFolder, "index.html");
                     else
                     {
-                        string relativeLocation = gameFolder.Replace(projectLocation + HalvaPackage.GetFolderCharacter(), "");
+                        string relativeLocation = gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "");
                         enginePackage.AddFileToList(projectLocation, Path.Combine(relativeLocation, "index.html"));
                     }
                     enginePackage.AddFileToList(projectLocation, "package.json");

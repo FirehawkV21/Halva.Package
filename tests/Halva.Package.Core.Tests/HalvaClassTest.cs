@@ -24,7 +24,7 @@ public class HalvaClassTest
     {
         Cleanup();
         HalvaPackage package = new(sourceFolder, destinationArchive, false);
-        package.Finalize();
+        package.Finish();
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
         package.Dispose();
     }
@@ -42,7 +42,7 @@ public class HalvaClassTest
     {
         HalvaPackage package = new(PackageUtilities.TempArchive,  destinationArchive, false);
         package.RemoveFileFromList("TestImage.webp");
-        package.Finalize();
+        package.Finish();
         if(Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
         Assert.Equal(2, Directory.EnumerateFiles(destinationFolder).Count());
@@ -54,7 +54,7 @@ public class HalvaClassTest
     {
         HalvaPackage package = new(PackageUtilities.TempArchive, destinationArchive, false);
         package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
-        package.Finalize();
+        package.Finish();
         if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
         Assert.Equal(3, Directory.EnumerateFiles(destinationFolder).Count());

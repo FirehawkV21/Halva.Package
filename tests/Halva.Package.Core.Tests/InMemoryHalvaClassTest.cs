@@ -42,7 +42,7 @@ public class InMemoryHalvaClassTest
     {
         HalvaPackage package = new(PackageUtilities.TempArchive,  destinationArchive, true);
         package.RemoveFileFromList("TestImage.webp");
-        package.Finalize();
+        package.Finish();
         if(Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
         Assert.Equal(2, Directory.EnumerateFiles(destinationFolder).Count());
@@ -54,7 +54,7 @@ public class InMemoryHalvaClassTest
     {
         HalvaPackage package = new(PackageUtilities.TempArchive, destinationArchive, true);
         package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
-        package.Finalize();
+        package.Finish();
         if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
         Assert.Equal(3, Directory.EnumerateFiles(destinationFolder).Count());

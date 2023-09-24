@@ -37,6 +37,7 @@ public class GamePackageManager
     private readonly string PackagePassword = "";
     //If you have set a IV for the archives, place it here or read from a file.
     private readonly string PackageIV = "";
+    private readonly bool useMemoryStream = true;
     private readonly PackageMetadata TargetPackageVersion = new();
     private readonly PackageMetadata CurrentPackageVersion = new();
 
@@ -98,10 +99,10 @@ public class GamePackageManager
     {
         HalvaPackage package;
         if (!string.IsNullOrEmpty(PackagePassword) && !string.IsNullOrWhiteSpace(PackagePassword)) {
-            if (!string.IsNullOrEmpty(PackageIV) && !string.IsNullOrWhiteSpace(PackageIV)) package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword, PackageIV);
-            else package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword);
+            if (!string.IsNullOrEmpty(PackageIV) && !string.IsNullOrWhiteSpace(PackageIV)) package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword, PackageIV, useMemoryStream);
+            else package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword, useMemoryStream);
         }
-        else package = new HalvaPackage(Path.Combine(PackageLocation, PackageName));
+        else package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), useMemoryStream);
             package.Password = PackagePassword;
             package.UpdateFromArchive(Path.Combine(ExctractLocation, "GameData"));
             package.Dispose();

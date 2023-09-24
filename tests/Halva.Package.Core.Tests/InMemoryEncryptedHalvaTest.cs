@@ -26,7 +26,7 @@ public class InMemoryEncryptedHalvaTest
     {
         Cleanup();
         HalvaPackage package = new(PassKey: testPassword, sourceFolder, destinationArchive, true);
-        package.Finalize();
+        package.Finish();
         EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword);
     }
 
@@ -35,7 +35,7 @@ public class InMemoryEncryptedHalvaTest
     {
         Cleanup();
         HalvaPackage package = new(PassKey: testPassword, IV: ivKey, sourceFolder, destinationArchive, true);
-        package.Finalize();
+        package.Finish();
         EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword, ivKey);
     }
 
@@ -58,7 +58,7 @@ public class InMemoryEncryptedHalvaTest
     {
         HalvaPackage package = new(PassKey: testPassword, destinationArchive, true);
         package.RemoveFileFromList("TestImage.webp");
-        package.Finalize();
+        package.Finish();
         if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
         EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword);
         Assert.Equal(2, Directory.EnumerateFiles(destinationFolder).Count());
@@ -69,7 +69,7 @@ public class InMemoryEncryptedHalvaTest
     {
         HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, true);
         package.RemoveFileFromList("TestImage.webp");
-        package.Finalize();
+        package.Finish();
         if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
         EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword);
         Assert.Equal(2, Directory.EnumerateFiles(destinationFolder).Count());
@@ -80,7 +80,7 @@ public class InMemoryEncryptedHalvaTest
     {
         HalvaPackage package = new(PassKey: testPassword, destinationArchive, true);
         package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
-        package.Finalize();
+        package.Finish();
         if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
         EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword);
         Assert.Equal(3, Directory.EnumerateFiles(destinationFolder).Count());
@@ -91,7 +91,7 @@ public class InMemoryEncryptedHalvaTest
     {
         HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, true);
         package.AddFileToList(Path.Combine(sourceFolder, "TestImage.webp"));
-        package.Finalize();
+        package.Finish();
         if (Directory.Exists(destinationFolder)) Directory.Delete(destinationFolder, true);
         EncryptedPackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, testPassword);
         Assert.Equal(3, Directory.EnumerateFiles(destinationFolder).Count());
