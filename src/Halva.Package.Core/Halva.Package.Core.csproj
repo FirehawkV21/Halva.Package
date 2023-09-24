@@ -11,7 +11,11 @@
 			Brotli compression, alognside some encryption options. The Halva package is a general
 			purpose game data packaging system that provides good and fast compression, making it
 			suitable for storing the game files with the game, releasing patches, etc.</Description>
-		<PackageReleaseNotes>-Performance and memory improvements when comparing files. </PackageReleaseNotes>
+		<PackageReleaseNotes>- [Breaking]Overhauled the API to support MemoryStreams.
+ - Add a bool to select either memory of FileStream.
+ - To close an archive, use Finish.
+ -  The built-in folder separator character is no longer accessible. Use Path.DirectorySeparatorChar instead.
+- Implemented .NET specific optimizations.</PackageReleaseNotes>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>
@@ -21,6 +25,7 @@
 		<RepositoryType>git</RepositoryType>
 		<FileAlignment>4096</FileAlignment>
 		<IsAotCompatible>true</IsAotCompatible>
+		<Title>Halva Package Core</Title>
 	</PropertyGroup>
 
 	<ItemGroup>
