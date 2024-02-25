@@ -16,6 +16,8 @@ public static class EncryptedPackageUtilities
     /// </summary>
     public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive_");
 
+    #region FileStream Compress/Decompress
+
     /// <summary>
     /// Compresses the encrypted archive.
     /// </summary>
@@ -62,31 +64,6 @@ public static class EncryptedPackageUtilities
 
     }
 
-    private static void CompressFile(ref Aes encryptionKey, string inputArchive, string outputArchive, CompressionLevel compression)
-    {
-        using (FileStream inputStream = File.OpenRead(inputArchive))
-        using (FileStream outputStream = File.Create(outputArchive))
-        using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
-        using (BrotliStream compressorStream = new(cryptStream, compression))
-        {
-            inputStream.CopyTo(compressorStream);
-        }
-        encryptionKey.Dispose();
-    }
-
-    [SupportedOSPlatform("windows")]
-    private static void CompressFile(ref AesCng encryptionKey, string inputArchive, string outputArchive, CompressionLevel compression)
-    {
-        using (FileStream inputStream = File.OpenRead(inputArchive))
-        using (FileStream outputStream = File.Create(outputArchive))
-        using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
-        using (BrotliStream compressorStream = new(cryptStream, compression))
-        {
-            inputStream.CopyTo(compressorStream);
-        }
-        encryptionKey.Dispose();
-    }
-
     /// <summary>
     /// Decompresses the archive.
     /// </summary>
@@ -121,32 +98,9 @@ public static class EncryptedPackageUtilities
             DecompressFile(ref encryptionKit, inputArchive, workerArchive);
         }
     }
+    #endregion
 
-    private static void DecompressFile(ref Aes encryptionKey, in string inputArchive, in string workerArchive)
-    {
-        using (FileStream inputStream = File.OpenRead(inputArchive))
-        using (FileStream outputStream = File.Create(workerArchive))
-        using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
-        using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
-        {
-            decompressorStream.CopyTo(outputStream);
-        }
-        encryptionKey.Dispose();
-    }
-
-    [SupportedOSPlatform("windows")]
-    private static void DecompressFile(ref AesCng encryptionKey, in string inputArchive, in string workerArchive)
-    {
-        using (FileStream inputStream = File.OpenRead(inputArchive))
-        using (FileStream outputStream = File.Create(workerArchive))
-        using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
-        using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
-        {
-            decompressorStream.CopyTo(outputStream);
-        }
-        encryptionKey.Dispose();
-    }
-
+    #region MemoryStream Compress/Decompress
     public static void CompressArchive(in MemoryStream inputArchive, in string outputArchive, in string password) => CompressArchive(inputArchive, outputArchive, password, CompressionLevel.Optimal);
 
     public static void CompressArchive(in MemoryStream inputArchive, in string outputArchive, in string password, in string ivKey) => CompressArchive(inputArchive, outputArchive, password, ivKey, CompressionLevel.Optimal);
@@ -188,28 +142,6 @@ public static class EncryptedPackageUtilities
         }
     }
 
-    private static void CompressFile(ref AesCng encryptionKey, in MemoryStream inputArchive, in string outputArchive, in CompressionLevel compression)
-    {
-        using (FileStream outputStream = File.Create(outputArchive))
-        using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
-        using (BrotliStream compressorStream = new(cryptStream, compression))
-        {
-            inputArchive.CopyTo(compressorStream);
-        }
-        encryptionKey.Dispose();
-    }
-
-    private static void CompressFile(ref Aes encryptionKey, in MemoryStream inputArchive, in string outputArchive, in CompressionLevel compression)
-    {
-        using (FileStream outputStream = File.Create(outputArchive))
-        using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
-        using (BrotliStream compressorStream = new(cryptStream, compression))
-        {
-            inputArchive.CopyTo(compressorStream);
-        }
-        encryptionKey.Dispose();
-    }
-
     /// <summary>
     /// Decompresses the archive.
     /// </summary>
@@ -247,6 +179,83 @@ public static class EncryptedPackageUtilities
             DecompressFile(ref encryptionKit, inputStream, uncompressedStream);
         }
     }
+    #endregion
+
+    #region Main Compression Code
+    private static void CompressFile(ref Aes encryptionKey, string inputArchive, string outputArchive, CompressionLevel compression)
+    {
+        using (FileStream inputStream = File.OpenRead(inputArchive))
+        using (FileStream outputStream = File.Create(outputArchive))
+        using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
+        using (BrotliStream compressorStream = new(cryptStream, compression))
+        {
+            inputStream.CopyTo(compressorStream);
+        }
+        encryptionKey.Dispose();
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static void CompressFile(ref AesCng encryptionKey, string inputArchive, string outputArchive, CompressionLevel compression)
+    {
+        using (FileStream inputStream = File.OpenRead(inputArchive))
+        using (FileStream outputStream = File.Create(outputArchive))
+        using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
+        using (BrotliStream compressorStream = new(cryptStream, compression))
+        {
+            inputStream.CopyTo(compressorStream);
+        }
+        encryptionKey.Dispose();
+    }
+
+    private static void CompressFile(ref AesCng encryptionKey, in MemoryStream inputArchive, in string outputArchive, in CompressionLevel compression)
+    {
+        using (FileStream outputStream = File.Create(outputArchive))
+        using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
+        using (BrotliStream compressorStream = new(cryptStream, compression))
+        {
+            inputArchive.CopyTo(compressorStream);
+        }
+        encryptionKey.Dispose();
+    }
+
+    private static void CompressFile(ref Aes encryptionKey, in MemoryStream inputArchive, in string outputArchive, in CompressionLevel compression)
+    {
+        using (FileStream outputStream = File.Create(outputArchive))
+        using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
+        using (BrotliStream compressorStream = new(cryptStream, compression))
+        {
+            inputArchive.CopyTo(compressorStream);
+        }
+        encryptionKey.Dispose();
+    }
+    #endregion
+
+    #region Main Decompression Code
+
+    private static void DecompressFile(ref Aes encryptionKey, in string inputArchive, in string workerArchive)
+    {
+        using (FileStream inputStream = File.OpenRead(inputArchive))
+        using (FileStream outputStream = File.Create(workerArchive))
+        using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
+        using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
+        {
+            decompressorStream.CopyTo(outputStream);
+        }
+        encryptionKey.Dispose();
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static void DecompressFile(ref AesCng encryptionKey, in string inputArchive, in string workerArchive)
+    {
+        using (FileStream inputStream = File.OpenRead(inputArchive))
+        using (FileStream outputStream = File.Create(workerArchive))
+        using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
+        using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
+        {
+            decompressorStream.CopyTo(outputStream);
+        }
+        encryptionKey.Dispose();
+    }
 
     [SupportedOSPlatform("windows")]
     private static void DecompressFile(ref AesCng encryptionKey, Stream inputStream, in MemoryStream uncompressedStream)
@@ -268,13 +277,16 @@ public static class EncryptedPackageUtilities
         }
         encryptionKey.Dispose();
     }
+    #endregion
 
+
+    #region Aes Key Handling
     /// <summary>
     /// Sets up the AES Encryptor/Decryptor
     /// </summary>
     /// <param name="encryptor">The Aes Encryptor/Decryptor used in code.</param>
     /// <param name="password">The password of the archive.</param>
-    private static void CreateKey (out Aes encryptor, in string password)
+    private static void CreateKey(out Aes encryptor, in string password)
     {
         encryptor = Aes.Create();
         encryptor.KeySize = 256;
@@ -292,7 +304,7 @@ public static class EncryptedPackageUtilities
     /// <param name="encryptor">The Aes Encryptor/Decryptor to initialize.</param>
     /// <param name="password">The password of the archive.</param>
     /// <param name="ivKey">The IV for the archive.</param>
-    private static void CreateKey (out Aes encryptor, in string password, in string ivKey)
+    private static void CreateKey(out Aes encryptor, in string password, in string ivKey)
     {
         encryptor = Aes.Create();
         encryptor.KeySize = 256;
@@ -306,7 +318,9 @@ public static class EncryptedPackageUtilities
         key.Dispose();
         vectorKey.Dispose();
     }
+    #endregion
 
+    #region AesCng Key Handling
     [SupportedOSPlatform("windows")]
     /// <summary>
     /// Sets up the AES Encryptor/Decryptor
@@ -350,6 +364,8 @@ public static class EncryptedPackageUtilities
         key.Dispose();
         vectorKey.Dispose();
     }
+    #endregion
+
 
     /// <summary>
     /// Creates a Halva package from a folder.
