@@ -11,7 +11,7 @@
     <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
     <LangVersion>latest</LangVersion>
     <FileAlignment>4096</FileAlignment>
-    <Copyright>2023 © Dragonhouse Software</Copyright>
+    <Copyright>2024 © Dragonhouse Software</Copyright>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
