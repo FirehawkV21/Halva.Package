@@ -3,7 +3,7 @@
     <Authors>AceOfAces</Authors>
     <Company>Dragonhouse Software</Company>
     <Product>Halva Package</Product>
-    <TargetFrameworks>net8.0;net7.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
     <RepositoryUrl>https://github.com/acemod13/Halva.Package</RepositoryUrl>
     <PackageTags>compression, package, Brotli, game-package</PackageTags>
     <TieredCompilation>true</TieredCompilation>

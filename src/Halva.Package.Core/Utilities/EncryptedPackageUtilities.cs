@@ -207,7 +207,7 @@ public static class EncryptedPackageUtilities
         encryptionKey.Dispose();
     }
 
-    private static void CompressFile(ref AesCng encryptionKey, in MemoryStream inputArchive, in string outputArchive, in CompressionLevel compression)
+    private static void CompressFile(ref AesCng encryptionKey, in Stream inputArchive, in string outputArchive, in CompressionLevel compression)
     {
         using (FileStream outputStream = File.Create(outputArchive))
         using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
@@ -218,7 +218,7 @@ public static class EncryptedPackageUtilities
         encryptionKey.Dispose();
     }
 
-    private static void CompressFile(ref Aes encryptionKey, in MemoryStream inputArchive, in string outputArchive, in CompressionLevel compression)
+    private static void CompressFile(ref Aes encryptionKey, in Stream inputArchive, in string outputArchive, in CompressionLevel compression)
     {
         using (FileStream outputStream = File.Create(outputArchive))
         using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))

@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using System.IO.Hashing;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -187,7 +188,7 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
         }
         else {
             WorkingArchive = ReserveRandomArchive();
-            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create); 
+            ArchiveMemoryStream = ZipFile.Open(WorkingArchive, ZipArchiveMode.Create);
         }
         foreach (string file in foundFilesList)
         {
@@ -357,20 +358,15 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
                 ReadOnlySpan<byte> targetFileSignature;
                 using (Stream archivedFile = entry.Open())
                 {
-#if NET7_0_OR_GREATER
                     using (FileStream targetFile = new(Path.Combine(TargetFolder, entry.FullName), FileMode.Open, FileAccess.Read))
                     {
-                        originalFileSignature = SHA256.HashData(archivedFile);
-                        targetFileSignature = SHA256.HashData(targetFile);
+                        XxHash128 archiveHash = new();
+                        XxHash128 targetHash = new();
+                        archiveHash.Append(archivedFile);
+                        targetHash.Append(targetFile);
+                        originalFileSignature = archiveHash.GetCurrentHash();
+                        targetFileSignature = targetHash.GetCurrentHash();
                     }
-#else
-                    using (SHA256 algo = SHA256.Create())
-                    using (FileStream targetFile = new(Path.Combine(TargetFolder, entry.FullName), FileMode.Open, FileAccess.Read))
-                    {
-                        originalFileSignature = algo.ComputeHash(archivedFile);
-                        targetFileSignature = algo.ComputeHash(targetFile);
-                    }
-#endif
                 }
                 if (originalFileSignature != targetFileSignature)
                 {
@@ -402,21 +398,17 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
                 ReadOnlySpan<byte> targetFileSignature;
                 using (Stream archivedFile = entry.Open())
                 {
-#if NET7_0_OR_GREATER
-                    using (FileStream targetFile = new(file, FileMode.Open, FileAccess.Read))
+                    using (FileStream targetFile = new(Path.Combine(file, entry.FullName), FileMode.Open, FileAccess.Read))
                     {
-                        originalFileSignature = SHA256.HashData(archivedFile);
-                        targetFileSignature = SHA256.HashData(targetFile);
+                        XxHash128 archiveHash = new();
+                        XxHash128 targetHash = new();
+                        archiveHash.Append(archivedFile);
+                        targetHash.Append(targetFile);
+                        originalFileSignature = archiveHash.GetCurrentHash();
+                        targetFileSignature = targetHash.GetCurrentHash();
                     }
-#else
-                    using (SHA256 algo = SHA256.Create())
-                    using (FileStream targetFile = new(file, FileMode.Open, FileAccess.Read))
-                    {
-                        originalFileSignature = algo.ComputeHash(archivedFile);
-                        targetFileSignature = algo.ComputeHash(targetFile);
-                    }
-#endif
                 }
+
                 if (originalFileSignature != targetFileSignature)
                 {
                     RemoveFileFromList(entry.FullName);
@@ -516,7 +508,7 @@ public sealed class HalvaPackage : IDisposable, IHalvaPackage
     }
 
     /// <summary>
-    /// Saves the changes to the destination archive. If password is set, it will attempt to encrypt it. 
+    /// Saves the changes to the destination archive. If password is set, it will attempt to encrypt it.
     /// </summary>
     public void Save()
     {
