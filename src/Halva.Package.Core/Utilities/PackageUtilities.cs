@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.Formats.Tar;
+using System.IO.Compression;
 
 namespace Halva.Package.Core.Utilities;
 
@@ -16,16 +17,7 @@ public static class PackageUtilities
 
     public static void CreateArchiveFromFolder(in string input, in string archiveLocation)
     {
-#if NET8_0_OR_GREATER
         CreateArchive(input, archiveLocation, true);
-#else
-        Random random = new();
-        string archive = TempArchive + random.Next(9999) + ".tmp";
-        if (File.Exists(archive)) File.Delete(archive);
-        ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
-        CompressArchive(archive, archiveLocation);
-        File.Delete(archive);
-#endif
     }
 
     /// <summary>
@@ -35,17 +27,7 @@ public static class PackageUtilities
     /// <param name="destination">The location for extracting the files.</param>
     public static void ExportFromArchive(in string inputArchive, in string destination)
     {
-#if NET8_0_OR_GREATER
         ExportFiles(inputArchive, destination, true);
-#else
-        Random random = new();
-        string archive = TempArchive + random.Next(9999) + ".tmp";
-        if (File.Exists(archive)) File.Delete(archive);
-        DecompressArchive(inputArchive, archive);
-        if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
-        ZipFile.ExtractToDirectory(archive, destination, true);
-        File.Delete(archive);
-#endif
     }
 
     /// <summary>
@@ -99,8 +81,8 @@ public static class PackageUtilities
     {
         if(useStreams)
         {
-            MemoryStream fileWrite = new MemoryStream();
-            ZipFile.CreateFromDirectory(input, fileWrite, CompressionLevel.NoCompression, false);
+            MemoryStream fileWrite = new();
+            TarFile.CreateFromDirectory(input, fileWrite,  false);
             CompressArchive(fileWrite, archiveLocation);
         }
         else
@@ -108,7 +90,7 @@ public static class PackageUtilities
             Random random = new();
             string archive = TempArchive + random.Next(9999) + ".tmp";
             if (File.Exists(archive)) File.Delete(archive);
-            ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
+            TarFile.CreateFromDirectory(input, archive, false);
             CompressArchive(archive, archiveLocation);
             File.Delete(archive);
         }
@@ -126,7 +108,7 @@ public static class PackageUtilities
             MemoryStream stream = new();
             DecompressArchive(File.OpenRead(inputArchive), out stream);
             if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
-            ZipFile.ExtractToDirectory(stream, destination, true);
+            TarFile.ExtractToDirectory(stream, destination, true);
             stream.Close();
         }
         else
@@ -137,7 +119,7 @@ public static class PackageUtilities
             DecompressArchive(inputArchive, archive);
             if (!Directory.Exists(destination))
             Directory.CreateDirectory(destination);
-            ZipFile.ExtractToDirectory(archive, destination, true);
+            TarFile.ExtractToDirectory(archive, destination, true);
             File.Delete(archive);
         }
     }

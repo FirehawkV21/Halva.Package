@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.Formats.Tar;
+using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
@@ -375,30 +376,12 @@ public static class EncryptedPackageUtilities
     /// <param name="password">The archive's password.</param>
     public static void CreateArchiveFromFolder(in string input, in string archiveLocation, in string password)
     {
-#if NET8_0_OR_GREATER
         CreateArchive(input, archiveLocation, true, password);
-#else
-        Random random = new();
-        string archive = TempArchive + random.Next(9999) + ".tmp";
-        if (File.Exists(archive)) File.Delete(archive);
-        ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
-        CompressArchive(archive, archiveLocation, password);
-        File.Delete(archive);
-#endif
     }
 
     public static void CreateArchiveFromFolder(in string input, in string archiveLocation, in string password, in string iv)
     {
-#if NET8_0_OR_GREATER
         CreateArchive(input, archiveLocation, true, password, iv);
-#else
-        Random random = new();
-        string archive = TempArchive + random.Next(9999) + ".tmp";
-        if (File.Exists(archive)) File.Delete(archive);
-        ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
-        CompressArchive(archive, archiveLocation, password, iv);
-        File.Delete(archive);
-#endif
     }
 
     /// <summary>
@@ -409,33 +392,13 @@ public static class EncryptedPackageUtilities
     /// <param name="password">The archive's password.</param>
     public static void ExportFromArchive(in string inputArchive, in string exportDestination, in string password)
     {
-#if NET8_0_OR_GREATER
         ExportFiles(inputArchive, exportDestination, true, password);
-#else
-        Random random = new();
-        string archive = TempArchive + random.Next(9999) + ".tmp";
-        if (File.Exists(archive)) File.Delete(archive);
-        if (!Directory.Exists(exportDestination)) Directory.CreateDirectory(exportDestination);
-        DecompressArchive(inputArchive, archive, password);
-        ZipFile.ExtractToDirectory(archive, exportDestination, true);
-        File.Delete(archive);
-#endif
 
     }
 
     public static void ExportFromArchive(in string inputArchive, in string exportDestination, in string password, in string ivKey)
     {
-#if NET8_0_OR_GREATER
         ExportFiles(inputArchive, exportDestination, true, password, ivKey);
-#else
-        Random random = new();
-        string archive = TempArchive + random.Next(9999) + ".tmp";
-        if (File.Exists(archive)) File.Delete(archive);
-        if (!Directory.Exists(exportDestination)) Directory.CreateDirectory(exportDestination);
-        DecompressArchive(inputArchive, archive, password, ivKey);
-        ZipFile.ExtractToDirectory(archive, exportDestination, true);
-        File.Delete(archive);
-#endif
 
     }
 #if NET8_0_OR_GREATER
@@ -450,7 +413,7 @@ public static class EncryptedPackageUtilities
         if (useMemoryStream)
         {
             MemoryStream stream = new();
-            ZipFile.CreateFromDirectory(input, stream, CompressionLevel.NoCompression, false);
+            TarFile.CreateFromDirectory(input, stream, false);
             CompressArchive(stream, archiveLocation, password);
         }
         else
@@ -458,7 +421,7 @@ public static class EncryptedPackageUtilities
             Random random = new();
             string archive = TempArchive + random.Next(9999) + ".tmp";
             if (File.Exists(archive)) File.Delete(archive);
-            ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
+            TarFile.CreateFromDirectory(input, archive, false);
             CompressArchive(archive, archiveLocation, password);
             File.Delete(archive);
         }
@@ -470,7 +433,7 @@ public static class EncryptedPackageUtilities
         if (useMemoryStream)
         {
             MemoryStream stream = new();
-            ZipFile.CreateFromDirectory(input, stream, CompressionLevel.NoCompression, false);
+            TarFile.CreateFromDirectory(input, stream, false);
             CompressArchive(stream, archiveLocation, password, iv);
         }
         else
@@ -478,7 +441,7 @@ public static class EncryptedPackageUtilities
             Random random = new();
             string archive = TempArchive + random.Next(9999) + ".tmp";
             if (File.Exists(archive)) File.Delete(archive);
-            ZipFile.CreateFromDirectory(input, archive, CompressionLevel.NoCompression, false);
+            TarFile.CreateFromDirectory(input, archive, false);
             CompressArchive(archive, archiveLocation, password, iv);
             File.Delete(archive);
         }
@@ -489,7 +452,7 @@ public static class EncryptedPackageUtilities
         {
             MemoryStream uncompressedStream;
             DecompressArchive(File.OpenRead(inputArchive), out uncompressedStream, password);
-            ZipFile.ExtractToDirectory(uncompressedStream, exportDestination, true);
+            TarFile.ExtractToDirectory(uncompressedStream, exportDestination, true);
             uncompressedStream.Close();
         }
         else
@@ -499,7 +462,7 @@ public static class EncryptedPackageUtilities
             if (File.Exists(archive)) File.Delete(archive);
             if (!Directory.Exists(exportDestination)) Directory.CreateDirectory(exportDestination);
             DecompressArchive(inputArchive, archive, password);
-            ZipFile.ExtractToDirectory(archive, exportDestination, true);
+            TarFile.ExtractToDirectory(archive, exportDestination, true);
             File.Delete(archive);
         }
 
@@ -511,7 +474,7 @@ public static class EncryptedPackageUtilities
         {
             MemoryStream uncompressedStream;
             DecompressArchive(File.OpenRead(inputArchive), out uncompressedStream, password, ivKey);
-            ZipFile.ExtractToDirectory(uncompressedStream, exportDestination, true);
+            TarFile.ExtractToDirectory(uncompressedStream, exportDestination, true);
             uncompressedStream.Close();
         }
         else
@@ -521,7 +484,7 @@ public static class EncryptedPackageUtilities
             if (File.Exists(archive)) File.Delete(archive);
             if (!Directory.Exists(exportDestination)) Directory.CreateDirectory(exportDestination);
             DecompressArchive(inputArchive, archive, password, ivKey);
-            ZipFile.ExtractToDirectory(archive, exportDestination, true);
+            TarFile.ExtractToDirectory(archive, exportDestination, true);
             File.Delete(archive);
         }
     }
