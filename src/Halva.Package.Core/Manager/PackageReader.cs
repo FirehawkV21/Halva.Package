@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Halva.Package.Core.Utilities;
 
 namespace Halva.Package.Core.Manager;
-public class PackageReader
+public class PackageReader : IDisposable
 {
     private bool disposedValue;
 
@@ -16,10 +16,6 @@ public class PackageReader
     /// The location of the source files.
     /// </summary>
     public StringBuilder SourceLocation { get; set; }
-    /// <summary>
-    /// The list of files of the archive.
-    /// </summary>
-    public List<string> FileList { get; set; } = [];
     /// <summary>
     /// The memory stream that handles the archive.
     /// </summary>
@@ -67,30 +63,30 @@ public class PackageReader
         }
     }
 
-    public PackageReader(string destination, string password, bool useMemoryStream)
+    public PackageReader(string source, bool useMemoryStream, string password)
     {
-        SourceLocation = new StringBuilder(destination);
+        SourceLocation = new StringBuilder(source);
         Password = password;
         if (useMemoryStream)
         {
             isMemoryStream = true;
             ZipStream = new();
             isMemoryStream = true;
-            EncryptedPackageUtilities.DecompressArchive(File.OpenRead(destination), out ZipStream, password);
+            EncryptedPackageUtilities.DecompressArchive(File.OpenRead(source), out ZipStream, password);
             ArchiveMemoryStream = new(ZipStream, true);
         }
         else
         {
             WorkingArchive = ReserveRandomArchive();
-            EncryptedPackageUtilities.DecompressArchive(destination, WorkingArchive, password);
+            EncryptedPackageUtilities.DecompressArchive(source, WorkingArchive, password);
             ZipFileStream = new(WorkingArchive, FileMode.Open);
             ArchiveMemoryStream = new(ZipFileStream, true);
         }
     }
 
-    public PackageReader(string destination, string password, string iv, bool useMemoryStream)
+    public PackageReader(string source, bool useMemoryStream, string password, string iv)
     {
-        SourceLocation = new StringBuilder(destination);
+        SourceLocation = new StringBuilder(source);
         Password = password;
         IVKey = iv;
         if (useMemoryStream)
@@ -98,13 +94,13 @@ public class PackageReader
             isMemoryStream = true;
             ZipStream = new();
             isMemoryStream = true;
-            EncryptedPackageUtilities.DecompressArchive(File.OpenRead(destination), out ZipStream, password, iv);
+            EncryptedPackageUtilities.DecompressArchive(File.OpenRead(source), out ZipStream, password, iv);
             ArchiveMemoryStream = new(ZipStream, true);
         }
         else
         {
             WorkingArchive = ReserveRandomArchive();
-            EncryptedPackageUtilities.DecompressArchive(destination, WorkingArchive, password, iv);
+            EncryptedPackageUtilities.DecompressArchive(source, WorkingArchive, password, iv);
             ZipFileStream = new(WorkingArchive, FileMode.Open);
             ArchiveMemoryStream = new(ZipFileStream, true);
         }
@@ -121,5 +117,30 @@ public class PackageReader
         }
         while (File.Exists(Path.Combine(Path.GetTempPath(), tempString + check + ".tmp")));
         return Path.Combine(Path.GetTempPath(), tempString + check + ".tmp");
+    }
+
+    /// <summary>
+    /// Removes the archive and deletes the temp archive.
+    /// </summary>
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                SourceLocation?.Clear();
+                ArchiveMemoryStream.Dispose();
+                ZipStream?.Close();
+                if (File.Exists(WorkingArchive)) File.Delete(WorkingArchive);
+            }
+            disposedValue = true;
+        }
     }
 }

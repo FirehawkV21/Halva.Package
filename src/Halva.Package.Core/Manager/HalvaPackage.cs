@@ -1,7 +1,5 @@
 ﻿using System.IO.Compression;
 using System.IO.Hashing;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Text;
 using Halva.Package.Core.Utilities;
 

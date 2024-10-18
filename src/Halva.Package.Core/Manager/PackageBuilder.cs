@@ -1,16 +1,13 @@
 ﻿using System.Formats.Tar;
 using System.IO.Compression;
 using System.Text;
+using Halva.Package.Core.Utilities;
 
 namespace Halva.Package.Core.Manager;
-public class PackageBuilder
+public class PackageBuilder : IDisposable
 {
     private bool disposedValue;
 
-    /// <summary>
-    /// The location of the source files.
-    /// </summary>
-    public StringBuilder SourceLocation { get; set; }
     /// <summary>
     /// The location of the final acrhive.
     /// </summary>
@@ -113,5 +110,66 @@ public class PackageBuilder
         }
         while (File.Exists(Path.Combine(Path.GetTempPath(), tempString + check + ".tmp")));
         return Path.Combine(Path.GetTempPath(), tempString + check + ".tmp");
+    }
+
+    /// <summary>
+    /// Adds a specified file to the list. This method is better suited for preserving the folder structure.
+    /// </summary>
+    /// <param name="source">The base folder that holds the file.</param>
+    /// <param name="fileRelativeLocation">The relative location of the file.</param>
+    public void AddFileToList(string source, string fileRelativeLocation)
+    {
+        FileList.Add(fileRelativeLocation);
+    }
+
+    /// <summary>
+    /// Adds files from a specific folder. The folder relative location is used to avoid messing up the folder structure.
+    /// </summary>
+    /// <param name="sourceLocation">The location of the source folder</param>
+    /// <param name="SourceFolderRelativeLocation">The relatice location of the source folder.</param>
+    public void AddFilesFromAFolder(string sourceLocation, string SourceFolderRelativeLocation)
+    {
+        List<string> tempList = PullFilesFromFolder(Path.Combine(sourceLocation, SourceFolderRelativeLocation));
+
+        foreach (string fileEntry in tempList)
+        {
+            FileList.Add(fileEntry.Replace(sourceLocation + GetFolderCharacter(), ""));
+        }
+
+    }
+
+    public static List<string> PullFilesFromFolder(string source)
+    {
+        IEnumerable<string> foundFiles = Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories);
+        return foundFiles.ToList();
+    }
+
+    /// <summary>
+    /// Removes the archive and deletes the temp archive.
+    /// </summary>
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                DestinationLocation?.Clear();
+                FileList.Clear();
+                FileList = null;
+                ArchiveMemoryStream.Dispose();
+                ZipStream?.Close();
+                if (File.Exists(WorkingArchive)) File.Delete(WorkingArchive);
+            }
+
+            disposedValue = true;
+        }
     }
 }

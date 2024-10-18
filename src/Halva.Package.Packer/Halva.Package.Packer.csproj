@@ -11,7 +11,7 @@
 		<StripSymbols>true</StripSymbols>
 		<PackageReleaseNotes>- Added support for user provided Initialisation Vector.</PackageReleaseNotes>
 		<FileAlignment>4096</FileAlignment>
-		<TargetFrameworks>net8.0</TargetFrameworks>
+		<TargetFramework>net9.0</TargetFramework>
 		<OptimizationPreference>Speed</OptimizationPreference>
 	</PropertyGroup>
 
