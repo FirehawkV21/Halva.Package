@@ -1,6 +1,7 @@
 # Halva Packaging System
+![NuGet Version](https://img.shields.io/nuget/v/Halva.Package.Core) ![GitHub License](https://img.shields.io/github/license/FirehawkV21/Halva.Package)
+
 An easy to use packaging system, based on the Brotli compression.
-![NuGet Version](https://img.shields.io/nuget/v/Halva.Package.Core)![GitHub License](https://img.shields.io/github/license/FirehawkV21/Halva.Package)
 
 
 ## What is this?

@@ -164,4 +164,17 @@ public static class PackageUtilities
             decompressorStream.CopyTo(outputStream);
         }
     }
+
+    public static string ReserveRandomArchive()
+    {
+        string tempString = "TempArchive_";
+        Random _random = new();
+        int check;
+        do
+        {
+            check = _random.Next(99999);
+        }
+        while (File.Exists(Path.Combine(Path.GetTempPath(), tempString + check + ".tmp")));
+        return Path.Combine(Path.GetTempPath(), tempString + check + ".tmp");
+    }
 }

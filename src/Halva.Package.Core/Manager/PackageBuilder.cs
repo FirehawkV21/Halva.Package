@@ -56,7 +56,7 @@ public class PackageBuilder : IDisposable
         }
         else
         {
-            WorkingArchive = ReserveRandomArchive();
+            WorkingArchive = PackageUtilities.ReserveRandomArchive();
             ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
             ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
         }
@@ -74,7 +74,7 @@ public class PackageBuilder : IDisposable
         }
         else
         {
-            WorkingArchive = ReserveRandomArchive();
+            WorkingArchive = PackageUtilities.ReserveRandomArchive();
             ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
             ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
         }
@@ -93,23 +93,10 @@ public class PackageBuilder : IDisposable
         }
         else
         {
-            WorkingArchive = ReserveRandomArchive();
+            WorkingArchive = PackageUtilities.ReserveRandomArchive();
             ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
             ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
         }
-    }
-
-    public static string ReserveRandomArchive()
-    {
-        string tempString = "TempArchive_";
-        Random _random = new();
-        int check;
-        do
-        {
-            check = _random.Next(99999);
-        }
-        while (File.Exists(Path.Combine(Path.GetTempPath(), tempString + check + ".tmp")));
-        return Path.Combine(Path.GetTempPath(), tempString + check + ".tmp");
     }
 
     /// <summary>
