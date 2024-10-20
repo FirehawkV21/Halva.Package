@@ -1,6 +1,6 @@
 ﻿global using System;
 global using System.IO;
-using Halva.Package.Core.Manager;
+using Halva.Package.Core.Managers;
 using Halva.Package.Packer.ProjectMetadata;
 using System.IO.Compression;
 using System.Reflection;

@@ -1,9 +1,8 @@
 ﻿using System.Formats.Tar;
 using System.IO.Compression;
 using System.Text;
-using Halva.Package.Core.Utilities;
 
-namespace Halva.Package.Core.Manager;
+namespace Halva.Package.Core.Managers;
 public sealed class PackageBuilder : IDisposable
 {
     private bool disposedValue;
@@ -45,42 +44,7 @@ public sealed class PackageBuilder : IDisposable
     private MemoryStream ZipStream;
     private FileStream ZipFileStream;
 
-    public PackageBuilder(string destination, bool useMemoryStream)
-    {
-        DestinationLocation = new StringBuilder(destination);
-        if (useMemoryStream)
-        {
-            isMemoryStream = true;
-            ZipStream = new();
-            ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
-        }
-        else
-        {
-            WorkingArchive = PackageUtilities.ReserveRandomArchive();
-            ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
-            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
-        }
-    }
-
-    public PackageBuilder(string destination, string password, bool useMemoryStream)
-    {
-        DestinationLocation = new StringBuilder(destination);
-        Password = password;
-        if (useMemoryStream)
-        {
-            isMemoryStream = true;
-            ZipStream = new();
-            ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
-        }
-        else
-        {
-            WorkingArchive = PackageUtilities.ReserveRandomArchive();
-            ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
-            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
-        }
-    }
-
-    public PackageBuilder(string destination, string password, string iv, bool useMemoryStream)
+    public PackageBuilder(string destination, bool useMemoryStream, string password = "", string iv = "")
     {
         DestinationLocation = new StringBuilder(destination);
         Password = password;
@@ -119,9 +83,7 @@ public sealed class PackageBuilder : IDisposable
         List<string> tempList = PullFilesFromFolder(Path.Combine(sourceLocation, SourceFolderRelativeLocation));
 
         foreach (string fileEntry in tempList)
-        {
             FileList.Add(fileEntry.Replace(sourceLocation + GetFolderCharacter(), ""));
-        }
 
     }
 
@@ -134,18 +96,16 @@ public sealed class PackageBuilder : IDisposable
         if (isMemoryStream)
         {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), Password, IVKey, CompressionOption);
-                else EncryptedPackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), Password, CompressionOption);
+                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) PackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), CompressionOption, Password, IVKey);
+                else PackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), CompressionOption, Password);
             else PackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), CompressionOption);
             ZipStream.Close();
         }
         else
-        {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password, IVKey, CompressionOption);
-                else EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password, CompressionOption);
-            else PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption);
-        }
+                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption, Password, IVKey);
+                else PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption, Password);
+            else PackageUtilities.CompressFile(WorkingArchive, DestinationLocation.ToString(), CompressionOption);
     }
 
     /// <summary>
@@ -159,9 +119,9 @@ public sealed class PackageBuilder : IDisposable
             {
                 FileStream fileLoader = File.Open(DestinationLocation.ToString(), FileMode.Open);
                 if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                    if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.DecompressArchive(fileLoader, out ZipStream, Password, IVKey);
-                    else EncryptedPackageUtilities.DecompressArchive(fileLoader, out ZipStream, Password);
-                else PackageUtilities.DecompressArchive(fileLoader, out ZipStream);
+                    if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) PackageUtilities.DecompressArchive(fileLoader, ZipStream, Password, IVKey);
+                    else PackageUtilities.DecompressArchive(fileLoader, ZipStream, Password);
+                else PackageUtilities.DecompressArchive(fileLoader, ZipStream);
                 fileLoader.Close();
             }
             ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
@@ -169,9 +129,9 @@ public sealed class PackageBuilder : IDisposable
         else
         {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password, IVKey);
-                else EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
-            else PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive);
+                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password, IVKey);
+                else PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
+            else PackageUtilities.DecompressFile(DestinationLocation.ToString(), WorkingArchive);
             ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
             ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
         }

@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Xunit;
 using Xunit.Abstractions;
-using Halva.Package.Core.Utilities;
 
 namespace Halva.Package.Core.Tests;
 
@@ -22,7 +21,7 @@ public class UtilitiesTest
         if (File.Exists("SampleFiles.halva")) File.Delete("SampleFiles.halva");
         try
         {
-           PackageUtilities.CreateArchiveFromFolder("SampleFiles", "SampleFiles.halva");
+           PackageUtilities.BuildArchiveFromFolder("SampleFiles", "SampleFiles.halva");
         }
         catch (Exception e)
         {
@@ -56,7 +55,7 @@ public class UtilitiesTest
         if (File.Exists("EncryptedSampleFiles.halva")) File.Delete("EncryptedSampleFiles.halva");
         try
         {
-            EncryptedPackageUtilities.CreateArchiveFromFolder("SampleFiles", "EncryptedSampleFiles.halva", "1234567890abcdefghijklm");
+            PackageUtilities.BuildArchiveFromFolder("SampleFiles", "EncryptedSampleFiles.halva", false, "1234567890abcdefghijklm");
         }
         catch (Exception e)
         {
@@ -73,7 +72,7 @@ public class UtilitiesTest
         if (Directory.Exists("SampleFiles2")) Directory.Delete("SampleFiles2", true);
         try
         {
-            EncryptedPackageUtilities.ExportFromArchive("EncryptedSampleFiles.halva", "SampleFiles2", "1234567890abcdefghijklm");
+            PackageUtilities.ExportFromArchive("EncryptedSampleFiles.halva", "SampleFiles2", false, "1234567890abcdefghijklm");
         }
         catch (Exception e)
         {

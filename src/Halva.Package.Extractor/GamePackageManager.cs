@@ -1,10 +1,10 @@
 ﻿#if WINDOWS10_0_17763_0_OR_GREATER
 using WinSystem = Windows;
 #endif
-using Halva.Package.Core.Utilities;
-using Halva.Package.Core.Manager;
 using System.Text.Json;
 using System.Diagnostics.CodeAnalysis;
+using Halva.Package.Core;
+using Halva.Package.Core.Managers;
 
 namespace Halva.Package.Bootstrapper;
 
@@ -13,6 +13,7 @@ public class GamePackageManager
     private readonly string PackageLocation = Path.Combine(AppContext.BaseDirectory, "GamePackages");
     //Change this to set a different folder.
     private static readonly string LocalFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
+    private bool shallUseMemoryStream = false;
     public static string ExctractLocation
     {
         get
@@ -37,7 +38,6 @@ public class GamePackageManager
     private readonly string PackagePassword = "";
     //If you have set a IV for the archives, place it here or read from a file.
     private readonly string PackageIV = "";
-    private readonly bool useMemoryStream = true;
     private readonly PackageMetadata TargetPackageVersion = new();
     private readonly PackageMetadata CurrentPackageVersion = new();
 
@@ -69,8 +69,8 @@ public class GamePackageManager
     {
         if (!string.IsNullOrEmpty(PackagePassword) && !string.IsNullOrWhiteSpace(PackagePassword)) {
             if (!string.IsNullOrEmpty(PackageIV) && !string.IsNullOrWhiteSpace(PackageIV))
-                EncryptedPackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), PackagePassword, PackageIV);
-            else  EncryptedPackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), PackagePassword);
+                PackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), shallUseMemoryStream, PackagePassword, PackageIV);
+            else  PackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), shallUseMemoryStream, PackagePassword);
         }
         else PackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"));
     }
@@ -97,12 +97,12 @@ public class GamePackageManager
 
     public void UpdateDataFromArchive(string PackageName, string PackageVersionKey)
     {
-        HalvaPackage package;
+        PackageReader package;
         if (!string.IsNullOrEmpty(PackagePassword) && !string.IsNullOrWhiteSpace(PackagePassword)) {
-            if (!string.IsNullOrEmpty(PackageIV) && !string.IsNullOrWhiteSpace(PackageIV)) package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword, PackageIV, useMemoryStream);
-            else package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), PackagePassword, useMemoryStream);
+            if (!string.IsNullOrEmpty(PackageIV) && !string.IsNullOrWhiteSpace(PackageIV)) package = new PackageReader(Path.Combine(PackageLocation, PackageName), shallUseMemoryStream, PackagePassword, PackageIV);
+            else package = new PackageReader(Path.Combine(PackageLocation, PackageName), shallUseMemoryStream, PackagePassword);
         }
-        else package = new HalvaPackage(Path.Combine(PackageLocation, PackageName), useMemoryStream);
+        else package = new PackageReader(Path.Combine(PackageLocation, PackageName));
             package.Password = PackagePassword;
             package.UpdateFromArchive(Path.Combine(ExctractLocation, "GameData"));
             package.Dispose();

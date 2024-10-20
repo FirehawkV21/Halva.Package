@@ -2,9 +2,8 @@
 using System.IO.Compression;
 using System.IO.Hashing;
 using System.Text;
-using Halva.Package.Core.Utilities;
 
-namespace Halva.Package.Core.Manager;
+namespace Halva.Package.Core.Managers;
 public sealed class PackageReader : IDisposable
 {
     private bool disposedValue;
@@ -12,76 +11,38 @@ public sealed class PackageReader : IDisposable
     /// <summary>
     /// The location of the source files.
     /// </summary>
-    public StringBuilder SourceLocation { get; set; }
+    private StringBuilder SourceLocation { get; set; }
     /// <summary>
     /// The memory stream that handles the archive.
     /// </summary>
-    public TarReader ArchiveMemoryStream { get; set; }
+    private TarReader ArchiveMemoryStream { get; set; }
     /// <summary>
     /// The temporary archive where changes are being worked on.
     /// </summary>
-    public string WorkingArchive { get; set; }
+    private string WorkingArchive { get; set; }
 
-    /// <summary>
-    /// Gets the character used for path designation.
-    /// </summary>
-    /// <returns>Either "\\" (in Windows) or "/" (Unix systems).</returns>
-    private static string GetFolderCharacter() => Path.DirectorySeparatorChar.ToString();
-    /// <summary>
-    /// Adjusts the compression of the final archive.
-    /// </summary>
-    public CompressionLevel CompressionOption { get; set; } = CompressionLevel.Optimal;
     /// <summary>
     /// The password of the archive. Don't forget to fill this in if you are working with encrypted packages.
     /// </summary>
     public string Password { get; set; }
 
+    /// <summary>
+    /// The initialisation Vector for an encrypted archive. This is necessary if an encrypted package used a custom IV.
+    /// </summary>
     public string IVKey { get; set; }
 
     private readonly bool isMemoryStream;
     private readonly MemoryStream ZipStream;
     private readonly FileStream ZipFileStream;
 
-    public PackageReader(string source, bool useMemoryStream)
-    {
-        SourceLocation = new StringBuilder(source);
-        if (useMemoryStream)
-        {
-            isMemoryStream = true;
-            PackageUtilities.DecompressArchive(File.OpenRead(source), out ZipStream);
-            ArchiveMemoryStream = new(ZipStream, true);
-        }
-        else
-        {
-            WorkingArchive = PackageUtilities.ReserveRandomArchive();
-            PackageUtilities.DecompressArchive(source, WorkingArchive);
-            ZipFileStream = new(WorkingArchive, FileMode.Open);
-            ArchiveMemoryStream = new(ZipFileStream, true);
-        }
-    }
-
-    public PackageReader(string source, bool useMemoryStream, string password)
-    {
-        SourceLocation = new StringBuilder(source);
-        Password = password;
-        if (useMemoryStream)
-        {
-            isMemoryStream = true;
-            ZipStream = new();
-            isMemoryStream = true;
-            EncryptedPackageUtilities.DecompressArchive(File.OpenRead(source), out ZipStream, password);
-            ArchiveMemoryStream = new(ZipStream, true);
-        }
-        else
-        {
-            WorkingArchive = PackageUtilities.ReserveRandomArchive();
-            EncryptedPackageUtilities.DecompressArchive(source, WorkingArchive, password);
-            ZipFileStream = new(WorkingArchive, FileMode.Open);
-            ArchiveMemoryStream = new(ZipFileStream, true);
-        }
-    }
-
-    public PackageReader(string source, bool useMemoryStream, string password, string iv)
+    /// <summary>
+    /// Opens an existing Halva 2 archive for reading and extracting files.
+    /// </summary>
+    /// <param name="source">The source package to open.</param>
+    /// <param name="useMemoryStream">Loads the decompressed package to a <see cref="MemoryStream"/>. Suitable for smaller packages.</param>
+    /// <param name="password">The password for the archive. Required for opening encrypted archives.</param>
+    /// <param name="iv">The Initialisation Vector for encrypted archives.</param>
+    public PackageReader(string source, bool useMemoryStream = false, string password = "", string iv = "")
     {
         SourceLocation = new StringBuilder(source);
         Password = password;
@@ -139,13 +100,11 @@ public sealed class PackageReader : IDisposable
         {
             tempEntry = ArchiveMemoryStream.GetNextEntry();
             if (tempEntry != null)
-            {
                 if (File.Exists(Path.Combine(TargetFolder, tempEntry.Name)))
                 {
                     ReadOnlySpan<byte> originalFileSignature;
                     ReadOnlySpan<byte> targetFileSignature;
                     using (Stream archivedFile = tempEntry.DataStream)
-                    {
                         using (FileStream targetFile = new(Path.Combine(TargetFolder, tempEntry.Name), FileMode.Open, FileAccess.Read))
                         {
                             XxHash128 archiveHash = new();
@@ -155,17 +114,11 @@ public sealed class PackageReader : IDisposable
                             originalFileSignature = archiveHash.GetCurrentHash();
                             targetFileSignature = targetHash.GetCurrentHash();
                         }
-                    }
                     if (originalFileSignature != targetFileSignature)
-                    {
                         tempEntry.ExtractToFile(Path.Combine(TargetFolder, tempEntry.Name), true);
-                    }
                 }
                 else
-                {
                     tempEntry.ExtractToFile(Path.Combine(TargetFolder, tempEntry.Name), true);
-                }
-            }
         }
         while (tempEntry != null);
         ReloadArchive();
@@ -184,13 +137,11 @@ public sealed class PackageReader : IDisposable
         {
             tempEntry = ArchiveMemoryStream.GetNextEntry();
             if (tempEntry != null)
-            {
                 if (File.Exists(Path.Combine(TargetFolder, tempEntry.Name)))
                 {
                     byte[] originalFileSignature;
                     byte[] targetFileSignature;
                     using (Stream archivedFile = tempEntry.DataStream)
-                    {
                         using (FileStream targetFile = new(Path.Combine(TargetFolder, tempEntry.Name), FileMode.Open, FileAccess.Read))
                         {
                             XxHash128 archiveHash = new();
@@ -200,17 +151,11 @@ public sealed class PackageReader : IDisposable
                             await targetHash.AppendAsync(targetFile, abortToken);
                             targetFileSignature = targetHash.GetCurrentHash();
                         }
-                    }
                     if (originalFileSignature != targetFileSignature)
-                    {
                         await tempEntry.ExtractToFileAsync(Path.Combine(TargetFolder, tempEntry.Name), true, abortToken);
-                    }
                 }
                 else
-                {
                     await tempEntry.ExtractToFileAsync(Path.Combine(TargetFolder, tempEntry.Name), true, abortToken);
-                }
-            }
         }
         while (tempEntry != null);
         ReloadArchive();
