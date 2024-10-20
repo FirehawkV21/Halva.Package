@@ -54,13 +54,13 @@ public sealed class PackageBuilder : IDisposable
         {
             isMemoryStream = true;
             ZipStream = new();
-            ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
+            ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, false);
         }
         else
         {
             WorkingArchive = PackageUtilities.ReserveRandomArchive();
             ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
-            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
+            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, false);
         }
     }
 
@@ -88,69 +88,57 @@ public sealed class PackageBuilder : IDisposable
 
     }
 
-    /// <summary>
-    /// Saves current changes to the destination archive. Note: If you use MemoryStream for the archive, it will no-op. Use Save() instead.
-    /// </summary>
-    private void CloseArchive()
+    public void Commit()
     {
-        ArchiveMemoryStream.Dispose();
+        foreach (string file in FileList)
+        {
+            ArchiveMemoryStream.WriteEntry(file, "");
+        }
         if (isMemoryStream)
         {
-            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) PackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), CompressionOption, Password, IVKey);
-                else PackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), CompressionOption, Password);
-            else PackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), CompressionOption);
-            ZipStream.Close();
+            PackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), CompressionOption, Password, IVKey);
+            ArchiveMemoryStream.Dispose();
+            ZipStream.Dispose();
+            ZipStream = new();
+            ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, false);
         }
         else
-            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption, Password, IVKey);
-                else PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption, Password);
-            else engine.CompressFile(WorkingArchive, DestinationLocation.ToString(), CompressionOption);
+        {
+            ArchiveMemoryStream.Dispose();
+            ZipFileStream.Close();
+            PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption, Password, IVKey);
+            File.Delete(WorkingArchive);
+            WorkingArchive = PackageUtilities.ReserveRandomArchive();
+            ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
+            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, false);
+
+        }
     }
 
-    /// <summary>
-    /// Reloads the archive. If you have a password set, it will attempt to decrypt the package first. Note: If you use MemoryStream archive, it will no-op. Use Save() instead.
-    /// </summary>
-    private void ReloadArchive()
+    public async Task CommitAsync(CancellationToken abortToken = default)
     {
+        foreach (string file in FileList)
+        {
+            await ArchiveMemoryStream.WriteEntryAsync(file, "", abortToken);
+        }
         if (isMemoryStream)
         {
-            if (!ZipStream.CanRead)
-            {
-                FileStream fileLoader = File.Open(DestinationLocation.ToString(), FileMode.Open);
-                if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                    if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) PackageUtilities.DecompressArchive(fileLoader, ZipStream, Password, IVKey);
-                    else PackageUtilities.DecompressArchive(fileLoader, ZipStream, Password);
-                else PackageUtilities.DecompressArchive(fileLoader, ZipStream);
-                fileLoader.Close();
-            }
+            await PackageUtilities.CompressArchiveAsync(ZipStream, DestinationLocation.ToString(), CompressionOption, Password, IVKey, abortToken);
+            ArchiveMemoryStream.Dispose();
+            ZipStream.Dispose();
+            ZipStream = new();
             ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
         }
         else
         {
-            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password, IVKey);
-                else PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
-            else engine.DecompressFile(DestinationLocation.ToString(), WorkingArchive);
+            ArchiveMemoryStream.Dispose();
+            ZipFileStream.Close();
+            await PackageUtilities.CompressArchiveAsync(WorkingArchive, DestinationLocation.ToString(), CompressionOption, Password, IVKey, abortToken);
+            File.Delete(WorkingArchive);
+            WorkingArchive = PackageUtilities.ReserveRandomArchive();
             ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
-            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
+            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, false);
         }
-    }
-
-    /// <summary>
-    /// Saves the changes to the destination archive. If password is set, it will attempt to encrypt it.
-    /// </summary>
-    public void Save()
-    {
-        CloseArchive();
-        ReloadArchive();
-    }
-
-    public void Finish()
-    {
-        CloseArchive();
-        if (isMemoryStream) ZipStream.Close();
     }
 
     public static List<string> PullFilesFromFolder(string source)

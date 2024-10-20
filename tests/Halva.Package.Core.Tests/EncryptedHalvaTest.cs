@@ -26,7 +26,7 @@ public class EncryptedHalvaTest
         Cleanup();
         PackageBuilder package = new(sourceFolder, false, testPassword);
         package.AddFilesFromAFolder(sourceFolder, Path.GetPathRoot(sourceFolder));
-        package.Finish();
+        package.Commit();
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, false,testPassword);
     }
 
@@ -36,7 +36,7 @@ public class EncryptedHalvaTest
         Cleanup();
         PackageBuilder package = new(destinationArchive, false, testPassword, ivKey);
         package.AddFilesFromAFolder(sourceFolder, Path.GetPathRoot(sourceFolder));
-        package.Finish();
+        package.Commit();
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, false, testPassword, ivKey);
     }
 

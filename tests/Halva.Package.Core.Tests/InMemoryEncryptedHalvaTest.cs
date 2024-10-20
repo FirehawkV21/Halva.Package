@@ -23,7 +23,7 @@ public class InMemoryEncryptedHalvaTest
     {
         Cleanup();
         PackageBuilder package = new(destinationArchive, true, testPassword, ivKey);
-        package.Finish();
+        package.Commit();
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, true, testPassword);
     }
 
@@ -32,7 +32,7 @@ public class InMemoryEncryptedHalvaTest
     {
         Cleanup();
         PackageBuilder package = new(destinationArchive, true, testPassword, ivKey);
-        package.Finish();
+        package.Commit();
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, true, testPassword, ivKey);
     }
 

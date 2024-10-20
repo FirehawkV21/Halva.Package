@@ -105,7 +105,7 @@ public static class PackageUtilities
     /// <param name="outputArchive">The output archive.</param>
     /// <param name="password">The archive's password.</param>
     /// <param name="compression">Sets the compression level.</param>
-    public static void CompressArchive(in MemoryStream inputStream, in string outputArchive, CompressionLevel compression = CompressionLevel.Optimal, in string password = "", in string IVkey = "")
+    public static void CompressArchive(in Stream inputStream, in string outputArchive, CompressionLevel compression = CompressionLevel.Optimal, in string password = "", in string IVkey = "")
     {
         inputStream.Position = 0;
         if (password != "")
@@ -194,7 +194,7 @@ public static class PackageUtilities
             await compressor.CompressFileAsync(inputStream, outputArchive, compression, abortToken);
     }
 
-    public static async Task DecompressArchiveAsync(Stream inputStream, MemoryStream outputStream, CompressionLevel compression = CompressionLevel.Optimal, string password = "", string IVkey = "", CancellationToken abortToken = default)
+    public static async Task DecompressArchiveAsync(Stream inputStream, MemoryStream outputStream, string password = "", string IVkey = "", CancellationToken abortToken = default)
     {
         if (password != "")
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -209,6 +209,23 @@ public static class PackageUtilities
             }
         else
             await compressor.DecompressFileAsync(inputStream, outputStream, abortToken);
+    }
+
+    public static async Task DecompressArchiveAsync(string inputStream, string outputStream, string password = "", string IVkey = "", CancellationToken abortToken = default)
+    {
+        if (password != "")
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                CreateKey(out AesCng cngEncryptionKit, password, IVkey);
+                await compressor.DecompressEncryptedFileAsync(cngEncryptionKit, inputStream, outputStream, abortToken);
+            }
+            else
+            {
+                CreateKey(out Aes encryptionKit, password, IVkey);
+                await compressor.DecompressEncryptedFileAsync(encryptionKit, inputStream, outputStream, abortToken);
+            }
+        else
+            await compressor.DecompressFileAsync(inputStream, outputStream);
     }
 
 

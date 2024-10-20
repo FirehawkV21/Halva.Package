@@ -246,7 +246,7 @@ internal sealed class Program
                     if (Directory.Exists(Path.Combine(gameFolder, "effects"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "effects");
                     if (Directory.Exists(Path.Combine(gameFolder, "movies"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "movies");
                     if (Directory.Exists(Path.Combine(gameFolder, "icon"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "icon");
-                    assetsPackage.Finish();
+                    assetsPackage.Commit();
                     assetsPackage.Dispose();
                     Console.WriteLine(Properties.Resources.AssetsCompressedText);
                 });
@@ -254,7 +254,7 @@ internal sealed class Program
                 {
                     Console.WriteLine(Properties.Resources.CompressingAudioFilesText);
                     audioPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "audio");
-                    audioPackage.Finish();
+                    audioPackage.Commit();
                     audioPackage.Dispose();
                     Console.WriteLine(Properties.Resources.AudioCompressedText);
                 });
@@ -263,7 +263,7 @@ internal sealed class Program
                     Console.WriteLine(Properties.Resources.CompressingDatabaseText);
                     databasePackage.CompressionOption = CheckLevel(binCompress);
                     databasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "data");
-                    databasePackage.Finish();
+                    databasePackage.Commit();
                     databasePackage.Dispose();
                     Console.WriteLine(Properties.Resources.DatabaseCompressedText);
                 });
@@ -279,7 +279,7 @@ internal sealed class Program
                         enginePackage.AddFileToList(projectLocation, Path.Combine(relativeLocation, "index.html"));
                     }
                     enginePackage.AddFileToList(projectLocation, "package.json");
-                    enginePackage.Finish();
+                    enginePackage.Commit();
                     enginePackage.Dispose();
                     Console.WriteLine(Properties.Resources.EngineCompressedText);
                 });

@@ -12,7 +12,7 @@ internal sealed class CompressorEngine
     /// <param name="inputArchive"></param>
     /// <param name="outputArchive"></param>
     /// <param name="Compression"></param>
-    internal void CompressFile(in MemoryStream inputArchive, in string outputArchive, CompressionLevel Compression = CompressionLevel.Optimal)
+    internal void CompressFile(in Stream inputArchive, in string outputArchive, CompressionLevel Compression = CompressionLevel.Optimal)
     {
         inputArchive.Position = 0;
         using (FileStream outputStream = File.Create(outputArchive))

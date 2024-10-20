@@ -23,7 +23,7 @@ public class HalvaClassTest
     {
         Cleanup();
         PackageBuilder package = new(destinationArchive);
-        package.Finish();
+        package.Commit();
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
         package.Dispose();
     }

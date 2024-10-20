@@ -1,5 +1,4 @@
 ﻿using System.Formats.Tar;
-using System.IO.Compression;
 using System.IO.Hashing;
 using System.Text;
 
@@ -53,14 +52,14 @@ public sealed class PackageReader : IDisposable
             ZipStream = new();
             isMemoryStream = true;
             PackageUtilities.DecompressArchive(File.OpenRead(source), ZipStream, password, iv);
-            ArchiveMemoryStream = new(ZipStream, true);
+            ArchiveMemoryStream = new(ZipStream, false);
         }
         else
         {
             WorkingArchive = PackageUtilities.ReserveRandomArchive();
             PackageUtilities.DecompressArchive(source, WorkingArchive, password, iv);
             ZipFileStream = new(WorkingArchive, FileMode.Open);
-            ArchiveMemoryStream = new(ZipFileStream, true);
+            ArchiveMemoryStream = new(ZipFileStream, false);
         }
     }
 
@@ -72,7 +71,7 @@ public sealed class PackageReader : IDisposable
             fileEntry = ArchiveMemoryStream.GetNextEntry();
             if (fileEntry == null) break;
         } while (fileEntry.Name != entry);
-        fileEntry?.ExtractToFile(Path.Combine(exportLocation, entry), true);
+        fileEntry?.ExtractToFile(Path.Combine(exportLocation, entry), false);
         ReloadArchive();
     }
 

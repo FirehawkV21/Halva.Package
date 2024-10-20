@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-using Xunit;
+﻿using Xunit;
 using Halva.Package.Core.Managers;
 
 namespace Halva.Package.Core.Tests;
@@ -23,7 +21,7 @@ public class InMemoryHalvaClassTest
     {
         Cleanup();
         PackageBuilder package = new(destinationArchive, true);
-        package.Save();
+        package.Commit();
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
         package.Dispose();
     }
