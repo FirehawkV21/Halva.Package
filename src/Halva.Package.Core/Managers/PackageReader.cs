@@ -52,13 +52,13 @@ public sealed class PackageReader : IDisposable
             isMemoryStream = true;
             ZipStream = new();
             isMemoryStream = true;
-            EncryptedPackageUtilities.DecompressArchive(File.OpenRead(source), out ZipStream, password, iv);
+            PackageUtilities.DecompressArchive(File.OpenRead(source), ZipStream, password, iv);
             ArchiveMemoryStream = new(ZipStream, true);
         }
         else
         {
             WorkingArchive = PackageUtilities.ReserveRandomArchive();
-            EncryptedPackageUtilities.DecompressArchive(source, WorkingArchive, password, iv);
+            PackageUtilities.DecompressArchive(source, WorkingArchive, password, iv);
             ZipFileStream = new(WorkingArchive, FileMode.Open);
             ArchiveMemoryStream = new(ZipFileStream, true);
         }
