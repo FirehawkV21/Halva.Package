@@ -76,13 +76,17 @@ public sealed class PackageBuilder : IDisposable
     /// Adds files from a specific folder. The folder relative location is used to avoid messing up the folder structure.
     /// </summary>
     /// <param name="sourceLocation">The location of the source folder</param>
-    /// <param name="SourceFolderRelativeLocation">The relatice location of the source folder.</param>
-    public void AddFilesFromAFolder(string sourceLocation, string SourceFolderRelativeLocation)
+    /// <param name="SourceFolderRelativeLocation">The relative location of the folder from <see href="sourceLocation"/>. Ommit this to put the files to the start of the archive's hirearchy.</param>
+    public void AddFilesFromAFolder(string sourceLocation, string SourceFolderRelativeLocation = "")
     {
-        List<string> tempList = PullFilesFromFolder(Path.Combine(sourceLocation, SourceFolderRelativeLocation));
+        List<string> tempList;
+        if (!string.IsNullOrEmpty(SourceFolderRelativeLocation) || !string.IsNullOrWhiteSpace(SourceFolderRelativeLocation))
+        tempList = PullFilesFromFolder(Path.Combine(sourceLocation, SourceFolderRelativeLocation));
+        else tempList = PullFilesFromFolder(sourceLocation);
+
 
         foreach (string fileEntry in tempList)
-            FileList.Add(new TarFileList(fileEntry, fileEntry.Replace(SourceFolderRelativeLocation + GetFolderCharacter(), "")));
+            FileList.Add(new TarFileList(fileEntry, fileEntry.Replace(sourceLocation, "")));
 
     }
 
@@ -167,6 +171,7 @@ public sealed class PackageBuilder : IDisposable
                 FileList = null;
                 ArchiveMemoryStream.Dispose();
                 ZipStream?.Close();
+                ZipFileStream?.Close();
                 if (File.Exists(WorkingArchive)) File.Delete(WorkingArchive);
             }
 

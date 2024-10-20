@@ -382,4 +382,10 @@ public static class PackageUtilities
         while (File.Exists(Path.Combine(Path.GetTempPath(), tempString + check + ".tmp")));
         return Path.Combine(Path.GetTempPath(), tempString + check + ".tmp");
     }
+
+    internal static string NormalizePath(string path)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return path.Replace("/", Path.DirectorySeparatorChar);
+        else return path.Replace('\\', Path.DirectorySeparatorChar);
+    }
 }

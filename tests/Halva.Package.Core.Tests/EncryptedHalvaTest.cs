@@ -7,9 +7,9 @@ namespace Halva.Package.Core.Tests;
 
 public class EncryptedHalvaTest
 {
-    private readonly string sourceFolder = "SampleFiles";
-    private readonly string destinationArchive = "SampleFiles4.halva";
-    private readonly string destinationFolder = "SampleFiles4";
+    private readonly string sourceFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles");
+    private readonly string destinationArchive = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles4.halva2");
+    private readonly string destinationFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles4");
     private readonly string testPassword = "1234567890abcdefghijklm";
     private readonly string ivKey = "mlkjihgfedcba0987654321";
 
@@ -24,8 +24,8 @@ public class EncryptedHalvaTest
     public void ArchiveBuilderTest()
     {
         Cleanup();
-        PackageBuilder package = new(sourceFolder, false, testPassword);
-        package.AddFilesFromAFolder(sourceFolder, Path.GetPathRoot(sourceFolder));
+        PackageBuilder package = new(destinationArchive, false, testPassword);
+        package.AddFilesFromAFolder(sourceFolder);
         package.Commit();
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, false,testPassword);
     }
@@ -35,7 +35,7 @@ public class EncryptedHalvaTest
     {
         Cleanup();
         PackageBuilder package = new(destinationArchive, false, testPassword, ivKey);
-        package.AddFilesFromAFolder(sourceFolder, Path.GetPathRoot(sourceFolder));
+        package.AddFilesFromAFolder(sourceFolder);
         package.Commit();
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, false, testPassword, ivKey);
     }
@@ -57,7 +57,7 @@ public class EncryptedHalvaTest
     [Fact]
     public void CanLibraryCheckForDifferencesInEncryptedArchives()
     {
-        PackageReader package = new(destinationArchive, false, testPassword, ivKey);
+        PackageReader package = new(destinationArchive, false, testPassword);
         package.UpdateFromArchive(destinationFolder);
     }
 

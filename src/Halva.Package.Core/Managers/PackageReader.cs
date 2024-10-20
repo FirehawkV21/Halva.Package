@@ -99,25 +99,31 @@ public sealed class PackageReader : IDisposable
         {
             tempEntry = ArchiveMemoryStream.GetNextEntry();
             if (tempEntry != null)
-                if (File.Exists(Path.Combine(TargetFolder, tempEntry.Name)))
-                {
-                    ReadOnlySpan<byte> originalFileSignature;
-                    ReadOnlySpan<byte> targetFileSignature;
-                    using (Stream archivedFile = tempEntry.DataStream)
-                        using (FileStream targetFile = new(Path.Combine(TargetFolder, tempEntry.Name), FileMode.Open, FileAccess.Read))
+            {
+                string targetName = Path.Combine(!(TargetFolder[..0] != Path.DirectorySeparatorChar.ToString()) ? TargetFolder + Path.DirectorySeparatorChar : TargetFolder, PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+                if (tempEntry != null)
+                    if (File.Exists(targetName))
+                    {
+                        ReadOnlySpan<byte> originalFileSignature;
+                        ReadOnlySpan<byte> targetFileSignature;
+                        using (Stream archivedFile = tempEntry.DataStream)
                         {
-                            XxHash128 archiveHash = new();
-                            XxHash128 targetHash = new();
-                            archiveHash.Append(archivedFile);
-                            targetHash.Append(targetFile);
-                            originalFileSignature = archiveHash.GetCurrentHash();
-                            targetFileSignature = targetHash.GetCurrentHash();
+                            using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read))
+                            {
+                                XxHash128 archiveHash = new();
+                                XxHash128 targetHash = new();
+                                archiveHash.Append(archivedFile);
+                                targetHash.Append(targetFile);
+                                originalFileSignature = archiveHash.GetCurrentHash();
+                                targetFileSignature = targetHash.GetCurrentHash();
+                            }
+                            tempEntry.DataStream.Position = 0;
+                            if (originalFileSignature != targetFileSignature) tempEntry.ExtractToFile(targetName, true);
                         }
-                    if (originalFileSignature != targetFileSignature)
-                        tempEntry.ExtractToFile(Path.Combine(TargetFolder, tempEntry.Name), true);
-                }
-                else
-                    tempEntry.ExtractToFile(Path.Combine(TargetFolder, tempEntry.Name), true);
+                    }
+                    else
+                        tempEntry.ExtractToFile(targetName, true);
+            }
         }
         while (tempEntry != null);
         ReloadArchive();
@@ -132,16 +138,20 @@ public sealed class PackageReader : IDisposable
     public async Task UpdateFromArchiveAsync(string TargetFolder, CancellationToken abortToken = default)
     {
         TarEntry tempEntry;
+        string targetName;
         do
         {
             tempEntry = ArchiveMemoryStream.GetNextEntry();
             if (tempEntry != null)
-                if (File.Exists(Path.Combine(TargetFolder, tempEntry.Name)))
+            {
+                targetName = Path.Combine(!(TargetFolder[..0] != Path.DirectorySeparatorChar.ToString()) ? TargetFolder + Path.DirectorySeparatorChar : TargetFolder, PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+                if (File.Exists(targetName))
                 {
                     byte[] originalFileSignature;
                     byte[] targetFileSignature;
                     using (Stream archivedFile = tempEntry.DataStream)
-                        using (FileStream targetFile = new(Path.Combine(TargetFolder, tempEntry.Name), FileMode.Open, FileAccess.Read))
+                    {
+                        using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read))
                         {
                             XxHash128 archiveHash = new();
                             XxHash128 targetHash = new();
@@ -150,11 +160,13 @@ public sealed class PackageReader : IDisposable
                             await targetHash.AppendAsync(targetFile, abortToken);
                             targetFileSignature = targetHash.GetCurrentHash();
                         }
+                    }
                     if (originalFileSignature != targetFileSignature)
-                        await tempEntry.ExtractToFileAsync(Path.Combine(TargetFolder, tempEntry.Name), true, abortToken);
+                        await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
                 }
                 else
-                    await tempEntry.ExtractToFileAsync(Path.Combine(TargetFolder, tempEntry.Name), true, abortToken);
+                    await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+            }
         }
         while (tempEntry != null);
         ReloadArchive();
@@ -173,7 +185,7 @@ public sealed class PackageReader : IDisposable
             ZipFileStream.Position = 0;
             ArchiveMemoryStream = new(ZipFileStream, true);
         }
-        
+
     }
 
     public async Task ReloadArchiveAsync(CancellationToken abortToken = default)
