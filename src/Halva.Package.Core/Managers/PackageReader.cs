@@ -52,14 +52,14 @@ public sealed class PackageReader : IDisposable
             ZipStream = new();
             isMemoryStream = true;
             PackageUtilities.DecompressArchive(File.OpenRead(source), ZipStream, password, iv);
-            ArchiveMemoryStream = new(ZipStream, false);
+            ArchiveMemoryStream = new(ZipStream, true);
         }
         else
         {
             WorkingArchive = PackageUtilities.ReserveRandomArchive();
             PackageUtilities.DecompressArchive(source, WorkingArchive, password, iv);
             ZipFileStream = new(WorkingArchive, FileMode.Open);
-            ArchiveMemoryStream = new(ZipFileStream, false);
+            ArchiveMemoryStream = new(ZipFileStream, true);
         }
     }
 
@@ -163,7 +163,33 @@ public sealed class PackageReader : IDisposable
     public void ReloadArchive()
     {
         ArchiveMemoryStream.Dispose();
-        ArchiveMemoryStream = isMemoryStream ? new(ZipStream, true) : new(ZipFileStream, true);
+        if (isMemoryStream)
+        {
+            ZipStream.Position = 0;
+            ArchiveMemoryStream = new(ZipStream, true);
+        }
+        else
+        {
+            ZipFileStream.Position = 0;
+            ArchiveMemoryStream = new(ZipFileStream, true);
+        }
+        
+    }
+
+    public async Task ReloadArchiveAsync(CancellationToken abortToken = default)
+    {
+        await ArchiveMemoryStream.DisposeAsync();
+        if (isMemoryStream)
+        {
+            ZipStream.Position = 0;
+            ArchiveMemoryStream = new(ZipStream, true);
+        }
+        else
+        {
+            ZipFileStream.Position = 0;
+            ArchiveMemoryStream = new(ZipFileStream, true);
+        }
+
     }
 
     /// <summary>
@@ -185,6 +211,7 @@ public sealed class PackageReader : IDisposable
                 SourceLocation?.Clear();
                 ArchiveMemoryStream.Dispose();
                 ZipStream?.Close();
+                ZipFileStream?.Dispose();
                 if (File.Exists(WorkingArchive)) File.Delete(WorkingArchive);
             }
             disposedValue = true;

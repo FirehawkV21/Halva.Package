@@ -55,13 +55,13 @@ public sealed class PackageBuilder : IDisposable
         {
             isMemoryStream = true;
             ZipStream = new();
-            ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, false);
+            ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
         }
         else
         {
             WorkingArchive = PackageUtilities.ReserveRandomArchive();
             ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
-            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, false);
+            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
         }
     }
 
@@ -98,7 +98,7 @@ public sealed class PackageBuilder : IDisposable
             ArchiveMemoryStream.Dispose();
             ZipStream.Dispose();
             ZipStream = new();
-            ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, false);
+            ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
         }
         else
         {
@@ -108,7 +108,7 @@ public sealed class PackageBuilder : IDisposable
             File.Delete(WorkingArchive);
             WorkingArchive = PackageUtilities.ReserveRandomArchive();
             ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
-            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, false);
+            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
 
         }
     }
@@ -135,7 +135,7 @@ public sealed class PackageBuilder : IDisposable
             File.Delete(WorkingArchive);
             WorkingArchive = PackageUtilities.ReserveRandomArchive();
             ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
-            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, false);
+            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
         }
     }
 
