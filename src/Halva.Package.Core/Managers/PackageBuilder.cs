@@ -6,6 +6,7 @@ namespace Halva.Package.Core.Managers;
 public sealed class PackageBuilder : IDisposable
 {
     private bool disposedValue;
+    private CompressorEngine engine;
 
     /// <summary>
     /// The location of the final acrhive.
@@ -105,7 +106,7 @@ public sealed class PackageBuilder : IDisposable
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
                 if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption, Password, IVKey);
                 else PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption, Password);
-            else PackageUtilities.CompressFile(WorkingArchive, DestinationLocation.ToString(), CompressionOption);
+            else engine.CompressFile(WorkingArchive, DestinationLocation.ToString(), CompressionOption);
     }
 
     /// <summary>
@@ -131,7 +132,7 @@ public sealed class PackageBuilder : IDisposable
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
                 if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password, IVKey);
                 else PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
-            else PackageUtilities.DecompressFile(DestinationLocation.ToString(), WorkingArchive);
+            else engine.DecompressFile(DestinationLocation.ToString(), WorkingArchive);
             ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
             ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
         }
