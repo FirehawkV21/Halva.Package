@@ -138,6 +138,73 @@ public class PackageBuilder : IDisposable
 
     }
 
+    /// <summary>
+    /// Saves current changes to the destination archive. Note: If you use MemoryStream for the archive, it will no-op. Use Save() instead.
+    /// </summary>
+    private void CloseArchive()
+    {
+        ArchiveMemoryStream.Dispose();
+        if (isMemoryStream)
+        {
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), Password, IVKey, CompressionOption);
+                else EncryptedPackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), Password, CompressionOption);
+            else PackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), CompressionOption);
+            ZipStream.Close();
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password, IVKey, CompressionOption);
+                else EncryptedPackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), Password, CompressionOption);
+            else PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption);
+        }
+    }
+
+    /// <summary>
+    /// Reloads the archive. If you have a password set, it will attempt to decrypt the package first. Note: If you use MemoryStream archive, it will no-op. Use Save() instead.
+    /// </summary>
+    private void ReloadArchive()
+    {
+        if (isMemoryStream)
+        {
+            if (!ZipStream.CanRead)
+            {
+                FileStream fileLoader = File.Open(DestinationLocation.ToString(), FileMode.Open);
+                if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                    if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.DecompressArchive(fileLoader, out ZipStream, Password, IVKey);
+                    else EncryptedPackageUtilities.DecompressArchive(fileLoader, out ZipStream, Password);
+                else PackageUtilities.DecompressArchive(fileLoader, out ZipStream);
+                fileLoader.Close();
+            }
+            ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                if (!string.IsNullOrEmpty(IVKey) && !string.IsNullOrWhiteSpace(IVKey)) EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password, IVKey);
+                else EncryptedPackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive, Password);
+            else PackageUtilities.DecompressArchive(DestinationLocation.ToString(), WorkingArchive);
+            ZipFileStream = new(WorkingArchive, FileMode.OpenOrCreate);
+            ArchiveMemoryStream = new(ZipFileStream, TarEntryFormat.Pax, true);
+        }
+    }
+
+    /// <summary>
+    /// Saves the changes to the destination archive. If password is set, it will attempt to encrypt it.
+    /// </summary>
+    public void Save()
+    {
+        CloseArchive();
+        ReloadArchive();
+    }
+
+    public void Finish()
+    {
+        CloseArchive();
+        if (isMemoryStream) ZipStream.Close();
+    }
+
     public static List<string> PullFilesFromFolder(string source)
     {
         IEnumerable<string> foundFiles = Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories);
