@@ -1,6 +1,7 @@
 ﻿using System.Formats.Tar;
 using System.IO.Compression;
 using System.Text;
+using Halva.Package.Core.Models;
 
 namespace Halva.Package.Core.Managers;
 public sealed class PackageBuilder : IDisposable
@@ -15,7 +16,7 @@ public sealed class PackageBuilder : IDisposable
     /// <summary>
     /// The list of files of the archive.
     /// </summary>
-    public List<string> FileList { get; set; } = [];
+    internal List<TarFileList> FileList { get; set; } = [];
     /// <summary>
     /// The memory stream that handles the archive.
     /// </summary>
@@ -69,10 +70,7 @@ public sealed class PackageBuilder : IDisposable
     /// </summary>
     /// <param name="source">The base folder that holds the file.</param>
     /// <param name="fileRelativeLocation">The relative location of the file.</param>
-    public void AddFileToList(string source, string fileRelativeLocation)
-    {
-        FileList.Add(fileRelativeLocation);
-    }
+    public void AddFileToList(string source, string fileRelativeLocation) => FileList.Add(new TarFileList(source, source.Replace(fileRelativeLocation + GetFolderCharacter(), "")));
 
     /// <summary>
     /// Adds files from a specific folder. The folder relative location is used to avoid messing up the folder structure.
@@ -84,15 +82,15 @@ public sealed class PackageBuilder : IDisposable
         List<string> tempList = PullFilesFromFolder(Path.Combine(sourceLocation, SourceFolderRelativeLocation));
 
         foreach (string fileEntry in tempList)
-            FileList.Add(fileEntry.Replace(sourceLocation + GetFolderCharacter(), ""));
+            FileList.Add(new TarFileList(fileEntry, fileEntry.Replace(SourceFolderRelativeLocation + GetFolderCharacter(), "")));
 
     }
 
     public void Commit()
     {
-        foreach (string file in FileList)
+        foreach (TarFileList file in FileList)
         {
-            ArchiveMemoryStream.WriteEntry(file, "");
+            ArchiveMemoryStream.WriteEntry(file.FileLocation, file.FileEntry);
         }
         if (isMemoryStream)
         {
@@ -117,9 +115,9 @@ public sealed class PackageBuilder : IDisposable
 
     public async Task CommitAsync(CancellationToken abortToken = default)
     {
-        foreach (string file in FileList)
+        foreach (TarFileList file in FileList)
         {
-            await ArchiveMemoryStream.WriteEntryAsync(file, "", abortToken);
+            await ArchiveMemoryStream.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
         }
         if (isMemoryStream)
         {
