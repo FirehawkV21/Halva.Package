@@ -4,7 +4,7 @@ using System.Text;
 using Halva.Package.Core.Utilities;
 
 namespace Halva.Package.Core.Manager;
-public class PackageBuilder : IDisposable
+public sealed class PackageBuilder : IDisposable
 {
     private bool disposedValue;
 

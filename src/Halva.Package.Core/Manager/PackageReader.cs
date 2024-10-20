@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Formats.Tar;
+﻿using System.Formats.Tar;
 using System.IO.Compression;
-using System.Linq;
+using System.IO.Hashing;
 using System.Text;
-using System.Threading.Tasks;
 using Halva.Package.Core.Utilities;
 
 namespace Halva.Package.Core.Manager;
-public class PackageReader : IDisposable
+public sealed class PackageReader : IDisposable
 {
     private bool disposedValue;
 
@@ -42,8 +39,8 @@ public class PackageReader : IDisposable
     public string IVKey { get; set; }
 
     private readonly bool isMemoryStream;
-    private MemoryStream ZipStream;
-    private FileStream ZipFileStream;
+    private readonly MemoryStream ZipStream;
+    private readonly FileStream ZipFileStream;
 
     public PackageReader(string source, bool useMemoryStream)
     {
@@ -104,6 +101,125 @@ public class PackageReader : IDisposable
             ZipFileStream = new(WorkingArchive, FileMode.Open);
             ArchiveMemoryStream = new(ZipFileStream, true);
         }
+    }
+
+    public void ExtractFile(string entry, string exportLocation)
+    {
+        TarEntry fileEntry;
+        do
+        {
+            fileEntry = ArchiveMemoryStream.GetNextEntry();
+            if (fileEntry == null) break;
+        } while (fileEntry.Name != entry);
+        fileEntry?.ExtractToFile(Path.Combine(exportLocation, entry), true);
+        ReloadArchive();
+    }
+
+    public async Task ExtractFileAsync(string entry, string exportLocation, CancellationToken abortToken = default)
+    {
+        TarEntry fileEntry;
+        do
+        {
+            fileEntry = await ArchiveMemoryStream.GetNextEntryAsync(cancellationToken: abortToken);
+            if (fileEntry == null) break;
+        } while (fileEntry.Name != entry);
+        await fileEntry?.ExtractToFileAsync(Path.Combine(exportLocation, entry), true, abortToken);
+        await Task.Run(ReloadArchive, abortToken);
+    }
+
+    /// <summary>
+    /// Exports the files that are different between the archive and the target folder.
+    /// </summary>
+    /// <param name="TargetFolder">The folder where the files to update are.</param>
+    /// 
+    public void UpdateFromArchive(string TargetFolder)
+    {
+        TarEntry tempEntry;
+        do
+        {
+            tempEntry = ArchiveMemoryStream.GetNextEntry();
+            if (tempEntry != null)
+            {
+                if (File.Exists(Path.Combine(TargetFolder, tempEntry.Name)))
+                {
+                    ReadOnlySpan<byte> originalFileSignature;
+                    ReadOnlySpan<byte> targetFileSignature;
+                    using (Stream archivedFile = tempEntry.DataStream)
+                    {
+                        using (FileStream targetFile = new(Path.Combine(TargetFolder, tempEntry.Name), FileMode.Open, FileAccess.Read))
+                        {
+                            XxHash128 archiveHash = new();
+                            XxHash128 targetHash = new();
+                            archiveHash.Append(archivedFile);
+                            targetHash.Append(targetFile);
+                            originalFileSignature = archiveHash.GetCurrentHash();
+                            targetFileSignature = targetHash.GetCurrentHash();
+                        }
+                    }
+                    if (originalFileSignature != targetFileSignature)
+                    {
+                        tempEntry.ExtractToFile(Path.Combine(TargetFolder, tempEntry.Name), true);
+                    }
+                }
+                else
+                {
+                    tempEntry.ExtractToFile(Path.Combine(TargetFolder, tempEntry.Name), true);
+                }
+            }
+        }
+        while (tempEntry != null);
+        ReloadArchive();
+    }
+
+    /// <summary>
+    /// Exports the files that are different between the archive and the target folder. This is the async version.
+    /// </summary>
+    /// <param name="TargetFolder">The folder where the files to update are.</param>
+    /// <param name="abortToken">The <see cref="CancellationToken"/> used to abort the task.</param>
+    /// 
+    public async Task UpdateFromArchiveAsync(string TargetFolder, CancellationToken abortToken = default)
+    {
+        TarEntry tempEntry;
+        do
+        {
+            tempEntry = ArchiveMemoryStream.GetNextEntry();
+            if (tempEntry != null)
+            {
+                if (File.Exists(Path.Combine(TargetFolder, tempEntry.Name)))
+                {
+                    byte[] originalFileSignature;
+                    byte[] targetFileSignature;
+                    using (Stream archivedFile = tempEntry.DataStream)
+                    {
+                        using (FileStream targetFile = new(Path.Combine(TargetFolder, tempEntry.Name), FileMode.Open, FileAccess.Read))
+                        {
+                            XxHash128 archiveHash = new();
+                            XxHash128 targetHash = new();
+                            await archiveHash.AppendAsync(archivedFile, abortToken);
+                            originalFileSignature = archiveHash.GetCurrentHash();
+                            await targetHash.AppendAsync(targetFile, abortToken);
+                            targetFileSignature = targetHash.GetCurrentHash();
+                        }
+                    }
+                    if (originalFileSignature != targetFileSignature)
+                    {
+                        await tempEntry.ExtractToFileAsync(Path.Combine(TargetFolder, tempEntry.Name), true, abortToken);
+                    }
+                }
+                else
+                {
+                    await tempEntry.ExtractToFileAsync(Path.Combine(TargetFolder, tempEntry.Name), true, abortToken);
+                }
+            }
+        }
+        while (tempEntry != null);
+        ReloadArchive();
+    }
+
+    public void ReloadArchive()
+    {
+        ArchiveMemoryStream.Dispose();
+        ArchiveMemoryStream = isMemoryStream ? new(ZipStream, true) : new(ZipFileStream, true);
     }
 
     /// <summary>
