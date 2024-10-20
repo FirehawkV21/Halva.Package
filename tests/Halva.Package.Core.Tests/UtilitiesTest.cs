@@ -1,18 +1,11 @@
-using System;
-using System.IO;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Halva.Package.Core.Tests;
 
-public class UtilitiesTest
+public class UtilitiesTest(ITestOutputHelper testOutputHelper)
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public UtilitiesTest(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
+    private readonly ITestOutputHelper _testOutputHelper = testOutputHelper;
 
     [Fact]
     public void CompressionCheck()

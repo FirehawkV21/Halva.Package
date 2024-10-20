@@ -355,7 +355,7 @@ public static class PackageUtilities
     }
     #endregion
 
-    public static string ReserveRandomArchive()
+    internal static string ReserveRandomArchive()
     {
         string tempString = "TempArchive_";
         Random _random = new();

@@ -6,7 +6,7 @@ namespace Halva.Package.Core.Managers;
 public sealed class PackageBuilder : IDisposable
 {
     private bool disposedValue;
-    private CompressorEngine engine;
+    private readonly CompressorEngine engine = new();
 
     /// <summary>
     /// The location of the final acrhive.
