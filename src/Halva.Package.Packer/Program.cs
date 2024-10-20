@@ -22,10 +22,10 @@ internal sealed class Program
         int assetCompress = 0;
         int binCompress = 0;
         string stringBuffer;
-        HalvaPackage audioPackage;
-        HalvaPackage assetsPackage;
-        HalvaPackage databasePackage;
-        HalvaPackage enginePackage;
+        PackageBuilder audioPackage;
+        PackageBuilder assetsPackage;
+        PackageBuilder databasePackage;
+        PackageBuilder enginePackage;
         Console.WriteLine(Properties.Resources.SplitterText);
         Console.WriteLine(Properties.Resources.ProgramTitle);
         Console.WriteLine(Properties.Resources.ProgramVersion, Assembly.GetExecutingAssembly().GetName().Version);
@@ -213,10 +213,10 @@ internal sealed class Program
         {
             if (!Directory.Exists(archiveDestination) && !string.IsNullOrEmpty(archiveDestination)) Directory.CreateDirectory(archiveDestination);
             string destinationPath = !string.IsNullOrEmpty(archiveDestination) ? archiveDestination : gameFolder;
-            audioPackage = new HalvaPackage(useMemoryStream);
-            assetsPackage = new HalvaPackage(useMemoryStream);
-            databasePackage = new HalvaPackage(useMemoryStream);
-            enginePackage = new HalvaPackage(useMemoryStream);
+            audioPackage = new(Path.Combine(destinationPath, "AssetsPackage.halva"), useMemoryStream);
+            assetsPackage = new(Path.Combine(destinationPath, "AudioPackage.halva"), useMemoryStream);
+            databasePackage = new(Path.Combine(destinationPath, "DatabasePackage.halva"), useMemoryStream);
+            enginePackage = new(Path.Combine(destinationPath, "EnginePackage.halva"), useMemoryStream);
             if (mustEncrypt && password != null)
             {
                 audioPackage.Password = password;
@@ -231,13 +231,9 @@ internal sealed class Program
                     enginePackage.IVKey = ivKey;
                 }
             }
-            assetsPackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "AssetsPackage.halva"));
             assetsPackage.CompressionOption = CheckLevel(assetCompress);
-            audioPackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "AudioPackage.halva"));
             audioPackage.CompressionOption = CheckLevel(assetCompress);
-            databasePackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "DatabasePackage.halva"));
             databasePackage.CompressionOption = CheckLevel(assetCompress);
-            enginePackage.DestinationLocation = new StringBuilder(Path.Combine(destinationPath, "EnginePackage.halva"));
             enginePackage.CompressionOption = CheckLevel(assetCompress);
             try
             {

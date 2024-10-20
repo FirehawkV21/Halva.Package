@@ -248,42 +248,40 @@ internal sealed class CompressorEngine
 
     #region Main Encrypted Package Decompression Code (Async)
 
-    internal async Task DecompressEncryptedFileAsync(Aes encryptionKey, string inputArchive, string workerArchive)
+    internal async Task DecompressEncryptedFileAsync(Aes encryptionKey, string inputArchive, string workerArchive, CancellationToken abortToken = default)
     {
         using (FileStream inputStream = File.OpenRead(inputArchive))
         using (FileStream outputStream = File.Create(workerArchive))
         using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
         using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
-            await decompressorStream.CopyToAsync(outputStream);
+            await decompressorStream.CopyToAsync(outputStream, abortToken);
         encryptionKey.Dispose();
     }
 
     [SupportedOSPlatform("windows")]
-    internal async Task DecompressEncryptedFileAsync(AesCng encryptionKey, string inputArchive, string workerArchive)
+    internal async Task DecompressEncryptedFileAsync(AesCng encryptionKey, string inputArchive, string workerArchive, CancellationToken abortToken = default)
     {
         using (FileStream inputStream = File.OpenRead(inputArchive))
         using (FileStream outputStream = File.Create(workerArchive))
         using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
         using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
-            await decompressorStream.CopyToAsync(outputStream);
+            await decompressorStream.CopyToAsync(outputStream, abortToken);
         encryptionKey.Dispose();
     }
 
     [SupportedOSPlatform("windows")]
-    internal async Task DecompressEncryptedFileAsync(AesCng encryptionKey, Stream inputStream, MemoryStream uncompressedStream)
+    internal async Task DecompressEncryptedFileAsync(AesCng encryptionKey, Stream inputStream, MemoryStream uncompressedStream, CancellationToken abortToken = default)
     {
         using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
         using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
-            await decompressorStream.CopyToAsync(uncompressedStream);
-        encryptionKey.Dispose();
+            await decompressorStream.CopyToAsync(uncompressedStream, abortToken);
     }
 
-    internal async Task DecompressEncryptedFileAsync(Aes encryptionKey, Stream inputStream, MemoryStream uncompressedStream)
+    internal async Task DecompressEncryptedFileAsync(Aes encryptionKey, Stream inputStream, MemoryStream uncompressedStream, CancellationToken abortToken = default)
     {
         using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
         using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
-            await decompressorStream.CopyToAsync(uncompressedStream);
-        encryptionKey.Dispose();
+            await decompressorStream.CopyToAsync(uncompressedStream, abortToken);
     }
     #endregion
 }

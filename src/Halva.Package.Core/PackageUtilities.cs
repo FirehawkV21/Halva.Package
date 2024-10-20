@@ -21,14 +21,56 @@ public static class PackageUtilities
     public static readonly string TempArchive = Path.Combine(Path.GetTempPath(), "TempArchive_");
 
     /// <summary>
+    /// Creates a Halva package from a folder.
+    /// </summary>
+    /// <param name="input">The folder that will be used as source.</param>
+    /// <param name="archiveLocation">The location of the package.</param>
+    /// <param name="useMemoryStream">Use MemoryStream for temp storage. Suitable for smaller archives (less than 4GB).</param>
+    public static void BuildArchiveFromFolder(in string input, in string archiveLocation, CompressionLevel compression = CompressionLevel.Optimal, bool useMemoryStream = false, string password = "", string ivKey = "")
+    {
+        if (useMemoryStream)
+        {
+            MemoryStream fileWrite = new();
+            TarFile.CreateFromDirectory(input, fileWrite, false);
+            CompressArchive(fileWrite, archiveLocation, compression, password, ivKey);
+        }
+        else
+        {
+            Random random = new();
+            string archive = TempArchive + random.Next(9999) + ".tmp";
+            if (File.Exists(archive)) File.Delete(archive);
+            TarFile.CreateFromDirectory(input, archive, false);
+            CompressArchive(archive, archiveLocation, compression, password, ivKey);
+            File.Delete(archive);
+        }
+    }
+
+    public static async Task BuildArchiveFromFolderAsync(string input, string archiveLocation, CompressionLevel compression = CompressionLevel.Optimal, bool useMemoryStream = false,  string password = "", string ivKey = "")
+    {
+        if (useMemoryStream)
+        {
+            MemoryStream fileWrite = new();
+            await TarFile.CreateFromDirectoryAsync(input, fileWrite, false);
+            await CompressArchiveAsync(fileWrite, archiveLocation, compression, password, ivKey);
+        }
+        else
+        {
+            string archive = ReserveRandomArchive();
+            if (File.Exists(archive)) File.Delete(archive);
+            await TarFile.CreateFromDirectoryAsync(input, archive, false);
+            await CompressArchiveAsync(archive, archiveLocation, compression, password, ivKey);
+            File.Delete(archive);
+        }
+    }
+
+    /// <summary>
     /// Exports all files from a Halva package.
     /// </summary>
     /// <param name="inputArchive">The Halva package for input.</param>
     /// <param name="destination">The location for extracting the files.</param>
-    public static void ExportFromArchive(in string inputArchive, in string destination, bool useMemoryStream = false, string password = "", string ivKey = "")
-    {
-        ExportFiles(inputArchive, destination, useMemoryStream, password, ivKey);
-    }
+    public static void ExportFromArchive(in string inputArchive, in string destination, bool useMemoryStream = false, string password = "", string ivKey = "") => ExportFiles(inputArchive, destination, useMemoryStream, password, ivKey);
+
+    public static async Task ExportFromArchiveAsync(string inputArchive, string destination, bool useMemoryStream = false, string password = "", string ivKey = "", CancellationToken abortToken = default) => await ExportFilesAsync(inputArchive, destination, useMemoryStream, password, ivKey, abortToken);
 
     /// <summary>
     /// Compresses the encrypted archive.
@@ -169,30 +211,7 @@ public static class PackageUtilities
             await compressor.DecompressFileAsync(inputStream, outputStream, abortToken);
     }
 
-    /// <summary>
-    /// Creates a Halva package from a folder.
-    /// </summary>
-    /// <param name="input">The folder that will be used as source.</param>
-    /// <param name="archiveLocation">The location of the package.</param>
-    /// <param name="useMemoryStream">Use MemoryStream for temp storage. Suitable for smaller archives (less than 4GB).</param>
-    public static void BuildArchiveFromFolder(in string input, in string archiveLocation, bool useMemoryStream = false, string password = "", string ivKey = "")
-    {
-        if (useMemoryStream)
-        {
-            MemoryStream fileWrite = new();
-            TarFile.CreateFromDirectory(input, fileWrite, false);
-            compressor.CompressFile(fileWrite, archiveLocation);
-        }
-        else
-        {
-            Random random = new();
-            string archive = TempArchive + random.Next(9999) + ".tmp";
-            if (File.Exists(archive)) File.Delete(archive);
-            TarFile.CreateFromDirectory(input, archive, false);
-            compressor.CompressFile(archive, archiveLocation);
-            File.Delete(archive);
-        }
-    }
+
 
     /// <summary>
     /// Exports all files from a Halva package.
@@ -235,6 +254,53 @@ public static class PackageUtilities
                     compressor.DecompressEncryptedFile(ref encryptionKey, inputArchive, archive);
                 }
             else compressor.DecompressFile(inputArchive, archive);
+            if (!Directory.Exists(destination))
+                Directory.CreateDirectory(destination);
+            TarFile.ExtractToDirectory(archive, destination, true);
+            File.Delete(archive);
+        }
+    }
+
+    public static async Task ExportFilesAsync(string inputArchive, string destination, bool useMemoryStream = false, string password = "", string ivKey = "", CancellationToken abortToken = default)
+    {
+        if (useMemoryStream)
+        {
+            MemoryStream stream = new();
+            if (password != "")
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    CreateKey(out AesCng encryptionKey, in password, in ivKey);
+                    await compressor.DecompressEncryptedFileAsync(encryptionKey, File.OpenRead(inputArchive), stream, abortToken);
+                    encryptionKey.Dispose();
+                }
+                else
+                {
+                    CreateKey(out Aes encryptionKey, in password, in ivKey);
+                    await compressor.DecompressEncryptedFileAsync(encryptionKey, File.OpenRead(inputArchive), stream, abortToken);
+                    encryptionKey.Dispose();
+                }
+            else await compressor.DecompressFileAsync(File.OpenRead(inputArchive), stream, abortToken);
+            if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
+            await TarFile.ExtractToDirectoryAsync(stream, destination, true, abortToken);
+            stream.Close();
+        }
+        else
+        {
+            string archive = ReserveRandomArchive();
+            if (password != "")
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    CreateKey(out AesCng encryptionKey, in password, in ivKey);
+                    await compressor.DecompressEncryptedFileAsync(encryptionKey, inputArchive, archive, abortToken);
+                    encryptionKey.Dispose();
+                }
+                else
+                {
+                    CreateKey(out Aes encryptionKey, in password, in ivKey);
+                    await compressor.DecompressEncryptedFileAsync(encryptionKey, inputArchive, archive, abortToken);
+                    encryptionKey.Dispose();
+                }
+            else await compressor.DecompressFileAsync(inputArchive, archive, abortToken);
             if (!Directory.Exists(destination))
                 Directory.CreateDirectory(destination);
             TarFile.ExtractToDirectory(archive, destination, true);

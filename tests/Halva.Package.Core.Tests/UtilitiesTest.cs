@@ -55,7 +55,7 @@ public class UtilitiesTest
         if (File.Exists("EncryptedSampleFiles.halva")) File.Delete("EncryptedSampleFiles.halva");
         try
         {
-            PackageUtilities.BuildArchiveFromFolder("SampleFiles", "EncryptedSampleFiles.halva", false, "1234567890abcdefghijklm");
+            PackageUtilities.BuildArchiveFromFolder("SampleFiles", "EncryptedSampleFiles.halva", System.IO.Compression.CompressionLevel.Optimal, false, "1234567890abcdefghijklm");
         }
         catch (Exception e)
         {

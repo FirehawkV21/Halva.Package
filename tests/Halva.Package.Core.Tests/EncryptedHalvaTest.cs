@@ -43,28 +43,28 @@ public class EncryptedHalvaTest
     [Fact]
     public void CanArchiveBuilderExtract()
     {
-        HalvaPackage package = new(PassKey: testPassword, destinationArchive, false);
+        PackageReader package = new(destinationArchive, false, testPassword);
         package.ExtractFile("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
     }
 
     [Fact]
     public void CanArchiveBuilderExtractWithIV()
     {
-        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, false);
+        PackageReader package = new(destinationArchive, false, testPassword, ivKey);
         package.ExtractFile("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
     }
 
     [Fact]
     public void CanLibraryCheckForDifferencesInEncryptedArchives()
     {
-        HalvaPackage package = new(PassKey: testPassword, destinationArchive, false);
+        PackageReader package = new(destinationArchive, false, testPassword, ivKey);
         package.UpdateFromArchive(destinationFolder);
     }
 
     [Fact]
     public void CanLibraryCheckForDifferencesInEncryptedArchivesWithIV()
     {
-        HalvaPackage package = new(PassKey: testPassword, IV: ivKey, destinationArchive, false);
+        PackageReader package = new(destinationArchive, false, testPassword, ivKey);
         package.UpdateFromArchive(destinationFolder);
     }
 

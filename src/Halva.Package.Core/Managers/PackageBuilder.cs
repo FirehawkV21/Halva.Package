@@ -45,7 +45,7 @@ public sealed class PackageBuilder : IDisposable
     private MemoryStream ZipStream;
     private FileStream ZipFileStream;
 
-    public PackageBuilder(string destination, bool useMemoryStream, string password = "", string iv = "")
+    public PackageBuilder(string destination, bool useMemoryStream = false, string password = "", string iv = "")
     {
         DestinationLocation = new StringBuilder(destination);
         Password = password;
