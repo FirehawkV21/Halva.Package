@@ -83,7 +83,7 @@ public sealed class PackageReader : IDisposable
             fileEntry = await ArchiveMemoryStream.GetNextEntryAsync(cancellationToken: abortToken);
             if (fileEntry == null) break;
         } while (fileEntry.Name != entry);
-        await fileEntry?.ExtractToFileAsync(Path.Combine(exportLocation, entry), true, abortToken);
+        if (fileEntry != null) await fileEntry?.ExtractToFileAsync(Path.Combine(exportLocation, entry), true, abortToken);
         await Task.Run(ReloadArchive, abortToken);
     }
 
@@ -160,9 +160,10 @@ public sealed class PackageReader : IDisposable
                             await targetHash.AppendAsync(targetFile, abortToken);
                             targetFileSignature = targetHash.GetCurrentHash();
                         }
+                        if (originalFileSignature != targetFileSignature)
+                            await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
                     }
-                    if (originalFileSignature != targetFileSignature)
-                        await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+
                 }
                 else
                     await tempEntry.ExtractToFileAsync(targetName, true, abortToken);

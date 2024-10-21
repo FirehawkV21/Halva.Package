@@ -385,7 +385,7 @@ public static class PackageUtilities
 
     internal static string NormalizePath(string path)
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return path.Replace("/", Path.DirectorySeparatorChar);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return path.Replace('/', Path.DirectorySeparatorChar);
         else return path.Replace('\\', Path.DirectorySeparatorChar);
     }
 }

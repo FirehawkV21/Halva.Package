@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-using Xunit;
+﻿using Xunit;
 using Halva.Package.Core.Managers;
 
 namespace Halva.Package.Core.Tests;
@@ -31,6 +29,16 @@ public class EncryptedHalvaTest
     }
 
     [Fact]
+    public async Task ArchiveBuilderTestAsync()
+    {
+        Cleanup();
+        PackageBuilder package = new(destinationArchive, false, testPassword);
+        package.AddFilesFromAFolder(sourceFolder);
+        await package.CommitAsync();
+        await PackageUtilities.ExportFromArchiveAsync(destinationArchive, destinationFolder, false, testPassword);
+    }
+
+    [Fact]
     public void ArchiveBuilderTest2()
     {
         Cleanup();
@@ -41,10 +49,27 @@ public class EncryptedHalvaTest
     }
 
     [Fact]
+    public async Task ArchiveBuilderTest2Async()
+    {
+        Cleanup();
+        PackageBuilder package = new(destinationArchive, false, testPassword, ivKey);
+        package.AddFilesFromAFolder(sourceFolder);
+        await package.CommitAsync();
+        await PackageUtilities.ExportFromArchiveAsync(destinationArchive, destinationFolder, false, testPassword, ivKey);
+    }
+
+    [Fact]
     public void CanArchiveBuilderExtract()
     {
         PackageReader package = new(destinationArchive, false, testPassword);
         package.ExtractFile("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
+    }
+
+    [Fact]
+    public async Task CanArchiveBuilderExtractAsync()
+    {
+        PackageReader package = new(destinationArchive, false, testPassword);
+        await package.ExtractFileAsync("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
     }
 
     [Fact]
@@ -55,6 +80,13 @@ public class EncryptedHalvaTest
     }
 
     [Fact]
+    public async Task CanArchiveBuilderExtractAsyncWithIV()
+    {
+        PackageReader package = new(destinationArchive, false, testPassword, ivKey);
+        await package.ExtractFileAsync("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
+    }
+
+    [Fact]
     public void CanLibraryCheckForDifferencesInEncryptedArchives()
     {
         PackageReader package = new(destinationArchive, false, testPassword);
@@ -62,10 +94,24 @@ public class EncryptedHalvaTest
     }
 
     [Fact]
+    public async Task CanLibraryCheckForDifferencesInEncryptedArchivesAsync()
+    {
+        PackageReader package = new(destinationArchive, false, testPassword);
+        await package.UpdateFromArchiveAsync(destinationFolder);
+    }
+
+    [Fact]
     public void CanLibraryCheckForDifferencesInEncryptedArchivesWithIV()
     {
         PackageReader package = new(destinationArchive, false, testPassword, ivKey);
         package.UpdateFromArchive(destinationFolder);
+    }
+
+    [Fact]
+    public async Task CanLibraryCheckForDifferencesInEncryptedArchivesAsyncWithIVAsync()
+    {
+        PackageReader package = new(destinationArchive, false, testPassword, ivKey);
+        await package.UpdateFromArchiveAsync(destinationFolder);
     }
 
 }
