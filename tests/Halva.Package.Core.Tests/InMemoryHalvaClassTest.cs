@@ -22,7 +22,17 @@ public class InMemoryHalvaClassTest
         Cleanup();
         PackageBuilder package = new(destinationArchive, true);
         package.Commit();
-        PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
+        PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, true);
+        package.Dispose();
+    }
+
+    [Fact]
+    public async Task ArchiveBuilderAsyncTest()
+    {
+        Cleanup();
+        PackageBuilder package = new(destinationArchive, true);
+        await package.CommitAsync();
+        await PackageUtilities.ExportFromArchiveAsync(destinationArchive, destinationFolder, true);
         package.Dispose();
     }
 
@@ -35,10 +45,26 @@ public class InMemoryHalvaClassTest
     }
 
     [Fact]
+    public async Task CanArchiveBuilderExtractAsync()
+    {
+        PackageReader package = new(destinationArchive, true);
+        await package.ExtractFileAsync("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
+        package.Dispose();
+    }
+
+    [Fact]
     public void CanLibraryCheckForDifferences()
     {
         PackageReader package = new(destinationArchive, true);
         package.UpdateFromArchive(destinationFolder);
+        package.Dispose();
+    }
+
+    [Fact]
+    public async Task CanLibraryCheckForDifferencesAsync()
+    {
+        PackageReader package = new(destinationArchive, true);
+        await package.UpdateFromArchiveAsync(destinationFolder);
         package.Dispose();
     }
 
