@@ -107,7 +107,7 @@ public sealed class PackageBuilder : IDisposable
         else
         {
             ArchiveMemoryStream.Dispose();
-            ZipFileStream.Close();
+            ZipFileStream.Dispose();
             PackageUtilities.CompressArchive(WorkingArchive, DestinationLocation.ToString(), CompressionOption, Password, IVKey);
             File.Delete(WorkingArchive);
             WorkingArchive = PackageUtilities.ReserveRandomArchive();
@@ -126,15 +126,15 @@ public sealed class PackageBuilder : IDisposable
         if (isMemoryStream)
         {
             await PackageUtilities.CompressArchiveAsync(ZipStream, DestinationLocation.ToString(), CompressionOption, Password, IVKey, abortToken);
-            ArchiveMemoryStream.Dispose();
-            ZipStream.Dispose();
+            await ArchiveMemoryStream.DisposeAsync();
+            await ZipStream.DisposeAsync();
             ZipStream = new();
             ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
         }
         else
         {
-            ArchiveMemoryStream.Dispose();
-            ZipFileStream.Close();
+            await ArchiveMemoryStream.DisposeAsync();
+            await ZipFileStream.DisposeAsync();
             await PackageUtilities.CompressArchiveAsync(WorkingArchive, DestinationLocation.ToString(), CompressionOption, Password, IVKey, abortToken);
             File.Delete(WorkingArchive);
             WorkingArchive = PackageUtilities.ReserveRandomArchive();
@@ -170,8 +170,8 @@ public sealed class PackageBuilder : IDisposable
                 FileList.Clear();
                 FileList = null;
                 ArchiveMemoryStream.Dispose();
-                ZipStream?.Close();
-                ZipFileStream?.Close();
+                ZipStream?.Dispose();
+                ZipFileStream?.Dispose();
                 if (File.Exists(WorkingArchive)) File.Delete(WorkingArchive);
             }
 

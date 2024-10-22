@@ -25,7 +25,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public async Task AsyncCompressionCheckAsync()
+    public async Task AsyncCompressionCheck()
     {
         bool finished = true;
         if (File.Exists("SampleFiles.halva")) File.Delete("SampleFiles.halva");

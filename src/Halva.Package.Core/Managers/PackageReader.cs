@@ -170,7 +170,7 @@ public sealed class PackageReader : IDisposable
             }
         }
         while (tempEntry != null);
-        ReloadArchive();
+        await ReloadArchiveAsync(abortToken);
     }
 
     public void ReloadArchive()
