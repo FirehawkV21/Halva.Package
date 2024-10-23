@@ -3,12 +3,12 @@
 	<PropertyGroup>
 		<AssemblyTitle>Halva Package Core</AssemblyTitle>
 		<Product>Halva Package</Product>
-		<AssemblyVersion>4.0.1.24296</AssemblyVersion>
-		<FileVersion>4.0.1.24296</FileVersion>
+		<AssemblyVersion>4.0.2.24297</AssemblyVersion>
+		<FileVersion>4.0.2.24297</FileVersion>
 		<PackageId>Halva.Package.Core</PackageId>
-		<Version>4.0.1</Version>
+		<Version>4.0.2</Version>
 		<Description>Halva (Χαλβάς in Greek) is a small .NET 6+ library that implements Google's Brotli compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
-		<PackageReleaseNotes>- Attempt to fix some issues with memory management.</PackageReleaseNotes>
+		<PackageReleaseNotes>- Fix an error with AddFileToList. Wrong logic broke the addition of files to the list.</PackageReleaseNotes>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>
