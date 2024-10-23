@@ -70,7 +70,7 @@ public sealed class PackageBuilder : IDisposable
     /// </summary>
     /// <param name="source">The base folder that holds the file.</param>
     /// <param name="fileRelativeLocation">The relative location of the file.</param>
-    public void AddFileToList(string source, string fileRelativeLocation) => FileList.Add(new TarFileList(source, source.Replace(fileRelativeLocation + GetFolderCharacter(), "")));
+    public void AddFileToList(string source, string fileRelativeLocation) => FileList.Add(new TarFileList(Path.Combine(source.TrimEnd(Path.DirectorySeparatorChar), fileRelativeLocation), fileRelativeLocation));
 
     /// <summary>
     /// Adds files from a specific folder. The folder relative location is used to avoid messing up the folder structure.
