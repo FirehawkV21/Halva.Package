@@ -1,5 +1,4 @@
 ﻿using System.Formats.Tar;
-using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
@@ -11,7 +10,6 @@ namespace Halva.Package.Core;
 /// <summary>
 /// A set of utilities for simple workloads.
 /// </summary>
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "For safety reasons, using simplified using should be avoided (unless noted otherwise).")]
 public static class PackageUtilities
 {
     private static readonly CompressorEngine compressor = new();
@@ -45,7 +43,7 @@ public static class PackageUtilities
         }
     }
 
-    public static async Task BuildArchiveFromFolderAsync(string input, string archiveLocation, CompressionLevel compression = CompressionLevel.Optimal, bool useMemoryStream = false,  string password = "", string ivKey = "")
+    public static async Task BuildArchiveFromFolderAsync(string input, string archiveLocation, CompressionLevel compression = CompressionLevel.Optimal, bool useMemoryStream = false, string password = "", string ivKey = "")
     {
         if (useMemoryStream)
         {
@@ -137,7 +135,7 @@ public static class PackageUtilities
                 compressor.DecompressEncryptedFile(ref encryptionKit, inputStream, outputStream);
             }
         else
-            compressor.DecompressFile(inputStream,out outputStream);
+            compressor.DecompressFile(inputStream, out outputStream);
     }
 
     public static void DecompressArchive(in string inputStream, string outputStream, in string password = "", in string IVkey = "")
@@ -154,7 +152,7 @@ public static class PackageUtilities
                 compressor.DecompressEncryptedFile(ref encryptionKit, inputStream, outputStream);
             }
         else
-            compressor.DecompressFile(inputStream,outputStream);
+            compressor.DecompressFile(inputStream, outputStream);
     }
 
 
@@ -172,7 +170,7 @@ public static class PackageUtilities
                 await compressor.CompressEncryptedFileAsync(encryptionKey, inputArchive, outputArchive, compression, abortToken);
             }
         else
-            await compressor.CompressFileAsync(inputArchive, outputArchive, compression);
+            await compressor.CompressFileAsync(inputArchive, outputArchive, compression, abortToken);
 
     }
 
@@ -200,12 +198,12 @@ public static class PackageUtilities
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 CreateKey(out AesCng cngEncryptionKit, password, IVkey);
-                await compressor.DecompressEncryptedFileAsync(cngEncryptionKit, inputStream, outputStream);
+                await compressor.DecompressEncryptedFileAsync(cngEncryptionKit, inputStream, outputStream, abortToken);
             }
             else
             {
                 CreateKey(out Aes encryptionKit, password, IVkey);
-                await compressor.DecompressEncryptedFileAsync(encryptionKit, inputStream, outputStream);
+                await compressor.DecompressEncryptedFileAsync(encryptionKit, inputStream, outputStream, abortToken);
             }
         else
             await compressor.DecompressFileAsync(inputStream, outputStream, abortToken);
@@ -225,7 +223,7 @@ public static class PackageUtilities
                 await compressor.DecompressEncryptedFileAsync(encryptionKit, inputStream, outputStream, abortToken);
             }
         else
-            await compressor.DecompressFileAsync(inputStream, outputStream);
+            await compressor.DecompressFileAsync(inputStream, outputStream, abortToken);
     }
 
 
@@ -252,6 +250,7 @@ public static class PackageUtilities
                     compressor.DecompressEncryptedFile(ref encryptionKey, File.OpenRead(inputArchive), stream);
                 }
             else compressor.DecompressFile(File.OpenRead(inputArchive), out stream);
+            stream.Position = 0;
             if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
             TarFile.ExtractToDirectory(stream, destination, true);
             stream.Close();
@@ -297,6 +296,7 @@ public static class PackageUtilities
                     encryptionKey.Dispose();
                 }
             else await compressor.DecompressFileAsync(File.OpenRead(inputArchive), stream, abortToken);
+            stream.Position = 0;
             if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
             await TarFile.ExtractToDirectoryAsync(stream, destination, true, abortToken);
             stream.Close();
@@ -332,13 +332,13 @@ public static class PackageUtilities
     /// <param name="encryptor">The Aes Encryptor/Decryptor to initialize.</param>
     /// <param name="password">The password of the archive.</param>
     /// <param name="ivKey">The IV for the archive.</param>
-    public static void CreateKey(out Aes encryptor, in string password, in string ivKey = "")
+    private static void CreateKey(out Aes encryptor, in string password, in string ivKey = "")
     {
         encryptor = Aes.Create();
         encryptor.KeySize = 256;
         encryptor.Padding = PaddingMode.PKCS7;
         byte[] hashCode = SHA512.HashData(Encoding.UTF8.GetBytes(password));
-        byte[] hashIV = !string.IsNullOrEmpty(ivKey) && !string.IsNullOrWhiteSpace(ivKey) ? SHA512.HashData(Encoding.UTF8.GetBytes(ivKey)) : hashCode;
+        byte[] hashIV = !string.IsNullOrEmpty(ivKey) && !string.IsNullOrWhiteSpace(ivKey) ? SHA512.HashData(Encoding.UTF8.GetBytes(ivKey)) : SHA512.HashData(hashCode);
         Rfc2898DeriveBytes key = new(password, hashCode, 50000, HashAlgorithmName.SHA512);
         Rfc2898DeriveBytes vectorKey = new(ivKey, hashIV, 50000, HashAlgorithmName.SHA512);
         encryptor.Key = key.GetBytes(encryptor.KeySize / 8);
@@ -354,7 +354,7 @@ public static class PackageUtilities
     /// <param name="encryptor">The Aes Encryptor/Decryptor to initialize.</param>
     /// <param name="password">The password of the archive.</param>
     /// <param name="ivKey">The IV for the archive.</param>
-    public static void CreateKey(out AesCng encryptor, in string password, in string ivKey = "")
+    private static void CreateKey(out AesCng encryptor, in string password, in string ivKey = "")
     {
         encryptor = new AesCng
         {
@@ -362,7 +362,7 @@ public static class PackageUtilities
             Padding = PaddingMode.PKCS7
         };
         byte[] hashCode = SHA512.HashData(Encoding.UTF8.GetBytes(password));
-        byte[] hashIV = !string.IsNullOrEmpty(ivKey) && !string.IsNullOrWhiteSpace(ivKey) ? SHA512.HashData(Encoding.UTF8.GetBytes(ivKey)) : hashCode;
+        byte[] hashIV = !string.IsNullOrEmpty(ivKey) && !string.IsNullOrWhiteSpace(ivKey) ? SHA512.HashData(Encoding.UTF8.GetBytes(ivKey)) : SHA512.HashData(hashCode);
         Rfc2898DeriveBytes key = new(password, hashCode, 50000, HashAlgorithmName.SHA512);
         Rfc2898DeriveBytes vectorKey = new(ivKey, hashIV, 50000, HashAlgorithmName.SHA512);
         encryptor.Key = key.GetBytes(encryptor.KeySize / 8);
