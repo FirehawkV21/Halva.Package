@@ -198,15 +198,15 @@ public static class PackageUtilities
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 CreateKey(out AesCng cngEncryptionKit, password, IVkey);
-                await compressor.DecompressEncryptedFileAsync(cngEncryptionKit, inputStream, outputStream, abortToken);
+                outputStream = await compressor.DecompressEncryptedFileAsync(cngEncryptionKit, inputStream, abortToken);
             }
             else
             {
                 CreateKey(out Aes encryptionKit, password, IVkey);
-                await compressor.DecompressEncryptedFileAsync(encryptionKit, inputStream, outputStream, abortToken);
+                outputStream = await compressor.DecompressEncryptedFileAsync(encryptionKit, inputStream, abortToken);
             }
         else
-            await compressor.DecompressFileAsync(inputStream, outputStream, abortToken);
+            outputStream = await compressor.DecompressFileAsync(inputStream, outputStream, abortToken);
     }
 
     public static async Task DecompressArchiveAsync(string inputStream, string outputStream, string password = "", string IVkey = "", CancellationToken abortToken = default)
@@ -286,16 +286,16 @@ public static class PackageUtilities
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     CreateKey(out AesCng encryptionKey, in password, in ivKey);
-                    await compressor.DecompressEncryptedFileAsync(encryptionKey, File.OpenRead(inputArchive), stream, abortToken);
+                    stream = await compressor.DecompressEncryptedFileAsync(encryptionKey, File.OpenRead(inputArchive), abortToken);
                     encryptionKey.Dispose();
                 }
                 else
                 {
                     CreateKey(out Aes encryptionKey, in password, in ivKey);
-                    await compressor.DecompressEncryptedFileAsync(encryptionKey, File.OpenRead(inputArchive), stream, abortToken);
+                    stream = await compressor.DecompressEncryptedFileAsync(encryptionKey, File.OpenRead(inputArchive), abortToken);
                     encryptionKey.Dispose();
                 }
-            else await compressor.DecompressFileAsync(File.OpenRead(inputArchive), stream, abortToken);
+            else stream = await compressor.DecompressFileAsync(File.OpenRead(inputArchive), stream, abortToken);
             stream.Position = 0;
             if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
             await TarFile.ExtractToDirectoryAsync(stream, destination, true, abortToken);

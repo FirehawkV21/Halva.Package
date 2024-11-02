@@ -4,7 +4,7 @@ using System.Text;
 using Halva.Package.Core.Models;
 
 namespace Halva.Package.Core.Managers;
-public sealed class PackageBuilder : IDisposable
+public sealed class PackageBuilder : IDisposable, IAsyncDisposable
 {
     private bool disposedValue;
     private readonly CompressorEngine engine = new();
@@ -175,6 +175,34 @@ public sealed class PackageBuilder : IDisposable
                 if (File.Exists(WorkingArchive)) File.Delete(WorkingArchive);
             }
 
+            disposedValue = true;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsync(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    private async ValueTask DisposeAsync(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                // Dispose managed state asynchronously (managed objects)
+                DestinationLocation?.Clear();
+                FileList?.Clear();
+                FileList = null;
+                await ArchiveMemoryStream.DisposeAsync();
+                await ZipStream.DisposeAsync();
+                await ZipFileStream.DisposeAsync();
+                if (!string.IsNullOrEmpty(WorkingArchive) && File.Exists(WorkingArchive))
+                {
+                    File.Delete(WorkingArchive); // Synchronous deletion
+                }
+            }
             disposedValue = true;
         }
     }

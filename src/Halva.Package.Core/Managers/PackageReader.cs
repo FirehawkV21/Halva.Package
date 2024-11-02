@@ -224,7 +224,7 @@ public sealed class PackageReader : IDisposable
             {
                 SourceLocation?.Clear();
                 ArchiveMemoryStream.Dispose();
-                ZipStream?.Close();
+                ZipStream?.Dispose();
                 ZipFileStream?.Dispose();
                 if (File.Exists(WorkingArchive)) File.Delete(WorkingArchive);
             }
