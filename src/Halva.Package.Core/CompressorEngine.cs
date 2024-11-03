@@ -1,7 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
-using Microsoft.IO;
 
 namespace Halva.Package.Core;
 internal sealed class CompressorEngine
@@ -101,15 +100,17 @@ internal sealed class CompressorEngine
     /// Decompresses the archive.
     /// </summary>
     /// <param name="inputStream">The input archive in a stream.</param>
-    internal async Task<RecyclableMemoryStream> DecompressFileAsync(Stream inputStream, CancellationToken abortToken = default)
+    /// <param name="uncompressedStream">The stream that will accept the uncompressed Stream.</param>
+    internal async Task<MemoryStream> DecompressFileAsync(Stream inputStream, MemoryStream uncompressedStream, CancellationToken abortToken = default)
     {
+        MemoryStream outputStream = new MemoryStream();
         inputStream.Position = 0;
+        uncompressedStream = new MemoryStream();
         using (BrotliStream decompressorStream = new(inputStream, CompressionMode.Decompress))
-        using (RecyclableMemoryStream outputStream = PackageUtilities.MemoryStreamManager.GetStream())
         {
             await decompressorStream.CopyToAsync(outputStream, abortToken);
-            return outputStream;
         }
+        return outputStream;
     }
 
     /// <summary>
@@ -276,26 +277,26 @@ internal sealed class CompressorEngine
     }
 
     [SupportedOSPlatform("windows")]
-    internal async Task<RecyclableMemoryStream> DecompressEncryptedFileAsync(AesCng encryptionKey, Stream inputStream, CancellationToken abortToken = default)
+    internal async Task<MemoryStream> DecompressEncryptedFileAsync(AesCng encryptionKey, Stream inputStream, CancellationToken abortToken = default)
     {
+        MemoryStream outputStream = new();
         using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
         using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
-        using (RecyclableMemoryStream outputStream = new(PackageUtilities.MemoryStreamManager))
         {
             await decompressorStream.CopyToAsync(outputStream, abortToken);
-            return outputStream;
         }
+        return outputStream;
     }
 
-    internal async Task<RecyclableMemoryStream> DecompressEncryptedFileAsync(Aes encryptionKey, Stream inputStream, CancellationToken abortToken = default)
+    internal async Task<MemoryStream> DecompressEncryptedFileAsync(Aes encryptionKey, Stream inputStream, CancellationToken abortToken = default)
     {
+        MemoryStream outputStream = new();
         using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
         using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
-        using (RecyclableMemoryStream outputStream = new(PackageUtilities.MemoryStreamManager))
         {
             await decompressorStream.CopyToAsync(outputStream, abortToken);
-            return outputStream;
         }
+        return outputStream;
     }
     #endregion
 }

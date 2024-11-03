@@ -1,7 +1,6 @@
 ﻿using System.Formats.Tar;
 using System.IO.Hashing;
 using System.Text;
-using Microsoft.IO;
 
 namespace Halva.Package.Core.Managers;
 public sealed class PackageReader : IDisposable
@@ -32,7 +31,7 @@ public sealed class PackageReader : IDisposable
     public string IVKey { get; set; }
 
     private readonly bool isMemoryStream;
-    private readonly RecyclableMemoryStream ZipStream;
+    private readonly MemoryStream ZipStream;
     private readonly FileStream ZipFileStream;
 
     /// <summary>
@@ -50,7 +49,7 @@ public sealed class PackageReader : IDisposable
         if (useMemoryStream)
         {
             isMemoryStream = true;
-            ZipStream = PackageUtilities.MemoryStreamManager.GetStream();
+            ZipStream = new();
             isMemoryStream = true;
             PackageUtilities.DecompressArchive(File.OpenRead(source), ZipStream, password, iv);
             ZipStream.Position = 0;
