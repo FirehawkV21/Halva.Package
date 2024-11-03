@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.IO;
 
 namespace Halva.Package.Core;
 
@@ -12,6 +13,7 @@ namespace Halva.Package.Core;
 /// </summary>
 public static class PackageUtilities
 {
+    internal static RecyclableMemoryStreamManager MemoryStreamManager { get; private set; } = new();
     private static readonly CompressorEngine compressor = new();
     /// <summary>
     /// The location of a temporary archive.
@@ -192,8 +194,9 @@ public static class PackageUtilities
             await compressor.CompressFileAsync(inputStream, outputArchive, compression, abortToken);
     }
 
-    public static async Task DecompressArchiveAsync(Stream inputStream, MemoryStream outputStream, string password = "", string IVkey = "", CancellationToken abortToken = default)
+    public static async Task<RecyclableMemoryStream> DecompressArchiveAsync(Stream inputStream, string password = "", string IVkey = "", CancellationToken abortToken = default)
     {
+        RecyclableMemoryStream outputStream = new(MemoryStreamManager);
         if (password != "")
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -206,7 +209,8 @@ public static class PackageUtilities
                 outputStream = await compressor.DecompressEncryptedFileAsync(encryptionKit, inputStream, abortToken);
             }
         else
-            outputStream = await compressor.DecompressFileAsync(inputStream, outputStream, abortToken);
+            outputStream = await compressor.DecompressFileAsync(inputStream, abortToken);
+        return outputStream;
     }
 
     public static async Task DecompressArchiveAsync(string inputStream, string outputStream, string password = "", string IVkey = "", CancellationToken abortToken = default)
@@ -295,7 +299,7 @@ public static class PackageUtilities
                     stream = await compressor.DecompressEncryptedFileAsync(encryptionKey, File.OpenRead(inputArchive), abortToken);
                     encryptionKey.Dispose();
                 }
-            else stream = await compressor.DecompressFileAsync(File.OpenRead(inputArchive), stream, abortToken);
+            else stream = await compressor.DecompressFileAsync(File.OpenRead(inputArchive), abortToken);
             stream.Position = 0;
             if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
             await TarFile.ExtractToDirectoryAsync(stream, destination, true, abortToken);
