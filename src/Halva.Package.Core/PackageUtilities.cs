@@ -192,39 +192,6 @@ public static class PackageUtilities
             await compressor.CompressFileAsync(inputStream, outputArchive, compression, abortToken);
     }
 
-    public static async Task DecompressArchiveAsync(Stream inputStream, MemoryStream outputStream, string password = "", string IVkey = "", CancellationToken abortToken = default)
-    {
-        if (password != "")
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                CreateKey(out AesCng cngEncryptionKit, password, IVkey);
-                outputStream = await compressor.DecompressEncryptedFileAsync(cngEncryptionKit, inputStream, abortToken);
-            }
-            else
-            {
-                CreateKey(out Aes encryptionKit, password, IVkey);
-                outputStream = await compressor.DecompressEncryptedFileAsync(encryptionKit, inputStream, abortToken);
-            }
-        else
-            outputStream = await compressor.DecompressFileAsync(inputStream, outputStream, abortToken);
-    }
-
-    public static async Task DecompressArchiveAsync(string inputStream, string outputStream, string password = "", string IVkey = "", CancellationToken abortToken = default)
-    {
-        if (password != "")
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                CreateKey(out AesCng cngEncryptionKit, password, IVkey);
-                await compressor.DecompressEncryptedFileAsync(cngEncryptionKit, inputStream, outputStream, abortToken);
-            }
-            else
-            {
-                CreateKey(out Aes encryptionKit, password, IVkey);
-                await compressor.DecompressEncryptedFileAsync(encryptionKit, inputStream, outputStream, abortToken);
-            }
-        else
-            await compressor.DecompressFileAsync(inputStream, outputStream, abortToken);
-    }
 
 
 
@@ -281,7 +248,7 @@ public static class PackageUtilities
     {
         if (useMemoryStream)
         {
-            MemoryStream stream = new();
+            MemoryStream stream;
             if (password != "")
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
@@ -295,7 +262,7 @@ public static class PackageUtilities
                     stream = await compressor.DecompressEncryptedFileAsync(encryptionKey, File.OpenRead(inputArchive), abortToken);
                     encryptionKey.Dispose();
                 }
-            else stream = await compressor.DecompressFileAsync(File.OpenRead(inputArchive), stream, abortToken);
+            else stream = await compressor.DecompressFileAsync(File.OpenRead(inputArchive), abortToken);
             stream.Position = 0;
             if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
             await TarFile.ExtractToDirectoryAsync(stream, destination, true, abortToken);
