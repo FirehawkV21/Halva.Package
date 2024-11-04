@@ -220,7 +220,7 @@ public static class PackageUtilities
             stream.Position = 0;
             if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
             TarFile.ExtractToDirectory(stream, destination, true);
-            stream.Dispose();
+            stream.Close();
         }
         else
         {
@@ -266,7 +266,7 @@ public static class PackageUtilities
             stream.Position = 0;
             if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
             await TarFile.ExtractToDirectoryAsync(stream, destination, true, abortToken);
-            await stream.DisposeAsync();
+            stream.Close();
         }
         else
         {
