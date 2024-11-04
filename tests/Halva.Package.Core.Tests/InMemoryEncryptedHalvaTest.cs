@@ -5,9 +5,9 @@ namespace Halva.Package.Core.Tests;
 
 public class InMemoryEncryptedHalvaTest
 {
-    private readonly string sourceFolder = "SampleFiles";
-    private readonly string destinationArchive = "SampleFiles4.halva";
-    private readonly string destinationFolder = "SampleFiles4";
+    private readonly string sourceFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles");
+    private readonly string destinationArchive = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles4.halva2");
+    private readonly string destinationFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles4");
     private readonly string testPassword = "1234567890abcdefghijklm";
     private readonly string ivKey = "mlkjihgfedcba0987654321";
 

@@ -101,11 +101,10 @@ internal sealed class CompressorEngine
     /// </summary>
     /// <param name="inputStream">The input archive in a stream.</param>
     /// <param name="uncompressedStream">The stream that will accept the uncompressed Stream.</param>
-    internal async Task<MemoryStream> DecompressFileAsync(Stream inputStream, MemoryStream uncompressedStream, CancellationToken abortToken = default)
+    internal async Task<MemoryStream> DecompressFileAsync(Stream inputStream,CancellationToken abortToken = default)
     {
         MemoryStream outputStream = new MemoryStream();
         inputStream.Position = 0;
-        uncompressedStream = new MemoryStream();
         using (BrotliStream decompressorStream = new(inputStream, CompressionMode.Decompress))
         {
             await decompressorStream.CopyToAsync(outputStream, abortToken);

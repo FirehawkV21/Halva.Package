@@ -70,7 +70,7 @@ public sealed class PackageBuilder : IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="source">The base folder that holds the file.</param>
     /// <param name="fileRelativeLocation">The relative location of the file.</param>
-    public void AddFileToList(string source, string fileRelativeLocation) => FileList.Add(new TarFileList(Path.Combine(source.TrimEnd(Path.DirectorySeparatorChar), fileRelativeLocation), fileRelativeLocation));
+    public void AddFileToList(string source, string fileRelativeLocation) => FileList.Add(new TarFileList(Path.Combine(source.TrimEnd(Path.DirectorySeparatorChar), fileRelativeLocation.TrimStart(Path.DirectorySeparatorChar)), fileRelativeLocation));
 
     /// <summary>
     /// Adds files from a specific folder. The folder relative location is used to avoid messing up the folder structure.
@@ -81,7 +81,7 @@ public sealed class PackageBuilder : IDisposable, IAsyncDisposable
     {
         List<string> tempList;
         if (!string.IsNullOrEmpty(SourceFolderRelativeLocation) || !string.IsNullOrWhiteSpace(SourceFolderRelativeLocation))
-        tempList = PullFilesFromFolder(Path.Combine(sourceLocation, SourceFolderRelativeLocation));
+        tempList = PullFilesFromFolder(Path.Combine(sourceLocation.TrimEnd(Path.DirectorySeparatorChar), SourceFolderRelativeLocation.TrimStart(Path.DirectorySeparatorChar)));
         else tempList = PullFilesFromFolder(sourceLocation);
 
 

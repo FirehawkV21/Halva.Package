@@ -6,9 +6,9 @@ namespace Halva.Package.Core.Tests;
 public class InMemoryHalvaClassTest
 {
 
-    private readonly string sourceFolder = "SampleFiles";
-    private readonly string destinationArchive = "SampleFiles2.halva";
-    private readonly string destinationFolder = "SampleFiles2";
+    private readonly string sourceFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles");
+    private readonly string destinationArchive = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles2.halva2");
+    private readonly string destinationFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles2");
 
     private void Cleanup()
     {
@@ -21,6 +21,7 @@ public class InMemoryHalvaClassTest
     {
         Cleanup();
         PackageBuilder package = new(destinationArchive, true);
+        package.AddFilesFromAFolder(AppContext.BaseDirectory, "\\SampleFiles");
         package.Commit();
         PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder, true);
         package.Dispose();
@@ -31,6 +32,11 @@ public class InMemoryHalvaClassTest
     {
         Cleanup();
         PackageBuilder package = new(destinationArchive, true);
+        List<string> fileList = Directory.EnumerateFiles(sourceFolder).ToList();
+        foreach (string file in fileList)
+        {
+            package.AddFileToList(Path.TrimEndingDirectorySeparator(sourceFolder), file.Replace(Path.TrimEndingDirectorySeparator(sourceFolder), ""));
+        }
         await package.CommitAsync();
         await PackageUtilities.ExportFromArchiveAsync(destinationArchive, destinationFolder, true);
         package.Dispose();
