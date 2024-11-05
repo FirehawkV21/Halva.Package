@@ -51,7 +51,7 @@ public sealed class PackageReader : IDisposable
             isMemoryStream = true;
             ZipStream = new();
             isMemoryStream = true;
-            PackageUtilities.DecompressArchive(File.OpenRead(source), ZipStream, password, iv);
+            PackageUtilities.DecompressArchive(File.OpenRead(source), ref ZipStream, password, iv);
             ZipStream.Position = 0;
             ArchiveMemoryStream = new(ZipStream, true);
         }

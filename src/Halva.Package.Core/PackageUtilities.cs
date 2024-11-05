@@ -121,7 +121,7 @@ public static class PackageUtilities
             compressor.CompressFile(inputStream, outputArchive, compression);
     }
 
-    public static void DecompressArchive(in Stream inputStream, MemoryStream outputStream, in string password = "", in string IVkey = "")
+    public static void DecompressArchive(in Stream inputStream, ref MemoryStream outputStream, in string password = "", in string IVkey = "")
     {
         if (password != "")
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
