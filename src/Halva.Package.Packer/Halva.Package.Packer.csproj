@@ -5,8 +5,8 @@
 		<AssemblyTitle>Halva Package Packing Tool</AssemblyTitle>
 		<PackageId>Halva.Package.Packer</PackageId>
 		<Version>1.2.0-20220914</Version>
-		<AssemblyVersion>1.2.0.24308</AssemblyVersion>
-		<FileVersion>1.2.0.24308</FileVersion>
+		<AssemblyVersion>1.2.0.24328</AssemblyVersion>
+		<FileVersion>1.2.0.24328</FileVersion>
 		<PublishAot>true</PublishAot>
 		<StripSymbols>true</StripSymbols>
 		<PackageReleaseNotes>- Added support for user provided Initialisation Vector.</PackageReleaseNotes>

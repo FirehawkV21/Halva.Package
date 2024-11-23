@@ -59,7 +59,7 @@ public sealed class PackageReader : IDisposable
         {
             WorkingArchive = PackageUtilities.ReserveRandomArchive();
             PackageUtilities.DecompressArchive(source, WorkingArchive, password, iv);
-            ZipFileStream = new(WorkingArchive, FileMode.Open);
+            ZipFileStream = new(WorkingArchive, FileMode.Open, FileAccess.Read);
             ArchiveMemoryStream = new(ZipFileStream, true);
         }
     }
@@ -119,7 +119,11 @@ public sealed class PackageReader : IDisposable
                                 targetFileSignature = targetHash.GetCurrentHash();
                             }
                             tempEntry.DataStream.Position = 0;
-                            if (originalFileSignature != targetFileSignature) tempEntry.ExtractToFile(targetName, true);
+                            if (originalFileSignature != targetFileSignature)
+                            {
+                                archivedFile.Position = 0;
+                                tempEntry.ExtractToFile(targetName, true);
+                            }
                         }
                     }
                     else
@@ -162,7 +166,10 @@ public sealed class PackageReader : IDisposable
                             targetFileSignature = targetHash.GetCurrentHash();
                         }
                         if (originalFileSignature != targetFileSignature)
+                        {
+                            archivedFile.Position = 0;
                             await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+                        }
                     }
 
                 }
