@@ -7,8 +7,8 @@
 		<AssemblyTitle>Halva Package Bootstrapper</AssemblyTitle>
 		<PackageId>Halva.Package.Bootstrapper</PackageId>
 		<Version>1.0.10-20220914</Version>
-		<AssemblyVersion>1.0.10.24328</AssemblyVersion>
-		<FileVersion>1.0.10.24328</FileVersion>
+		<AssemblyVersion>1.0.10.25005</AssemblyVersion>
+		<FileVersion>1.0.10.25005</FileVersion>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishAot>true</PublishAot>
 		<OptimizationPreference>Speed</OptimizationPreference>
@@ -16,7 +16,7 @@
     <FileAlignment>4096</FileAlignment>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="DesktopBridge.Helpers" Version="1.2.2" />
+		<PackageReference Include="DesktopBridge.Helpers"/>
 	</ItemGroup>
 	
 

@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
+using Microsoft.IO;
 
 namespace Halva.Package.Core;
 internal sealed class CompressorEngine
@@ -41,10 +42,10 @@ internal sealed class CompressorEngine
     /// </summary>
     /// <param name="inputStream">The input archive in a stream.</param>
     /// <param name="uncompressedStream">The stream that will accept the uncompressed Stream.</param>
-    internal void DecompressFile(in Stream inputStream, out MemoryStream uncompressedStream)
+    internal void DecompressFile(in Stream inputStream, out RecyclableMemoryStream uncompressedStream)
     {
         inputStream.Position = 0;
-        uncompressedStream = new MemoryStream();
+        uncompressedStream = PackageUtilities.MemoryStreamManager.GetStream();
         using (BrotliStream decompressorStream = new(inputStream, CompressionMode.Decompress))
             decompressorStream.CopyTo(uncompressedStream);
     }
@@ -103,7 +104,7 @@ internal sealed class CompressorEngine
     /// <param name="uncompressedStream">The stream that will accept the uncompressed Stream.</param>
     internal async Task<MemoryStream> DecompressFileAsync(Stream inputStream,CancellationToken abortToken = default)
     {
-        MemoryStream outputStream = new MemoryStream();
+        MemoryStream outputStream = PackageUtilities.MemoryStreamManager.GetStream();
         inputStream.Position = 0;
         using (BrotliStream decompressorStream = new(inputStream, CompressionMode.Decompress))
         {

@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.IO;
 
 namespace Halva.Package.Core;
 
@@ -12,6 +13,17 @@ namespace Halva.Package.Core;
 /// </summary>
 public static class PackageUtilities
 {
+    private static readonly RecyclableMemoryStreamManager.Options InitialOptions = new()
+    {
+        BlockSize = 1024,
+        LargeBufferMultiple = 1024 * 1024,
+        MaximumBufferSize = 16 * 1024 * 1024,
+        AggressiveBufferReturn = true,
+        MaximumLargePoolFreeBytes = 16 * 1024 * 1024 * 4,
+        MaximumSmallPoolFreeBytes = 100 * 1024,
+        ZeroOutBuffer = true,
+    };
+    internal static RecyclableMemoryStreamManager MemoryStreamManager { get; private set; } = new(InitialOptions);
     private static readonly CompressorEngine compressor = new();
     /// <summary>
     /// The location of a temporary archive.
@@ -47,9 +59,10 @@ public static class PackageUtilities
     {
         if (useMemoryStream)
         {
-            MemoryStream fileWrite = new();
+            RecyclableMemoryStream fileWrite = MemoryStreamManager.GetStream();
             await TarFile.CreateFromDirectoryAsync(input, fileWrite, false);
             await CompressArchiveAsync(fileWrite, archiveLocation, compression, password, ivKey);
+            await fileWrite.DisposeAsync();
         }
         else
         {
@@ -121,7 +134,7 @@ public static class PackageUtilities
             compressor.CompressFile(inputStream, outputArchive, compression);
     }
 
-    public static void DecompressArchive(in Stream inputStream, ref MemoryStream outputStream, in string password = "", in string IVkey = "")
+    public static void DecompressArchive(in Stream inputStream, ref RecyclableMemoryStream outputStream, in string password = "", in string IVkey = "")
     {
         if (password != "")
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -204,15 +217,17 @@ public static class PackageUtilities
     {
         if (useMemoryStream)
         {
-            MemoryStream stream = new();
+            RecyclableMemoryStream stream;
             if (password != "")
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
+                    stream = MemoryStreamManager.GetStream();
                     CreateKey(out AesCng encryptionKey, in password, in ivKey);
                     compressor.DecompressEncryptedFile(ref encryptionKey, File.OpenRead(inputArchive), stream);
                 }
                 else
                 {
+                    stream = MemoryStreamManager.GetStream();
                     CreateKey(out Aes encryptionKey, in password, in ivKey);
                     compressor.DecompressEncryptedFile(ref encryptionKey, File.OpenRead(inputArchive), stream);
                 }

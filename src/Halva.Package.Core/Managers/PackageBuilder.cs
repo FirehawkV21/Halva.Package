@@ -2,6 +2,7 @@
 using System.IO.Compression;
 using System.Text;
 using Halva.Package.Core.Models;
+using Microsoft.IO;
 
 namespace Halva.Package.Core.Managers;
 public sealed class PackageBuilder : IDisposable, IAsyncDisposable
@@ -25,12 +26,6 @@ public sealed class PackageBuilder : IDisposable, IAsyncDisposable
     /// The temporary archive where changes are being worked on.
     /// </summary>
     public string WorkingArchive { get; set; }
-
-    /// <summary>
-    /// Gets the character used for path designation.
-    /// </summary>
-    /// <returns>Either "\\" (in Windows) or "/" (Unix systems).</returns>
-    private static string GetFolderCharacter() => Path.DirectorySeparatorChar.ToString();
     /// <summary>
     /// Adjusts the compression of the final archive.
     /// </summary>
@@ -43,7 +38,7 @@ public sealed class PackageBuilder : IDisposable, IAsyncDisposable
     public string IVKey { get; set; }
 
     private readonly bool isMemoryStream;
-    private MemoryStream ZipStream;
+    private RecyclableMemoryStream ZipStream;
     private FileStream ZipFileStream;
 
     public PackageBuilder(string destination, bool useMemoryStream = false, string password = "", string iv = "")
@@ -54,7 +49,7 @@ public sealed class PackageBuilder : IDisposable, IAsyncDisposable
         if (useMemoryStream)
         {
             isMemoryStream = true;
-            ZipStream = new();
+            ZipStream = PackageUtilities.MemoryStreamManager.GetStream();
             ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
         }
         else
@@ -101,7 +96,7 @@ public sealed class PackageBuilder : IDisposable, IAsyncDisposable
             PackageUtilities.CompressArchive(ZipStream, DestinationLocation.ToString(), CompressionOption, Password, IVKey);
             ArchiveMemoryStream.Dispose();
             ZipStream.Dispose();
-            ZipStream = new();
+            ZipStream = PackageUtilities.MemoryStreamManager.GetStream();
             ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
         }
         else
@@ -128,7 +123,7 @@ public sealed class PackageBuilder : IDisposable, IAsyncDisposable
             await PackageUtilities.CompressArchiveAsync(ZipStream, DestinationLocation.ToString(), CompressionOption, Password, IVKey, abortToken);
             await ArchiveMemoryStream.DisposeAsync();
             await ZipStream.DisposeAsync();
-            ZipStream = new();
+            ZipStream = PackageUtilities.MemoryStreamManager.GetStream();
             ArchiveMemoryStream = new(ZipStream, TarEntryFormat.Pax, true);
         }
         else
