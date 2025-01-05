@@ -15,15 +15,21 @@ public static class PackageUtilities
 {
     private static readonly RecyclableMemoryStreamManager.Options InitialOptions = new()
     {
-        BlockSize = 1024,
-        LargeBufferMultiple = 1024 * 1024,
-        MaximumBufferSize = 16 * 1024 * 1024,
+        BlockSize = 4 * 1024 * 1024,  // 4 MB
+        LargeBufferMultiple = 32 * 1024 * 1024,  // 32 MB
+        MaximumBufferSize = 32 * 1024 * 1024,  // 32 MB
         AggressiveBufferReturn = true,
-        MaximumLargePoolFreeBytes = 16 * 1024 * 1024 * 4,
-        MaximumSmallPoolFreeBytes = 100 * 1024,
+        MaximumLargePoolFreeBytes = 256 * 1024 * 1024,  // 256 MB
+        MaximumSmallPoolFreeBytes = 1024 * 1024,  // 1 MB
+
+#if DEBUG
+        GenerateCallStacks = true,
+#endif
         ZeroOutBuffer = true,
     };
-    internal static RecyclableMemoryStreamManager MemoryStreamManager { get; private set; } = new(InitialOptions);
+    static internal RecyclableMemoryStreamManager MemoryStreamManager { get; private set; } = new(InitialOptions);
+    public static void SetMemoryStreamOptions(RecyclableMemoryStreamManager.Options options) => MemoryStreamManager = new(options);
+
     private static readonly CompressorEngine compressor = new();
     /// <summary>
     /// The location of a temporary archive.
