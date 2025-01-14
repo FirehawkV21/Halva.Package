@@ -28,6 +28,11 @@ public static class PackageUtilities
         ZeroOutBuffer = true,
     };
     static internal RecyclableMemoryStreamManager MemoryStreamManager { get; private set; } = new(InitialOptions);
+
+    /// <summary>
+    /// Sets the options for the MemoryStreamManager. The settings adjust how the MemoryStreamManager handles the pool used by the library. This needs to run before any operation with the library runs (including any new <see cref="Managers.PackageBuilder"/> or <see cref="Managers.PackageReader"/> variables that you'll initialize), so they can applied properly.
+    /// </summary>
+    /// <param name="options">The settings that you want to apply to the memory manager.</param>
     public static void SetMemoryStreamOptions(RecyclableMemoryStreamManager.Options options) => MemoryStreamManager = new(options);
 
     private static readonly CompressorEngine compressor = new();
