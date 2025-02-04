@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.IO;
+using System.IO.Compression;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using Microsoft.IO;
@@ -174,8 +175,8 @@ internal sealed class CompressorEngine
     #region Main Encrypted Package Compression Code (Async)
     internal async Task CompressEncryptedFileAsync(Aes aesEncryptionKey, string inputArchive, string outputArchive, CompressionLevel compression, CancellationToken abortToken)
     {
-        using (FileStream inputStream = File.OpenRead(inputArchive))
-        using (FileStream outputStream = File.Create(outputArchive))
+        using (FileStream inputStream = new(inputArchive, FileMode.Open, FileAccess.Read, FileShare.None, 4096, true))
+        using (FileStream outputStream = new(outputArchive, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, true))
         using (CryptoStream cryptStream = new(outputStream, aesEncryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
         using (BrotliStream compressorStream = new(cryptStream, compression))
             await inputStream.CopyToAsync(compressorStream, abortToken);
@@ -184,8 +185,8 @@ internal sealed class CompressorEngine
     [SupportedOSPlatform("windows")]
     internal async Task CompressEncryptedFileAsync(AesCng cngEncryptionKey, string inputArchive, string outputArchive, CompressionLevel compression = CompressionLevel.Optimal, CancellationToken abortToken = default)
     {
-        using (FileStream inputStream = File.OpenRead(inputArchive))
-        using (FileStream outputStream = File.Create(outputArchive))
+        using (FileStream inputStream = new(inputArchive, FileMode.Open, FileAccess.Read, FileShare.None, 4096, true))
+        using (FileStream outputStream = new(outputArchive, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, true))
         using (CryptoStream cryptStream = new(outputStream, cngEncryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
         using (BrotliStream compressorStream = new(cryptStream, compression))
             await inputStream.CopyToAsync(compressorStream, abortToken);
@@ -193,7 +194,7 @@ internal sealed class CompressorEngine
 
     internal async Task CompressEncryptedFileAsync(Aes encryptionKey, Stream inputArchive, string outputArchive, CompressionLevel compression = CompressionLevel.Optimal, CancellationToken abortToken = default)
     {
-        using (FileStream outputStream = File.Create(outputArchive))
+        using (FileStream outputStream = new(outputArchive, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, true))
         using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
         using (BrotliStream compressorStream = new(cryptStream, compression))
             await inputArchive.CopyToAsync(compressorStream, abortToken);
@@ -202,7 +203,7 @@ internal sealed class CompressorEngine
     [SupportedOSPlatform("windows")]
     internal async Task CompressEncryptedFileAsync(AesCng cngEncryptionKey, Stream inputStream, string outputArchive, CompressionLevel compression = CompressionLevel.Optimal, CancellationToken abortToken = default)
     {
-        using (FileStream outputStream = File.Create(outputArchive))
+        using (FileStream outputStream = new(outputArchive, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, true))
         using (CryptoStream cryptStream = new(outputStream, cngEncryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
         using (BrotliStream compressorStream = new(cryptStream, compression))
             await inputStream.CopyToAsync(compressorStream, abortToken);
@@ -256,8 +257,8 @@ internal sealed class CompressorEngine
 
     internal async Task DecompressEncryptedFileAsync(Aes encryptionKey, string inputArchive, string workerArchive, CancellationToken abortToken = default)
     {
-        using (FileStream inputStream = File.OpenRead(inputArchive))
-        using (FileStream outputStream = File.Create(workerArchive))
+        using (FileStream inputStream = new(inputArchive, FileMode.Open, FileAccess.Read, FileShare.None, 4096, true))
+        using (FileStream outputStream = new(workerArchive, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, true))
         using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
         using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
             await decompressorStream.CopyToAsync(outputStream, abortToken);
@@ -267,8 +268,8 @@ internal sealed class CompressorEngine
     [SupportedOSPlatform("windows")]
     internal async Task DecompressEncryptedFileAsync(AesCng encryptionKey, string inputArchive, string workerArchive, CancellationToken abortToken = default)
     {
-        using (FileStream inputStream = File.OpenRead(inputArchive))
-        using (FileStream outputStream = File.Create(workerArchive))
+        using (FileStream inputStream = new(inputArchive, FileMode.Open, FileAccess.Read, FileShare.None, 4096, true))
+        using (FileStream outputStream = new(workerArchive, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, true))
         using (CryptoStream cryptStream = new(inputStream, encryptionKey.CreateDecryptor(), CryptoStreamMode.Read))
         using (BrotliStream decompressorStream = new(cryptStream, CompressionMode.Decompress))
         {

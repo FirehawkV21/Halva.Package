@@ -279,13 +279,19 @@ public static class PackageUtilities
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     CreateKey(out AesCng encryptionKey, in password, in ivKey);
-                    stream = await compressor.DecompressEncryptedFileAsync(encryptionKey, File.OpenRead(inputArchive), abortToken);
+                    using (FileStream fileStream = new(inputArchive, FileMode.Open, FileAccess.Read, FileShare.None, 4096, useAsync: true))
+                    { 
+                    stream = await compressor.DecompressEncryptedFileAsync(encryptionKey, fileStream, abortToken);
+                    }
                     encryptionKey.Dispose();
                 }
                 else
                 {
                     CreateKey(out Aes encryptionKey, in password, in ivKey);
-                    stream = await compressor.DecompressEncryptedFileAsync(encryptionKey, File.OpenRead(inputArchive), abortToken);
+                    using (FileStream fileStream = new(inputArchive, FileMode.Open, FileAccess.Read, FileShare.None, 4096, useAsync: true))
+                    {
+                        stream = await compressor.DecompressEncryptedFileAsync(encryptionKey, fileStream, abortToken);
+                    }
                     encryptionKey.Dispose();
                 }
             else stream = await compressor.DecompressFileAsync(File.OpenRead(inputArchive), abortToken);
