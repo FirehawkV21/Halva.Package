@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
-    <AssemblyVersion>3.0.0.25035</AssemblyVersion>
-    <FileVersion>3.0.0.25035</FileVersion>
+    <AssemblyVersion>3.0.0.25038</AssemblyVersion>
+    <FileVersion>3.0.0.25038</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
