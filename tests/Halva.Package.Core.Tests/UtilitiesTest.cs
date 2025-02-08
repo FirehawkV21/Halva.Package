@@ -65,7 +65,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
         if (Directory.Exists("SampleFiles1")) Directory.Delete("SampleFiles1", true);
         try
         {
-            await PackageUtilities.ExportFromArchiveAsync("SampleFiles.halva", "SampleFiles1", true);
+            await PackageUtilities.ExportFromArchiveAsync("SampleFiles.halva", "SampleFiles1", true, useMultiThread:true);
         }
         catch (Exception e)
         {

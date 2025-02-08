@@ -91,9 +91,9 @@ public static class PackageUtilities
     /// </summary>
     /// <param name="inputArchive">The Halva package for input.</param>
     /// <param name="destination">The location for extracting the files.</param>
-    public static void ExportFromArchive(in string inputArchive, in string destination, bool useMemoryStream = false, string password = "", string ivKey = "") => ExportFiles(inputArchive, destination, useMemoryStream, password, ivKey);
+    public static void ExportFromArchive(in string inputArchive, in string destination, bool useMemoryStream = false, string password = "", string ivKey = "") => ExportFiles(inputArchive, destination, useMemoryStream, password, ivKey, false);
 
-    public static async Task ExportFromArchiveAsync(string inputArchive, string destination, bool useMemoryStream = false, string password = "", string ivKey = "", CancellationToken abortToken = default) => await ExportFilesAsync(inputArchive, destination, useMemoryStream, password, ivKey, abortToken);
+    public static async Task ExportFromArchiveAsync(string inputArchive, string destination, bool useMemoryStream = false, string password = "", string ivKey = "", bool useMultiThread = false, CancellationToken abortToken = default) => await ExportFilesAsync(inputArchive, destination, useMemoryStream, password, ivKey, useMultiThread, abortToken);
 
     /// <summary>
     /// Compresses the encrypted archive.
@@ -225,7 +225,7 @@ public static class PackageUtilities
     /// </summary>
     /// <param name="inputArchive">The Halva package for input.</param>
     /// <param name="destination">The location for extracting the files.</param>
-    public static void ExportFiles(in string inputArchive, string destination, bool useMemoryStream = false, string password = "", string ivKey = "")
+    public static void ExportFiles(in string inputArchive, string destination, bool useMemoryStream = false, string password = "", string ivKey = "", bool multiExtract= false)
     {
         if (useMemoryStream)
         {
@@ -246,22 +246,46 @@ public static class PackageUtilities
             else compressor.DecompressFile(File.OpenRead(inputArchive), out stream);
             stream.Position = 0;
             if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
-            TarReader reader = new(stream);
-            ConcurrentBag<TarEntry> entries = [];
-            TarEntry tempentry;
-            do
+            if (multiExtract)
             {
-                tempentry =  reader.GetNextEntry(false);
-                if (tempentry != null) entries.Add(tempentry);
-            } while (tempentry != null);
-            Parallel.ForEach(entries, (entry) =>
-            {
+                TarReader reader = new(stream);
+                ConcurrentBag<StreamObject> entries = [];
+                TarEntry tempentry;
+                do
+                {
+                    tempentry = reader.GetNextEntry(false);
+                    if (tempentry != null)
+                    {
+                        StreamObject streamObject = new()
+                        {
+                            Stream = MemoryStreamManager.GetStream(),
+                            Name = tempentry.Name
+                        };
+                        RecyclableMemoryStream entryStream = MemoryStreamManager.GetStream();
+                        tempentry.DataStream.CopyTo(streamObject.Stream);
+                        streamObject.Name = tempentry.Name;
+                        streamObject.Stream.Position = 0;
+                        entries.Add(streamObject);
+                    }
+                } while (tempentry != null);
+                Parallel.ForEach(entries, async (entry, token) =>
+                {
 
-                string path = Path.Combine(destination, NormalizePath(entry.Name));
-                string targetDirectory = path.Replace(Path.GetFileName(path), "");
-                if (!Directory.Exists(targetDirectory)) Directory.CreateDirectory(targetDirectory);
-                entry.ExtractToFile(path, true);
-            });
+                    string path = Path.Combine(destination, NormalizePath(entry.Name));
+                    string targetDirectory = path.Replace(Path.GetFileName(path), "");
+                    if (!Directory.Exists(targetDirectory)) Directory.CreateDirectory(targetDirectory);
+                    using (FileStream fileStream = new(path, FileMode.Create, FileAccess.Write, FileShare.None, 131072))
+                    {
+                        await entry.Stream.CopyToAsync(fileStream);
+                    }
+                    await entry.Stream.DisposeAsync();
+                });
+                reader.Dispose();
+            }
+            else
+            {
+                TarFile.ExtractToDirectoryAsync(stream, destination, true);
+            }
             stream.Dispose();
         }
         else
@@ -283,29 +307,52 @@ public static class PackageUtilities
                 Directory.CreateDirectory(destination);
             using (FileStream stream = new(archive, FileMode.Open, FileAccess.Read, FileShare.Read, 131072))
             {
-                TarReader reader = new(stream);
-                ConcurrentBag<TarEntry> entries = [];
-                TarEntry entry;
-                do
+                if (multiExtract)
                 {
-                    entry = reader.GetNextEntry(false);
-                    if (entry != null) entries.Add(entry);
-                } while (entry != null);
-                Parallel.ForEach(entries, (entry, token) =>
+                    TarReader reader = new(stream);
+                    ConcurrentBag<StreamObject> entries = [];
+                    TarEntry tempentry;
+                    do
+                    {
+                        tempentry = reader.GetNextEntry(false);
+                        if (tempentry != null)
+                        {
+                            StreamObject streamObject = new()
+                            {
+                                Stream = MemoryStreamManager.GetStream(),
+                                Name = tempentry.Name
+                            };
+                            RecyclableMemoryStream entryStream = MemoryStreamManager.GetStream();
+                            tempentry.DataStream.CopyTo(streamObject.Stream);
+                            streamObject.Name = tempentry.Name;
+                            streamObject.Stream.Position = 0;
+                            entries.Add(streamObject);
+                        }
+                    } while (tempentry != null);
+                    Parallel.ForEach(entries, async (entry, token) =>
+                    {
+
+                        string path = Path.Combine(destination, NormalizePath(entry.Name));
+                        string targetDirectory = path.Replace(Path.GetFileName(path), "");
+                        if (!Directory.Exists(targetDirectory)) Directory.CreateDirectory(targetDirectory);
+                        using (FileStream fileStream = new(path, FileMode.Create, FileAccess.Write, FileShare.None, 131072))
+                        {
+                            await entry.Stream.CopyToAsync(fileStream);
+                        }
+                        await entry.Stream.DisposeAsync();
+                    });
+                    reader.Dispose();
+                }
+                else
                 {
-                    string path = Path.Combine(destination, NormalizePath(entry.Name));
-                    string targetDirectory = path.Replace(Path.GetFileName(path), "");
-                    if (!Directory.Exists(targetDirectory))
-                        Directory.CreateDirectory(targetDirectory);
-                    entry.ExtractToFile(path, true);
-                });
-                reader.Dispose();
+                    TarFile.ExtractToDirectoryAsync(stream, destination, true);
+                }
             }
             File.Delete(archive);
         }
     }
 
-    public static async Task ExportFilesAsync(string inputArchive, string destination, bool useMemoryStream = false, string password = "", string ivKey = "", CancellationToken abortToken = default)
+    public static async Task ExportFilesAsync(string inputArchive, string destination, bool useMemoryStream = false, string password = "", string ivKey = "", bool multiExtract = false, CancellationToken abortToken = default)
     {
         if (useMemoryStream)
         {
@@ -332,22 +379,45 @@ public static class PackageUtilities
             else stream = await compressor.DecompressFileAsync(File.OpenRead(inputArchive), abortToken);
             stream.Position = 0;
             if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
-            TarReader reader = new(stream);
-            ConcurrentBag<TarEntry> entries = [];
-            TarEntry tempentry;
-            do
+            if (multiExtract)
             {
-                tempentry = await reader.GetNextEntryAsync(true, abortToken);
-                if (tempentry != null) entries.Add(tempentry);
-            } while (tempentry != null);
-            await Parallel.ForEachAsync(entries, abortToken, async (entry, token) =>
-            {
+                TarReader reader = new(stream);
+                ConcurrentBag<StreamObject> entries = [];
+                TarEntry tempentry;
+                do
+                {
+                    tempentry = await reader.GetNextEntryAsync(false, abortToken);
+                    if (tempentry != null)
+                    {
+                        StreamObject streamObject = new()
+                        {
+                            Stream = MemoryStreamManager.GetStream(),
+                            Name = tempentry.Name
+                        };
+                        RecyclableMemoryStream entryStream = MemoryStreamManager.GetStream();
+                        await tempentry.DataStream.CopyToAsync(streamObject.Stream, abortToken);
+                        streamObject.Name = tempentry.Name;
+                        streamObject.Stream.Position = 0;
+                        entries.Add(streamObject);
+                    }
+                } while (tempentry != null);
+                await Parallel.ForEachAsync(entries, abortToken, async (entry, token) =>
+                {
 
-                string path = Path.Combine(destination, NormalizePath(entry.Name));
-                string targetDirectory = path.Replace(Path.GetFileName(path), "");
-                if (!Directory.Exists(targetDirectory)) Directory.CreateDirectory(targetDirectory);
-                await entry.ExtractToFileAsync(path, true, abortToken);
-            });
+                    string path = Path.Combine(destination, NormalizePath(entry.Name));
+                    string targetDirectory = path.Replace(Path.GetFileName(path), "");
+                    if (!Directory.Exists(targetDirectory)) Directory.CreateDirectory(targetDirectory);
+                    using (FileStream fileStream = new(path, FileMode.Create, FileAccess.Write, FileShare.None, 131072, useAsync: true))
+                    {
+                        await entry.Stream.CopyToAsync(fileStream, abortToken);
+                    }
+                    await entry.Stream.DisposeAsync();
+                });
+            }
+            else
+            {
+                TarFile.ExtractToDirectory(stream, destination, true);
+            }
             await stream.DisposeAsync();
         }
         else
@@ -371,23 +441,45 @@ public static class PackageUtilities
                 Directory.CreateDirectory(destination);
             using (FileStream stream = new(archive, FileMode.Open, FileAccess.Read, FileShare.Read, 131072, true))
             {
-                TarReader reader = new(stream);
-                ConcurrentBag<TarEntry> entries = [];
-                TarEntry entry;
-                do
+                if (multiExtract)
                 {
-                    entry = await reader.GetNextEntryAsync(true, abortToken);
-                    if (entry != null) entries.Add(entry);
-                } while (entry != null);
-                await Parallel.ForEachAsync(entries, abortToken, async (entry, token) =>
+                    TarReader reader = new(stream);
+                    ConcurrentBag<StreamObject> entries = [];
+                    TarEntry tempentry;
+                    do
+                    {
+                        tempentry = await reader.GetNextEntryAsync(false, abortToken);
+                        if (tempentry != null)
+                        {
+                            StreamObject streamObject = new()
+                            {
+                                Stream = MemoryStreamManager.GetStream(),
+                                Name = tempentry.Name
+                            };
+                            RecyclableMemoryStream entryStream = MemoryStreamManager.GetStream();
+                            await tempentry.DataStream.CopyToAsync(streamObject.Stream, abortToken);
+                            streamObject.Name = tempentry.Name;
+                            streamObject.Stream.Position = 0;
+                            entries.Add(streamObject);
+                        }
+                    } while (tempentry != null);
+                    await Parallel.ForEachAsync(entries, abortToken, async (entry, token) =>
+                    {
+
+                        string path = Path.Combine(destination, NormalizePath(entry.Name));
+                        string targetDirectory = path.Replace(Path.GetFileName(path), "");
+                        if (!Directory.Exists(targetDirectory)) Directory.CreateDirectory(targetDirectory);
+                        using (FileStream fileStream = new(path, FileMode.Create, FileAccess.Write, FileShare.None, 131072, useAsync: true))
+                        {
+                            await entry.Stream.CopyToAsync(fileStream, abortToken);
+                        }
+                        await entry.Stream.DisposeAsync();
+                    });
+                }
+                else
                 {
-                    string path = Path.Combine(destination, NormalizePath(entry.Name));
-                    string targetDirectory = path.Replace(Path.GetFileName(path), "");
-                    if (!Directory.Exists(targetDirectory))
-                        Directory.CreateDirectory(targetDirectory);
-                    await entry.ExtractToFileAsync(path, true, abortToken);
-                });
-                reader.Dispose();
+                    await TarFile.ExtractToDirectoryAsync(stream, destination, true, abortToken);
+                }
             }
             File.Delete(archive);
         }
@@ -453,7 +545,14 @@ public static class PackageUtilities
 
     static internal string NormalizePath(string path)
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return path.Replace('/', Path.DirectorySeparatorChar);
-        else return path.Replace('\\', Path.DirectorySeparatorChar);
+        string temp = path.TrimStart('/', '\\');
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return temp.Replace('/', Path.DirectorySeparatorChar);
+        else return temp.Replace('\\', Path.DirectorySeparatorChar);
+    }
+
+    public class StreamObject
+    {
+        public RecyclableMemoryStream Stream { get; set; }
+        public string Name { get; set; }
     }
 }
