@@ -261,7 +261,6 @@ public static class PackageUtilities
                             Stream = MemoryStreamManager.GetStream(),
                             Name = tempentry.Name
                         };
-                        RecyclableMemoryStream entryStream = MemoryStreamManager.GetStream();
                         tempentry.DataStream.CopyTo(streamObject.Stream);
                         streamObject.Name = tempentry.Name;
                         streamObject.Stream.Position = 0;
@@ -322,7 +321,6 @@ public static class PackageUtilities
                                 Stream = MemoryStreamManager.GetStream(),
                                 Name = tempentry.Name
                             };
-                            RecyclableMemoryStream entryStream = MemoryStreamManager.GetStream();
                             tempentry.DataStream.CopyTo(streamObject.Stream);
                             streamObject.Name = tempentry.Name;
                             streamObject.Stream.Position = 0;
@@ -394,7 +392,6 @@ public static class PackageUtilities
                             Stream = MemoryStreamManager.GetStream(),
                             Name = tempentry.Name
                         };
-                        RecyclableMemoryStream entryStream = MemoryStreamManager.GetStream();
                         await tempentry.DataStream.CopyToAsync(streamObject.Stream, abortToken);
                         streamObject.Name = tempentry.Name;
                         streamObject.Stream.Position = 0;
@@ -456,7 +453,6 @@ public static class PackageUtilities
                                 Stream = MemoryStreamManager.GetStream(),
                                 Name = tempentry.Name
                             };
-                            RecyclableMemoryStream entryStream = MemoryStreamManager.GetStream();
                             await tempentry.DataStream.CopyToAsync(streamObject.Stream, abortToken);
                             streamObject.Name = tempentry.Name;
                             streamObject.Stream.Position = 0;

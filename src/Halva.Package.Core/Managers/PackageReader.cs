@@ -34,7 +34,6 @@ public sealed class PackageReader : IDisposable
     private readonly bool isMemoryStream;
     private readonly RecyclableMemoryStream ZipStream;
     private readonly FileStream ZipFileStream;
-    private bool useMultiThreaded = false;
 
     /// <summary>
     /// Opens an existing Halva 2 archive for reading and extracting files.
@@ -43,7 +42,7 @@ public sealed class PackageReader : IDisposable
     /// <param name="useMemoryStream">Loads the decompressed package to a <see cref="MemoryStream"/>. Suitable for smaller packages.</param>
     /// <param name="password">The password for the archive. Required for opening encrypted archives.</param>
     /// <param name="iv">The Initialisation Vector for encrypted archives.</param>
-    public PackageReader(string source, bool useMemoryStream = false, string password = "", string iv = "", bool useMultiThreaded = false)
+    public PackageReader(string source, bool useMemoryStream = false, string password = "", string iv = "")
     {
         SourceLocation = new StringBuilder(source);
         Password = password;
@@ -64,8 +63,6 @@ public sealed class PackageReader : IDisposable
             ZipFileStream = new(WorkingArchive, FileMode.Open, FileAccess.Read);
             ArchiveMemoryStream = new(ZipFileStream, true);
         }
-
-        this.useMultiThreaded = useMultiThreaded;
     }
 
     public void ExtractFile(string entry, string exportLocation)
@@ -182,7 +179,7 @@ public sealed class PackageReader : IDisposable
             }
         }
         while (tempEntry != null);
-        await ReloadArchiveAsync(abortToken);
+        await ReloadArchiveAsync();
     }
 
     public void ReloadArchive()
@@ -201,7 +198,7 @@ public sealed class PackageReader : IDisposable
 
     }
 
-    public async Task ReloadArchiveAsync(CancellationToken abortToken = default)
+    public async Task ReloadArchiveAsync()
     {
         await ArchiveMemoryStream.DisposeAsync();
         if (isMemoryStream)
