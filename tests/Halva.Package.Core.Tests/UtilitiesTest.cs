@@ -1,5 +1,4 @@
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Halva.Package.Core.Tests;
 
@@ -65,7 +64,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
         if (Directory.Exists("SampleFiles1")) Directory.Delete("SampleFiles1", true);
         try
         {
-            await PackageUtilities.ExportFromArchiveAsync("SampleFiles.halva", "SampleFiles1", true, useMultiThread:true);
+            await PackageUtilities.ExportFromArchiveAsync("SampleFiles.halva", "SampleFiles1", true, abortToken: TestContext.Current.CancellationToken);
         }
         catch (Exception e)
         {
@@ -133,7 +132,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
         if (Directory.Exists("SampleFiles2")) Directory.Delete("SampleFiles2", true);
         try
         {
-            await PackageUtilities.ExportFromArchiveAsync("EncryptedSampleFiles.halva", "SampleFiles2", false, "1234567890abcdefghijklm");
+            await PackageUtilities.ExportFromArchiveAsync("EncryptedSampleFiles.halva", "SampleFiles2", false, "1234567890abcdefghijklm", abortToken: TestContext.Current.CancellationToken);
         }
         catch (Exception e)
         {

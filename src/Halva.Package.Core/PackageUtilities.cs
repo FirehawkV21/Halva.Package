@@ -92,7 +92,7 @@ public static class PackageUtilities
     /// <param name="destination">The location for extracting the files.</param>
     public static void ExportFromArchive(in string inputArchive, in string destination, bool useMemoryStream = false, string password = "", string ivKey = "") => ExportFiles(inputArchive, destination, useMemoryStream, password, ivKey);
 
-    public static async Task ExportFromArchiveAsync(string inputArchive, string destination, bool useMemoryStream = false, string password = "", string ivKey = "", bool useMultiThread = false, CancellationToken abortToken = default) => await ExportFilesAsync(inputArchive, destination, useMemoryStream, password, ivKey, abortToken);
+    public static async Task ExportFromArchiveAsync(string inputArchive, string destination, bool useMemoryStream = false, string password = "", string ivKey = "", CancellationToken abortToken = default) => await ExportFilesAsync(inputArchive, destination, useMemoryStream, password, ivKey, abortToken);
 
     /// <summary>
     /// Compresses the encrypted archive.
