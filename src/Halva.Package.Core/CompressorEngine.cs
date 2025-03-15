@@ -137,7 +137,11 @@ internal sealed class CompressorEngine
         using (FileStream outputStream = File.Create(outputArchive))
         using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
         using (BrotliStream compressorStream = new(cryptStream, compression))
+        {
             inputStream.CopyTo(compressorStream);
+            compressorStream.Flush();
+            cryptStream.FlushFinalBlock();
+        }
         encryptionKey.Dispose();
     }
 
@@ -146,7 +150,11 @@ internal sealed class CompressorEngine
         using (FileStream outputStream = File.Create(outputArchive))
         using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
         using (BrotliStream compressorStream = new(cryptStream, compression))
+        {
             inputArchive.CopyTo(compressorStream);
+            outputStream.Flush();
+            cryptStream.FlushFinalBlock();
+        }
         encryptionKey.Dispose();
     }
 
@@ -157,7 +165,11 @@ internal sealed class CompressorEngine
         using (FileStream outputStream = File.Create(outputArchive))
         using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
         using (BrotliStream compressorStream = new(cryptStream, compression))
+        {
             inputStream.CopyTo(compressorStream);
+            outputStream.Flush();
+            cryptStream.FlushFinalBlock();  
+        }
         encryptionKey.Dispose();
     }
 
@@ -179,7 +191,11 @@ internal sealed class CompressorEngine
         using (FileStream outputStream = new(outputArchive, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, true))
         using (CryptoStream cryptStream = new(outputStream, aesEncryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
         using (BrotliStream compressorStream = new(cryptStream, compression))
+        {
             await inputStream.CopyToAsync(compressorStream, abortToken);
+            await compressorStream.FlushAsync(abortToken);
+            await cryptStream.FlushFinalBlockAsync(abortToken);
+        }
     }
 
     [SupportedOSPlatform("windows")]
@@ -189,7 +205,11 @@ internal sealed class CompressorEngine
         using (FileStream outputStream = new(outputArchive, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, true))
         using (CryptoStream cryptStream = new(outputStream, cngEncryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
         using (BrotliStream compressorStream = new(cryptStream, compression))
+        {
             await inputStream.CopyToAsync(compressorStream, abortToken);
+            await compressorStream.FlushAsync(abortToken);
+            await cryptStream.FlushFinalBlockAsync(abortToken);
+        }
     }
 
     internal async Task CompressEncryptedFileAsync(Aes encryptionKey, Stream inputArchive, string outputArchive, CompressionLevel compression = CompressionLevel.Optimal, CancellationToken abortToken = default)
@@ -197,7 +217,11 @@ internal sealed class CompressorEngine
         using (FileStream outputStream = new(outputArchive, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, true))
         using (CryptoStream cryptStream = new(outputStream, encryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
         using (BrotliStream compressorStream = new(cryptStream, compression))
+        {
             await inputArchive.CopyToAsync(compressorStream, abortToken);
+            await compressorStream.FlushAsync(abortToken);
+            await cryptStream.FlushFinalBlockAsync(abortToken);
+        }
     }
 
     [SupportedOSPlatform("windows")]
@@ -206,7 +230,11 @@ internal sealed class CompressorEngine
         using (FileStream outputStream = new(outputArchive, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 4096, true))
         using (CryptoStream cryptStream = new(outputStream, cngEncryptionKey.CreateEncryptor(), CryptoStreamMode.Write))
         using (BrotliStream compressorStream = new(cryptStream, compression))
+        {
             await inputStream.CopyToAsync(compressorStream, abortToken);
+            await compressorStream.FlushAsync(abortToken);
+            await cryptStream.FlushFinalBlockAsync(abortToken);
+        }
     }
     #endregion
 

@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Halva.Package.Core/Halva.Package.Core.csproj" />
+    <Project Path="src/Halva.Package.Extractor/Halva.Package.Bootstrapper.csproj" />
+    <Project Path="src/Halva.Package.Packer/Halva.Package.Packer.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Halva.Package.Core.Tests/Halva.Package.Core.Tests.csproj" />
+  </Folder>
+</Solution>
