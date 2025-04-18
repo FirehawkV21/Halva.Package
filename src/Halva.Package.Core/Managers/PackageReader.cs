@@ -177,9 +177,11 @@ public sealed class PackageReader : IDisposable
                     }
 
                 }
-                else { }
-                if (!Directory.Exists(targetName.Replace(Path.GetFileName(targetName), "").TrimEnd(Path.DirectorySeparatorChar))) Directory.CreateDirectory(targetName.Replace(Path.GetFileName(targetName), "").TrimEnd(Path.DirectorySeparatorChar));         
-                await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+                else
+                {
+                    if (!Directory.Exists(targetName.Replace(Path.GetFileName(targetName), "").TrimEnd(Path.DirectorySeparatorChar))) Directory.CreateDirectory(targetName.Replace(Path.GetFileName(targetName), "").TrimEnd(Path.DirectorySeparatorChar));
+                    await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+                }
             }
         }
         while (tempEntry != null);
