@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using Microsoft.IO;
@@ -19,7 +18,9 @@ internal sealed class CompressorEngine
         inputArchive.Position = 0;
         using (FileStream outputStream = File.Create(outputArchive))
         using (BrotliStream compressorStream = new(outputStream, Compression))
+        {
             inputArchive.CopyTo(compressorStream);
+        }
     }
 
     /// <summary>
@@ -48,7 +49,9 @@ internal sealed class CompressorEngine
         inputStream.Position = 0;
         uncompressedStream = PackageUtilities.MemoryStreamManager.GetStream();
         using (BrotliStream decompressorStream = new(inputStream, CompressionMode.Decompress))
+        {
             decompressorStream.CopyTo(uncompressedStream);
+        }
     }
 
     /// <summary>
@@ -139,8 +142,6 @@ internal sealed class CompressorEngine
         using (BrotliStream compressorStream = new(cryptStream, compression))
         {
             inputStream.CopyTo(compressorStream);
-            compressorStream.Flush();
-            cryptStream.FlushFinalBlock();
         }
         encryptionKey.Dispose();
     }
@@ -152,8 +153,6 @@ internal sealed class CompressorEngine
         using (BrotliStream compressorStream = new(cryptStream, compression))
         {
             inputArchive.CopyTo(compressorStream);
-            outputStream.Flush();
-            cryptStream.FlushFinalBlock();
         }
         encryptionKey.Dispose();
     }
@@ -167,8 +166,6 @@ internal sealed class CompressorEngine
         using (BrotliStream compressorStream = new(cryptStream, compression))
         {
             inputStream.CopyTo(compressorStream);
-            outputStream.Flush();
-            cryptStream.FlushFinalBlock();  
         }
         encryptionKey.Dispose();
     }
@@ -193,8 +190,6 @@ internal sealed class CompressorEngine
         using (BrotliStream compressorStream = new(cryptStream, compression))
         {
             await inputStream.CopyToAsync(compressorStream, abortToken);
-            await compressorStream.FlushAsync(abortToken);
-            await cryptStream.FlushFinalBlockAsync(abortToken);
         }
     }
 
@@ -207,8 +202,6 @@ internal sealed class CompressorEngine
         using (BrotliStream compressorStream = new(cryptStream, compression))
         {
             await inputStream.CopyToAsync(compressorStream, abortToken);
-            await compressorStream.FlushAsync(abortToken);
-            await cryptStream.FlushFinalBlockAsync(abortToken);
         }
     }
 
@@ -219,8 +212,6 @@ internal sealed class CompressorEngine
         using (BrotliStream compressorStream = new(cryptStream, compression))
         {
             await inputArchive.CopyToAsync(compressorStream, abortToken);
-            await compressorStream.FlushAsync(abortToken);
-            await cryptStream.FlushFinalBlockAsync(abortToken);
         }
     }
 
@@ -232,8 +223,6 @@ internal sealed class CompressorEngine
         using (BrotliStream compressorStream = new(cryptStream, compression))
         {
             await inputStream.CopyToAsync(compressorStream, abortToken);
-            await compressorStream.FlushAsync(abortToken);
-            await cryptStream.FlushFinalBlockAsync(abortToken);
         }
     }
     #endregion
