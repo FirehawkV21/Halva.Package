@@ -11,7 +11,7 @@ public static class PackageUtilities
     #region Creating Packages
     public static void CreatePackageFromFolder(string sourceFolder, string targetPackagePath, string password = "", string ivKey = "", CompressionLevel compression = CompressionLevel.Optimal)
     {
-        using (FileStream fs = new(targetPackagePath, FileMode.Create, FileAccess.Write))
+        using (FileStream fs = new(targetPackagePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.SequentialScan))
         {
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {
@@ -88,7 +88,7 @@ public static class PackageUtilities
     public static void DecompressPackageToFolder(string packagePath, string targetFolder, string password = "", string ivKey = "")
     {
         if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
-        using (FileStream fs = new(packagePath, FileMode.Open))
+        using (FileStream fs = new(packagePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
         {
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {

@@ -144,7 +144,7 @@ public class PackageReader(string packageLocation, string password = "", string 
 
     public void UpdateFromArchive(string TargetFolder)
     {
-        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read))
+        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
@@ -184,7 +184,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                         ReadOnlySpan<byte> targetFileSignature;
                         using (Stream archivedFile = tempEntry.DataStream)
                         {
-                            using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read))
+                            using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
                             {
                                 XxHash128 archiveHash = new();
                                 XxHash128 targetHash = new();
