@@ -53,8 +53,8 @@ public class EncryptedHalvaTest
         Cleanup();
         PackageBuilder package = new(destinationArchive, testPassword, ivKey);
         package.AddFilesFromAFolder(sourceFolder);
-        await package.CommitAsync();
-        await PackageUtilities.DecompressPackageToFolderAsync(destinationArchive, destinationFolder, testPassword, abortToken: TestContext.Current.CancellationToken);
+        await package.CommitAsync(TestContext.Current.CancellationToken);
+        await PackageUtilities.DecompressPackageToFolderAsync(destinationArchive, destinationFolder, testPassword, ivKey, TestContext.Current.CancellationToken);
     }
 
     [Fact]
