@@ -69,10 +69,10 @@ public class GamePackageManager
     {
         if (!string.IsNullOrEmpty(PackagePassword) && !string.IsNullOrWhiteSpace(PackagePassword)) {
             if (!string.IsNullOrEmpty(PackageIV) && !string.IsNullOrWhiteSpace(PackageIV))
-                PackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), shallUseMemoryStream, PackagePassword, PackageIV);
-            else  PackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), shallUseMemoryStream, PackagePassword);
+                PackageUtilities.DecompressPackageToFolder(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), PackagePassword, PackageIV);
+            else  PackageUtilities.DecompressPackageToFolder(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"), PackagePassword);
         }
-        else PackageUtilities.ExportFromArchive(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"));
+        else PackageUtilities.DecompressPackageToFolder(Path.Combine(PackageLocation, PackageName), Path.Combine(ExctractLocation, "GameData"));
     }
 
     public void ExtractPackage(string PackageName, string PackageVersionKey)
@@ -99,13 +99,12 @@ public class GamePackageManager
     {
         PackageReader package;
         if (!string.IsNullOrEmpty(PackagePassword) && !string.IsNullOrWhiteSpace(PackagePassword)) {
-            if (!string.IsNullOrEmpty(PackageIV) && !string.IsNullOrWhiteSpace(PackageIV)) package = new PackageReader(Path.Combine(PackageLocation, PackageName), shallUseMemoryStream, PackagePassword, PackageIV);
-            else package = new PackageReader(Path.Combine(PackageLocation, PackageName), shallUseMemoryStream, PackagePassword);
+            if (!string.IsNullOrEmpty(PackageIV) && !string.IsNullOrWhiteSpace(PackageIV)) package = new PackageReader(Path.Combine(PackageLocation, PackageName),  PackagePassword, PackageIV);
+            else package = new PackageReader(Path.Combine(PackageLocation, PackageName), PackagePassword);
         }
         else package = new PackageReader(Path.Combine(PackageLocation, PackageName));
             package.Password = PackagePassword;
             package.UpdateFromArchive(Path.Combine(ExctractLocation, "GameData"));
-            package.Dispose();
         switch (PackageVersionKey)
         {
             case "assetsVersion":

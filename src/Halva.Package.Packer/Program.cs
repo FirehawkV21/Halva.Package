@@ -4,7 +4,6 @@ using Halva.Package.Core.Managers;
 using Halva.Package.Packer.ProjectMetadata;
 using System.IO.Compression;
 using System.Reflection;
-using System.Text;
 
 namespace Halva.Package.Packer;
 
@@ -213,10 +212,10 @@ internal sealed class Program
         {
             if (!Directory.Exists(archiveDestination) && !string.IsNullOrEmpty(archiveDestination)) Directory.CreateDirectory(archiveDestination);
             string destinationPath = !string.IsNullOrEmpty(archiveDestination) ? archiveDestination : gameFolder;
-            audioPackage = new(Path.Combine(destinationPath, "AssetsPackage.halva"), useMemoryStream);
-            assetsPackage = new(Path.Combine(destinationPath, "AudioPackage.halva"), useMemoryStream);
-            databasePackage = new(Path.Combine(destinationPath, "DatabasePackage.halva"), useMemoryStream);
-            enginePackage = new(Path.Combine(destinationPath, "EnginePackage.halva"), useMemoryStream);
+            audioPackage = new(Path.Combine(destinationPath, "AssetsPackage.halva"));
+            assetsPackage = new(Path.Combine(destinationPath, "AudioPackage.halva"));
+            databasePackage = new(Path.Combine(destinationPath, "DatabasePackage.halva"));
+            enginePackage = new(Path.Combine(destinationPath, "EnginePackage.halva"));
             if (mustEncrypt && password != null)
             {
                 audioPackage.Password = password;
@@ -225,10 +224,10 @@ internal sealed class Program
                 enginePackage.Password = password;
                 if (!string.IsNullOrEmpty(ivKey) && !string.IsNullOrWhiteSpace(ivKey))
                 {
-                    audioPackage.IVKey = ivKey;
-                    assetsPackage.IVKey = ivKey;
-                    databasePackage.IVKey = ivKey;
-                    enginePackage.IVKey = ivKey;
+                    audioPackage.IvKey = ivKey;
+                    assetsPackage.IvKey = ivKey;
+                    databasePackage.IvKey = ivKey;
+                    enginePackage.IvKey = ivKey;
                 }
             }
             assetsPackage.CompressionOption = CheckLevel(assetCompress);
@@ -247,7 +246,6 @@ internal sealed class Program
                     if (Directory.Exists(Path.Combine(gameFolder, "movies"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "movies");
                     if (Directory.Exists(Path.Combine(gameFolder, "icon"))) assetsPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "icon");
                     assetsPackage.Commit();
-                    assetsPackage.Dispose();
                     Console.WriteLine(Properties.Resources.AssetsCompressedText);
                 });
                 Task buildAudio = Task.Run(() =>
@@ -255,7 +253,6 @@ internal sealed class Program
                     Console.WriteLine(Properties.Resources.CompressingAudioFilesText);
                     audioPackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "audio");
                     audioPackage.Commit();
-                    audioPackage.Dispose();
                     Console.WriteLine(Properties.Resources.AudioCompressedText);
                 });
                 Task buildDatabase = Task.Run(() =>
@@ -264,7 +261,6 @@ internal sealed class Program
                     databasePackage.CompressionOption = CheckLevel(binCompress);
                     databasePackage.AddFilesFromAFolder(projectLocation, gameFolder.Replace(projectLocation + Path.DirectorySeparatorChar, "") + Path.DirectorySeparatorChar + "data");
                     databasePackage.Commit();
-                    databasePackage.Dispose();
                     Console.WriteLine(Properties.Resources.DatabaseCompressedText);
                 });
                 Task buildEngine = Task.Run(() =>
@@ -280,7 +276,6 @@ internal sealed class Program
                     }
                     enginePackage.AddFileToList(projectLocation, "package.json");
                     enginePackage.Commit();
-                    enginePackage.Dispose();
                     Console.WriteLine(Properties.Resources.EngineCompressedText);
                 });
                 await Task.WhenAll(buildAssets, buildAudio, buildDatabase, buildEngine);

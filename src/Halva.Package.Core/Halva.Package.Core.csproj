@@ -33,8 +33,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.IO.RecyclableMemoryStream" />
 		<PackageReference Include="System.IO.Hashing" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="NewManagers\" />
 	</ItemGroup>
 
 </Project>

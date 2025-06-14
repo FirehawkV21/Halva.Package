@@ -13,7 +13,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
         if (File.Exists("SampleFiles.halva")) File.Delete("SampleFiles.halva");
         try
         {
-           PackageUtilities.BuildArchiveFromFolder("SampleFiles", "SampleFiles.halva");
+           PackageUtilities.CreatePackageFromFolder("SampleFiles", "SampleFiles.halva");
         }
         catch (Exception e)
         {
@@ -30,7 +30,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
         if (File.Exists("SampleFiles.halva")) File.Delete("SampleFiles.halva");
         try
         {
-            await PackageUtilities.BuildArchiveFromFolderAsync("SampleFiles", "SampleFiles.halva");
+            await PackageUtilities.CreatePackageFromFolderAsync("SampleFiles", "SampleFiles.halva", abortToken: TestContext.Current.CancellationToken);
         }
         catch (Exception e)
         {
@@ -47,7 +47,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
         if (Directory.Exists("SampleFiles1")) Directory.Delete("SampleFiles1", true);
         try
         {
-            PackageUtilities.ExportFromArchive("SampleFiles.halva", "SampleFiles1");
+            PackageUtilities.DecompressPackageToFolder("SampleFiles.halva", "SampleFiles1");
         }
         catch (Exception e)
         {
@@ -64,7 +64,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
         if (Directory.Exists("SampleFiles1")) Directory.Delete("SampleFiles1", true);
         try
         {
-            await PackageUtilities.ExportFromArchiveAsync("SampleFiles.halva", "SampleFiles1", true, abortToken: TestContext.Current.CancellationToken);
+            await PackageUtilities.DecompressPackageToFolderAsync("SampleFiles.halva", "SampleFiles1", abortToken: TestContext.Current.CancellationToken);
         }
         catch (Exception e)
         {
@@ -81,7 +81,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
         if (File.Exists("EncryptedSampleFiles.halva")) File.Delete("EncryptedSampleFiles.halva");
         try
         {
-            PackageUtilities.BuildArchiveFromFolder("SampleFiles", "EncryptedSampleFiles.halva", System.IO.Compression.CompressionLevel.Optimal, false, "1234567890abcdefghijklm");
+            PackageUtilities.CreatePackageFromFolder("SampleFiles", "EncryptedSampleFiles.halva",  "1234567890abcdefghijklm");
         }
         catch (Exception e)
         {
@@ -98,7 +98,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
         if (File.Exists("EncryptedSampleFiles.halva")) File.Delete("EncryptedSampleFiles.halva");
         try
         {
-            await PackageUtilities.BuildArchiveFromFolderAsync("SampleFiles", "EncryptedSampleFiles.halva", System.IO.Compression.CompressionLevel.Optimal, false, "1234567890abcdefghijklm");
+            await PackageUtilities.CreatePackageFromFolderAsync("SampleFiles", "EncryptedSampleFiles.halva", "1234567890abcdefghijklm", abortToken: TestContext.Current.CancellationToken);
         }
         catch (Exception e)
         {
@@ -115,7 +115,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
         if (Directory.Exists("SampleFiles2")) Directory.Delete("SampleFiles2", true);
         try
         {
-            PackageUtilities.ExportFromArchive("EncryptedSampleFiles.halva", "SampleFiles2", false, "1234567890abcdefghijklm");
+            PackageUtilities.DecompressPackageToFolder("EncryptedSampleFiles.halva", "SampleFiles2", "1234567890abcdefghijklm");
         }
         catch (Exception e)
         {
@@ -132,7 +132,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
         if (Directory.Exists("SampleFiles2")) Directory.Delete("SampleFiles2", true);
         try
         {
-            await PackageUtilities.ExportFromArchiveAsync("EncryptedSampleFiles.halva", "SampleFiles2", false, "1234567890abcdefghijklm", abortToken: TestContext.Current.CancellationToken);
+            await PackageUtilities.DecompressPackageToFolderAsync("EncryptedSampleFiles.halva", "SampleFiles2", "1234567890abcdefghijklm", abortToken: TestContext.Current.CancellationToken);
         }
         catch (Exception e)
         {

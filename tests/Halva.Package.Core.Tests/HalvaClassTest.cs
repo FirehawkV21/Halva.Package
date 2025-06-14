@@ -25,8 +25,7 @@ public class HalvaClassTest
         PackageBuilder package = new(destinationArchive);
         package.AddFilesFromAFolder(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles");
         package.Commit();
-        PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
-        package.Dispose();
+        PackageUtilities.DecompressPackageToFolder(destinationArchive, destinationFolder);
     }
 
     [Fact]
@@ -36,8 +35,7 @@ public class HalvaClassTest
         PackageBuilder package = new(destinationArchive);
         package.AddFilesFromAFolder(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles");
         await package.CommitAsync();
-        PackageUtilities.ExportFromArchive(destinationArchive, destinationFolder);
-        package.Dispose();
+        PackageUtilities.DecompressPackageToFolder(destinationArchive, destinationFolder);
     }
 
     [Fact]
@@ -45,30 +43,26 @@ public class HalvaClassTest
     {
         PackageReader package = new(destinationArchive);
         package.ExtractFile("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
-        package.Dispose();
     }
 
     [Fact]
     public async Task CanArchiveBuilderExtractAsync()
     {
         PackageReader package = new(destinationArchive);
-        await package.ExtractFileAsync("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"));
-        package.Dispose();
+        await package.ExtractFileAsync("TestImage.webp", Path.Combine(destinationFolder, "TestImage.webp"), TestContext.Current.CancellationToken);
     }
 
     [Fact]
     public void CanLibraryCheckForDifferences()
     {
-        PackageReader package = new(destinationArchive, false);
+        PackageReader package = new(destinationArchive);
         package.UpdateFromArchive(destinationFolder);
-        package.Dispose();
     }
 
     [Fact]
     public async Task CanLibraryCheckForDifferencesAsync()
     {
-        PackageReader package = new(destinationArchive, false);
-        await package.UpdateFromArchiveAsync(destinationFolder);
-        package.Dispose();
+        PackageReader package = new(destinationArchive);
+        await package.UpdateFromArchiveAsync(destinationFolder, TestContext.Current.CancellationToken);
     }
 }
