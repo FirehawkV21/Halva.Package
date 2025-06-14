@@ -17,8 +17,18 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     public CompressionLevel CompressionOption { get; set; } = CompressionLevel.Optimal;
     public StringBuilder DestinationLocation { get; set; } = new(destinationLocation);
 
+    /// <summary>
+    /// Adds a file to the list of files to be archived.
+    /// </summary>
+    /// <param name="source">The parent folder for the file.</param>
+    /// <param name="fileRelativeLocation">The relative location of the file in the parent folder.</param>
     public void AddFileToList(string source, string fileRelativeLocation) => FileList.Add(new TarFileList(Path.Combine(source.TrimEnd(Path.DirectorySeparatorChar), fileRelativeLocation.TrimStart(Path.DirectorySeparatorChar)), fileRelativeLocation));
 
+    /// <summary>
+    /// Adds files from a folder to the list of files to be archived.
+    /// </summary>
+    /// <param name="source">The parent folder for the file.</param>
+    /// <param name="SourceFolderRelativeLocation">The relative location of the folder that has the files in the parent folder.</param>
     public void AddFilesFromAFolder(string sourceLocation, string SourceFolderRelativeLocation = "")
     {
         List<string> tempList;
@@ -32,12 +42,20 @@ public class PackageBuilder(string destinationLocation, string password = "", st
 
     }
 
+    /// <summary>
+    /// Pulls files from a folder recursively.
+    /// </summary>
+    /// <param name="source">The source folder.</param>
+    /// <returns>A list of files from the folder.</returns>
     public static List<string> PullFilesFromFolder(string source)
     {
         IEnumerable<string> foundFiles = Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories);
         return [.. foundFiles];
     }
 
+    /// <summary>
+    /// Creates the archive file with the files added to the list.
+    /// </summary>
     public void Commit()
     {
         using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.SequentialScan))
@@ -85,6 +103,11 @@ public class PackageBuilder(string destinationLocation, string password = "", st
                 }
     }
 
+    /// <summary>
+    /// Creates the archive file with the files added to the list asynchronously.
+    /// </summary>
+    /// <param name="abortToken">The cancellation token to abort the task.</param>
+    /// <returns>A task that handles the creation of the archive.</returns>
     public async Task CommitAsync(CancellationToken abortToken = default)
     {
         using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan))

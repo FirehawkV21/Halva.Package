@@ -9,6 +9,14 @@ namespace Halva.Package.Core;
 public static class PackageUtilities
 {
     #region Creating Packages
+    /// <summary>
+    /// Creates a Halva package from a folder.
+    /// </summary>
+    /// <param name="sourceFolder">The folder with the files you want in the package.</param>
+    /// <param name="targetPackagePath">The location of the package to save.</param>
+    /// <param name="password">The password for the package.</param>
+    /// <param name="ivKey">The IV key for the package.</param>
+    /// <param name="compression">The level of compression for the package.</param>
     public static void CreatePackageFromFolder(string sourceFolder, string targetPackagePath, string password = "", string ivKey = "", CompressionLevel compression = CompressionLevel.Optimal)
     {
         using (FileStream fs = new(targetPackagePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.SequentialScan))
@@ -44,6 +52,15 @@ public static class PackageUtilities
         }
     }
 
+    /// <summary>
+    /// Creates a Halva package from a folder.
+    /// </summary>
+    /// <param name="sourceFolder">The folder with the files you want in the package.</param>
+    /// <param name="targetPackagePath">The location of the package to save.</param>
+    /// <param name="password">The password for the package.</param>
+    /// <param name="ivKey">The IV key for the package.</param>
+    /// <param name="compression">The level of compression for the package.</param>
+    /// <param name="abortToken">The cancellation token to abort the operation.</param>
     public static async Task CreatePackageFromFolderAsync(string sourceFolder, string targetPackagePath, string password ="", string ivKey = "", CompressionLevel compression = CompressionLevel.Optimal, CancellationToken abortToken = default)
     {
         using (FileStream fs = new(targetPackagePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan))
@@ -85,6 +102,13 @@ public static class PackageUtilities
     #endregion
 
     #region Decompression Packages
+    /// <summary>
+    /// Decompresses a Halva package to a folder.
+    /// </summary>
+    /// <param name="packagePath">The source package file.</param>
+    /// <param name="targetFolder">The folder where the files of the package will be decompressed to.</param>
+    /// <param name="password">The password for the package.</param>
+    /// <param name="ivKey">The IV key for the package.</param>
     public static void DecompressPackageToFolder(string packagePath, string targetFolder, string password = "", string ivKey = "")
     {
         if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
@@ -125,6 +149,14 @@ public static class PackageUtilities
         }
     }
 
+    /// <summary>
+    /// Decompresses a Halva package to a folder.
+    /// </summary>
+    /// <param name="packagePath">The source package file.</param>
+    /// <param name="targetFolder">The folder where the files of the package will be decompressed to.</param>
+    /// <param name="password">The password for the package.</param>
+    /// <param name="ivKey">The IV key for the package.</param>
+    /// <param name="abortToken">The cancellation token to abort the operation.</param>
     public static async Task DecompressPackageToFolderAsync(string packagePath, string targetFolder, string password = "", string ivKey = "", CancellationToken abortToken = default)
     {
         if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
@@ -166,6 +198,11 @@ public static class PackageUtilities
     }
     #endregion
 
+    /// <summary>
+    /// Normalizes a file path to use the correct directory separator character for the current platform.
+    /// </summary>
+    /// <param name="path">The path to normalize.</param>
+    /// <returns>The given path, normalized to the OS'.</returns>
     static internal string NormalizePath(string path)
     {
         string temp = path.TrimStart('/', '\\');

@@ -11,6 +11,11 @@ public class PackageReader(string packageLocation, string password = "", string 
     public string IvKey { get; set; } = ivKey;
     public string PackageLocation { get; set; } = packageLocation;
 
+    /// <summary>
+    /// Exrtacts a file from the package to the destination path.
+    /// </summary>
+    /// <param name="fileName">The file you want to extract.</param>
+    /// <param name="destinationPath">The destination of the file.</param>
     public void ExtractFile(string fileName, string destinationPath)
     {
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
@@ -75,6 +80,12 @@ public class PackageReader(string packageLocation, string password = "", string 
         }
     }
 
+    /// <summary>
+    /// Exrtacts a file from the package to the destination path asynchronously.
+    /// </summary>
+    /// <param name="fileName">The file you want to extract.</param>
+    /// <param name="destinationPath">The destination of the file.</param>
+    /// <param name="abortToken">The cancellation token to abort the operation.</param>
     public async Task ExtractFileAsync (string fileName, string destinationPath, CancellationToken abortToken = default)
     {
         if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
@@ -142,6 +153,10 @@ public class PackageReader(string packageLocation, string password = "", string 
         }
     }
 
+    /// <summary>
+    /// Updates the files in the target folder from the archive.
+    /// </summary>
+    /// <param name="TargetFolder">The folder that has the files that you want to update.</param>
     public void UpdateFromArchive(string TargetFolder)
     {
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
@@ -211,6 +226,11 @@ public class PackageReader(string packageLocation, string password = "", string 
         while (tempEntry != null);
     }
 
+    /// <summary>
+    /// Updates the files in the target folder from the archive asynchronously.
+    /// </summary>
+    /// <param name="TargetFolder">The folder that has the files that you want to update.</param>
+    /// <param name="abortToken">The cancellation token to abort the operation.</param>
     public async Task UpdateFromArchiveAsync(string TargetFolder, CancellationToken abortToken = default) {         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
