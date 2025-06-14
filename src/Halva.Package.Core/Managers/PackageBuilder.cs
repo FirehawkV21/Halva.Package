@@ -41,7 +41,7 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     public void Commit()
     {
         using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write))
-            if (string.IsNullOrEmpty(Password) && string.IsNullOrWhiteSpace(Password))
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
@@ -70,7 +70,7 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     public async Task CommitAsync(CancellationToken abortToken = default)
     {
         using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write))
-            if (string.IsNullOrEmpty(Password) && string.IsNullOrWhiteSpace(Password))
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
