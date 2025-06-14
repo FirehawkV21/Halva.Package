@@ -34,7 +34,7 @@ public class HalvaClassTest
         Cleanup();
         PackageBuilder package = new(destinationArchive);
         package.AddFilesFromAFolder(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles");
-        await package.CommitAsync();
+        await package.CommitAsync(TestContext.Current.CancellationToken);
         PackageUtilities.DecompressPackageToFolder(destinationArchive, destinationFolder);
     }
 

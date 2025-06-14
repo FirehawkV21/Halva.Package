@@ -46,25 +46,43 @@ public class PackageBuilder(string destinationLocation, string password = "", st
                 {
                     PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
                     using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
                         using (BrotliStream CompressionStream = new(cryptoStream, CompressionOption))
+                        {
                             using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                            {
                                 foreach (TarFileList file in FileList)
-                                    _tarBuilder.WriteEntry(file.FileEntry, file.FileLocation);
+                                    _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
+                            }
+                        }
+                    }
                 }
                 else
                 {
                     PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
                     using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+
                         using (BrotliStream CompressionStream = new(cryptoStream, CompressionOption))
+                        {
                             using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                            {
                                 foreach (TarFileList file in FileList)
-                                    _tarBuilder.WriteEntry(file.FileEntry, file.FileLocation);
+                                    _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
+                            }
+                        }
+                    }
                 }
+
             else
                 using (BrotliStream CompressionStream = new(fs, CompressionOption))
+                {
                     using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                    {
                         foreach (TarFileList file in FileList)
-                            _tarBuilder.WriteEntry(file.FileEntry, file.FileLocation);
+                            _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
+                    }
+                }
     }
 
     public async Task CommitAsync(CancellationToken abortToken = default)
@@ -81,7 +99,7 @@ public class PackageBuilder(string destinationLocation, string password = "", st
                             using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
                             {
                                 foreach (TarFileList file in FileList)
-                                    await _tarBuilder.WriteEntryAsync(file.FileEntry, file.FileLocation, abortToken);
+                                    await _tarBuilder.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
                             }
                         }
                     }
@@ -97,7 +115,7 @@ public class PackageBuilder(string destinationLocation, string password = "", st
                             using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
                             {
                                 foreach (TarFileList file in FileList)
-                                    await _tarBuilder.WriteEntryAsync(file.FileEntry, file.FileLocation, abortToken);
+                                    await _tarBuilder.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
                             }
                         }
                     }
@@ -108,7 +126,7 @@ public class PackageBuilder(string destinationLocation, string password = "", st
                     using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
                     {
                         foreach (TarFileList file in FileList)
-                            await _tarBuilder.WriteEntryAsync(file.FileEntry, file.FileLocation, abortToken);
+                            await _tarBuilder.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
                     }
                 }
     }

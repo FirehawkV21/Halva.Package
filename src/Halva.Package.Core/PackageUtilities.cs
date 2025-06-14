@@ -87,6 +87,7 @@ public static class PackageUtilities
     #region Decompression Packages
     public static void DecompressPackageToFolder(string packagePath, string targetFolder, string password = "", string ivKey = "")
     {
+        if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
         using (FileStream fs = new(packagePath, FileMode.Open))
         {
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
@@ -126,6 +127,7 @@ public static class PackageUtilities
 
     public static async Task DecompressPackageToFolderAsync(string packagePath, string targetFolder, string password = "", string ivKey = "", CancellationToken abortToken = default)
     {
+        if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
         using (FileStream fs = new(packagePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan))
         {
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))

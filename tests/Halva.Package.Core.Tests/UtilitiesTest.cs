@@ -63,6 +63,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
     {
         bool finished = true;
         if (Directory.Exists("SampleFiles1")) Directory.Delete("SampleFiles1", true);
+        Directory.CreateDirectory("SampleFiles1");
         try
         {
             await PackageUtilities.DecompressPackageToFolderAsync("SampleFiles.halva", "SampleFiles1", abortToken: TestContext.Current.CancellationToken);
@@ -131,6 +132,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
     {
         bool finished = true;
         if (Directory.Exists("SampleFiles2")) Directory.Delete("SampleFiles2", true);
+        Directory.CreateDirectory("SampleFiles2");
         try
         {
             await PackageUtilities.DecompressPackageToFolderAsync("EncryptedSampleFiles.halva", "SampleFiles2", "1234567890abcdefghijklm", abortToken: TestContext.Current.CancellationToken);

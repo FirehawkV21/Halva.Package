@@ -173,7 +173,7 @@ public class PackageReader(string packageLocation, string password = "", string 
         TarEntry tempEntry;
         do
         {
-            tempEntry = tarReader.GetNextEntry();
+            tempEntry = tarReader.GetNextEntry(true);
             if (tempEntry != null)
             {
                 string targetName = Path.Combine(!(TargetFolder[..0] != Path.DirectorySeparatorChar.ToString()) ? TargetFolder + Path.DirectorySeparatorChar : TargetFolder, PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
@@ -217,17 +217,30 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
                     using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    {
                         using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        {
                             using (TarReader tarReader = new(decompressionStream))
+                            {
                                 await UpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+                            }
+                        }
+                    }
+                                
                 }
                 else
                 {
                     PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
                     using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    {
                         using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        {
                             using (TarReader tarReader = new(decompressionStream))
+                            {
                                 await UpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+                            }
+                        }
+                    }
                 }
             else
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
@@ -240,7 +253,7 @@ public class PackageReader(string packageLocation, string password = "", string 
         TarEntry tempEntry;
         do
         {
-            tempEntry = await tarReader.GetNextEntryAsync(cancellationToken: abortToken);
+            tempEntry = await tarReader.GetNextEntryAsync(true, abortToken);
             if (tempEntry != null)
             {
                 string targetName = Path.Combine(!(TargetFolder[..0] != Path.DirectorySeparatorChar.ToString()) ? TargetFolder + Path.DirectorySeparatorChar : TargetFolder, PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
