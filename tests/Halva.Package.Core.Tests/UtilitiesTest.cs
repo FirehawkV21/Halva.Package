@@ -45,6 +45,7 @@ public class UtilitiesTest(ITestOutputHelper testOutputHelper)
     {
         bool finished = true;
         if (Directory.Exists("SampleFiles1")) Directory.Delete("SampleFiles1", true);
+        Directory.CreateDirectory("SampleFiles1");
         try
         {
             PackageUtilities.DecompressPackageToFolder("SampleFiles.halva", "SampleFiles1");
