@@ -35,7 +35,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                             }
                         }
                     }
-                                
+
                 }
                 else
                 {
@@ -50,7 +50,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                             }
                         }
                     }
-                                
+
                 }
             }
             else
@@ -66,7 +66,7 @@ public class PackageReader(string packageLocation, string password = "", string 
         }
     }
 
-    private void ExtractFileWorkload (in string fileName, in string destinationPath, in TarReader tarReader)
+    private void ExtractFileWorkload(in string fileName, in string destinationPath, in TarReader tarReader)
     {
         TarEntry entry = tarReader.GetNextEntry();
         while (entry != null)
@@ -86,7 +86,7 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="fileName">The file you want to extract.</param>
     /// <param name="destinationPath">The destination of the file.</param>
     /// <param name="abortToken">The cancellation token to abort the operation.</param>
-    public async Task ExtractFileAsync (string fileName, string destinationPath, CancellationToken abortToken = default)
+    public async Task ExtractFileAsync(string fileName, string destinationPath, CancellationToken abortToken = default)
     {
         if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -123,7 +123,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                         }
                     }
                 }
-                    
+
             }
         else
             using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
@@ -136,7 +136,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     }
                 }
             }
-                        
+
     }
 
     private async Task ExtractFileWorkloadAsync(string fileName, string destinationPath, TarReader tarReader, CancellationToken abortToken)
@@ -165,62 +165,153 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
                     using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    {
                         using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        {
                             using (TarReader tarReader = new(decompressionStream))
+                            {
                                 UpdateWorkload(in tarReader, in TargetFolder);
+                            }
+                        }
+                    }
+                        
                 }
                 else
                 {
                     PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
                     using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    {
                         using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        {
                             using (TarReader tarReader = new(decompressionStream))
+                            {
                                 UpdateWorkload(in tarReader, in TargetFolder);
+                            }
+                        }
+                    }
                 }
             else
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
-                    using (TarReader tarReader = new(decompressionStream))
-                        UpdateWorkload(in tarReader, in TargetFolder);
+                using (TarReader tarReader = new(decompressionStream))
+                    UpdateWorkload(in tarReader, in TargetFolder);
     }
 
-    private void UpdateWorkload (in TarReader tarReader, in string TargetFolder)
+    private void UpdateWorkload(in TarReader tarReader, in string targetFolder)
     {
         TarEntry tempEntry;
         do
         {
             tempEntry = tarReader.GetNextEntry(true);
-            if (tempEntry != null)
+            if (tempEntry == null) continue;
+            string normalizedPath = PackageUtilities.NormalizePath(tempEntry.Name)
+                .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            string targetName = Path.Combine(targetFolder, normalizedPath);
+            if (File.Exists(targetName))
             {
-                string targetName = Path.Combine(!(TargetFolder[..0] != Path.DirectorySeparatorChar.ToString()) ? TargetFolder + Path.DirectorySeparatorChar : TargetFolder, PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-                if (tempEntry != null)
-                    if (File.Exists(targetName))
+                ReadOnlySpan<byte> archiveHashSpan;
+                ReadOnlySpan<byte> targetHashSpan;
+                using (Stream archivedFile = tempEntry.DataStream)
+                using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
+                {
+                    XxHash128 archiveHash = new();
+                    XxHash128 targetHash = new();
+
+                    archiveHash.Append(archivedFile);
+                    targetHash.Append(targetFile);
+
+                    archiveHashSpan = archiveHash.GetCurrentHash();
+                    targetHashSpan = targetHash.GetCurrentHash();
+                }
+                if (!archiveHashSpan.SequenceEqual(targetHashSpan))
+                {
+                    tempEntry.DataStream.Position = 0;
+                    tempEntry.ExtractToFile(targetName, true);
+                }
+            }
+            else
+            {
+                string? dir = Path.GetDirectoryName(targetName);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+
+                tempEntry.ExtractToFile(targetName, true);
+            }
+
+        } while (tempEntry != null);
+    }
+
+    /// <summary>
+    /// Updates the files in the target folder from the archive.
+    /// </summary>
+    /// <param name="TargetFolder">The folder that has the files that you want to update by using file metadata. </param>
+    public void FastUpdateFromArchive(string TargetFolder)
+    {
+        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
+                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
                     {
-                        ReadOnlySpan<byte> originalFileSignature;
-                        ReadOnlySpan<byte> targetFileSignature;
-                        using (Stream archivedFile = tempEntry.DataStream)
+                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                         {
-                            using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
+                            using (TarReader tarReader = new(decompressionStream))
                             {
-                                XxHash128 archiveHash = new();
-                                XxHash128 targetHash = new();
-                                archiveHash.Append(archivedFile);
-                                targetHash.Append(targetFile);
-                                originalFileSignature = archiveHash.GetCurrentHash();
-                                targetFileSignature = targetHash.GetCurrentHash();
-                            }
-                            tempEntry.DataStream.Position = 0;
-                            if (originalFileSignature != targetFileSignature)
-                            {
-                                archivedFile.Position = 0;
-                                tempEntry.ExtractToFile(targetName, true);
+                                FastUpdateWorkload(in tarReader, in TargetFolder);
                             }
                         }
                     }
-                    else
+
+                }
+                else
+                {
+                    PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
+                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
                     {
-                        if (!Directory.Exists(targetName.Replace(Path.GetFileName(targetName), "").TrimEnd(Path.DirectorySeparatorChar))) Directory.CreateDirectory(targetName.Replace(Path.GetFileName(targetName), "").TrimEnd(Path.DirectorySeparatorChar));
-                        tempEntry.ExtractToFile(targetName, true);
+                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        {
+                            using (TarReader tarReader = new(decompressionStream))
+                            {
+                                FastUpdateWorkload(in tarReader, in TargetFolder);
+                            }
+                        }
                     }
+                }
+            else
+                using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
+                {
+                    using (TarReader tarReader = new(decompressionStream))
+                    {
+                        FastUpdateWorkload(in tarReader, in TargetFolder);
+                    }
+                }
+    }
+
+    private void FastUpdateWorkload(in TarReader tarReader, in string TargetFolder)
+    {
+        TarEntry tempEntry;
+        do
+        {
+            tempEntry = tarReader.GetNextEntry(false);
+            if (tempEntry == null) continue;
+            string normalizedPath = PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            string targetName = Path.Combine(TargetFolder, normalizedPath);
+            if (File.Exists(targetName))
+            {
+                FileInfo targetFile = new(targetName);
+                if (tempEntry.DataStream.Length != targetFile.Length || tempEntry.ModificationTime != targetFile.LastWriteTimeUtc)
+                {
+                    tempEntry.ExtractToFile(targetName, true);
+                }
+            }
+            else
+            {
+                string dirPath = Path.GetDirectoryName(targetName);
+                if (dirPath != null && !Directory.Exists(dirPath))
+                {
+                    Directory.CreateDirectory(dirPath);
+                }
+                tempEntry.ExtractToFile(targetName, true);
             }
         }
         while (tempEntry != null);
@@ -231,7 +322,9 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// </summary>
     /// <param name="TargetFolder">The folder that has the files that you want to update.</param>
     /// <param name="abortToken">The cancellation token to abort the operation.</param>
-    public async Task UpdateFromArchiveAsync(string TargetFolder, CancellationToken abortToken = default) {         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+    public async Task UpdateFromArchiveAsync(string TargetFolder, CancellationToken abortToken = default)
+    {
+        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
@@ -246,7 +339,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                             }
                         }
                     }
-                                
+
                 }
                 else
                 {
@@ -264,11 +357,98 @@ public class PackageReader(string packageLocation, string password = "", string 
                 }
             else
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
-                    using (TarReader tarReader = new(decompressionStream))
-                        await UpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+                using (TarReader tarReader = new(decompressionStream))
+                    await UpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
     }
 
-    private async Task UpdateWorkloadAsync (TarReader tarReader, string TargetFolder, CancellationToken abortToken = default)
+    private async Task UpdateWorkloadAsync(TarReader tarReader, string targetFolder, CancellationToken abortToken = default)
+    {
+        TarEntry tempEntry;
+        do
+        {
+            tempEntry = await tarReader.GetNextEntryAsync(true, abortToken);
+            if (tempEntry == null) continue;
+            string normalizedPath = PackageUtilities.NormalizePath(tempEntry.Name)
+                .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            string targetName = Path.Combine(targetFolder, normalizedPath);
+            if (File.Exists(targetName))
+            {
+                ReadOnlySpan<byte> archiveHashSpan;
+                ReadOnlySpan<byte> targetHashSpan;
+                using (Stream archivedFile = tempEntry.DataStream)
+                using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan))
+                {
+                    XxHash128 archiveHash = new();
+                    XxHash128 targetHash = new();
+
+                    archiveHash.Append(archivedFile);
+                    targetHash.Append(targetFile);
+
+                    archiveHashSpan = archiveHash.GetCurrentHash();
+                    targetHashSpan = targetHash.GetCurrentHash();
+                }
+                if (!archiveHashSpan.SequenceEqual(targetHashSpan))
+                {
+                    await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+                }
+            }
+            else
+            {
+                string? dir = Path.GetDirectoryName(targetName);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+
+                await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+            }
+
+        } while (tempEntry != null);
+    }
+
+    /// <summary>
+    /// Updates the files in the target folder from the archive asynchronously by checking the metadata. This is suitable for cases where accuracy isn't required.
+    /// </summary>
+    /// <param name="TargetFolder">The folder that has the files that you want to update.</param>
+    /// <param name="abortToken">The cancellation token to abort the operation.</param>
+    public async Task FastUpdateFromArchiveAsync(string TargetFolder, CancellationToken abortToken = default)
+    {
+        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
+                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    {
+                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        {
+                            using (TarReader tarReader = new(decompressionStream))
+                            {
+                                await FastUpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+                            }
+                        }
+                    }
+
+                }
+                else
+                {
+                    PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
+                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    {
+                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        {
+                            using (TarReader tarReader = new(decompressionStream))
+                            {
+                                await FastUpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+                            }
+                        }
+                    }
+                }
+            else
+                using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
+                using (TarReader tarReader = new(decompressionStream))
+                    await FastUpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+    }
+
+    private async Task FastUpdateWorkloadAsync(TarReader tarReader, string TargetFolder, CancellationToken abortToken = default)
     {
         TarEntry tempEntry;
         do
@@ -280,25 +460,10 @@ public class PackageReader(string packageLocation, string password = "", string 
                 if (tempEntry != null)
                     if (File.Exists(targetName))
                     {
-                        ReadOnlySpan<byte> originalFileSignature;
-                        ReadOnlySpan<byte> targetFileSignature;
-                        using (Stream archivedFile = tempEntry.DataStream)
+                        FileInfo targetFile = new(targetName);
+                        if (tempEntry.DataStream.Length != targetFile.Length || tempEntry.ModificationTime != targetFile.LastWriteTimeUtc)
                         {
-                            using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
-                            {
-                                XxHash128 archiveHash = new();
-                                XxHash128 targetHash = new();
-                                archiveHash.Append(archivedFile);
-                                targetHash.Append(targetFile);
-                                originalFileSignature = archiveHash.GetCurrentHash();
-                                targetFileSignature = targetHash.GetCurrentHash();
-                            }
-                            tempEntry.DataStream.Position = 0;
-                            if (originalFileSignature != targetFileSignature)
-                            {
-                                archivedFile.Position = 0;
-                                await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
-                            }
+                            await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
                         }
                     }
                     else
