@@ -230,7 +230,7 @@ public class PackageReader(string packageLocation, string password = "", string 
             }
             else
             {
-                string? dir = Path.GetDirectoryName(targetName);
+                string dir = Path.GetDirectoryName(targetName);
                 if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
 
@@ -394,7 +394,7 @@ public class PackageReader(string packageLocation, string password = "", string 
             }
             else
             {
-                string? dir = Path.GetDirectoryName(targetName);
+                string dir = Path.GetDirectoryName(targetName);
                 if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
 
