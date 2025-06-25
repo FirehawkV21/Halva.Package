@@ -23,24 +23,11 @@ public static class PackageUtilities
         {
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    CreateKey(out AesCng cngEncryptionKit, password, ivKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
                     using (BrotliStream CompressionStream = new(cryptoStream, compression))
                     {
                         TarFile.CreateFromDirectory(sourceFolder, CompressionStream, false);
                     }
-                }
-                else
-                {
-                    CreateKey(out Aes cngEncryptionKit, password, ivKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
-                    using (BrotliStream CompressionStream = new(cryptoStream, compression))
-                    {
-                        TarFile.CreateFromDirectory(sourceFolder, CompressionStream, false);
-                    }
-                }
             }
             else
             {
@@ -67,28 +54,13 @@ public static class PackageUtilities
         {
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    CreateKey(out AesCng cngEncryptionKit, password, ivKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
                     {
                         using (BrotliStream CompressionStream = new(cryptoStream, compression))
                         {
                             await TarFile.CreateFromDirectoryAsync(sourceFolder, CompressionStream, false, abortToken);
                         }
                     }
-                }
-                else
-                {
-                    CreateKey(out Aes cngEncryptionKit, password, ivKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
-                    {
-                        using (BrotliStream CompressionStream = new(cryptoStream, compression))
-                        {
-                            await TarFile.CreateFromDirectoryAsync(sourceFolder, CompressionStream, false, abortToken);
-                        }
-                    }
-                }
             }
             else
             {
@@ -116,28 +88,13 @@ public static class PackageUtilities
         {
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    CreateKey(out AesCng cngEncryptionKit, password, ivKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
                     {
                         using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                         {
                             TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
                         }
                     }
-                }
-                else
-                {
-                    CreateKey(out Aes cngEncryptionKit, password, ivKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
-                        }
-                    }
-                }
             }
             else
             {
@@ -164,28 +121,13 @@ public static class PackageUtilities
         {
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    CreateKey(out AesCng cngEncryptionKit, password, ivKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
                     {
                         using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                         {
                             await TarFile.ExtractToDirectoryAsync(decompressionStream, targetFolder, true, abortToken);
                         }
                     }
-                }
-                else
-                {
-                    CreateKey(out Aes cngEncryptionKit, password, ivKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            await TarFile.ExtractToDirectoryAsync(decompressionStream, targetFolder, true, abortToken);
-                        }
-                    }
-                }
             }
             else
             {
@@ -211,6 +153,20 @@ public static class PackageUtilities
     }
 
     #region Encryption Key Handling
+
+    static internal Aes GetEncryptionKey(in string password, in string iv)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            CreateKey(out AesCng encryptionKey, password, iv);
+            return encryptionKey;
+        }
+        else
+        {
+            CreateKey(out Aes encryptionKey, password, iv);
+            return encryptionKey;
+        }
+    }
     /// <summary>
     /// Sets up the Aes Encryptor/Decryptor with IV used in code.
     /// </summary>

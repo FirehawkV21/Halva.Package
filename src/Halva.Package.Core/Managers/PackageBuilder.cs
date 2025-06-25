@@ -60,38 +60,19 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     {
         using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.SequentialScan))
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
                 {
-                    PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
+                    using (BrotliStream CompressionStream = new(cryptoStream, CompressionOption))
                     {
-                        using (BrotliStream CompressionStream = new(cryptoStream, CompressionOption))
+                        using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
                         {
-                            using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
-                            {
-                                foreach (TarFileList file in FileList)
-                                    _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
-                            }
+                            foreach (TarFileList file in FileList)
+                                _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
                         }
                     }
                 }
-                else
-                {
-                    PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
-                    {
-
-                        using (BrotliStream CompressionStream = new(cryptoStream, CompressionOption))
-                        {
-                            using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
-                            {
-                                foreach (TarFileList file in FileList)
-                                    _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
-                            }
-                        }
-                    }
-                }
-
+            }
             else
                 using (BrotliStream CompressionStream = new(fs, CompressionOption))
                 {
@@ -112,10 +93,7 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     {
         using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan))
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
+                    using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
                     {
                         using (BrotliStream CompressionStream = new(cryptoStream, CompressionOption))
                         {
@@ -126,23 +104,6 @@ public class PackageBuilder(string destinationLocation, string password = "", st
                             }
                         }
                     }
-                        
-                }
-                else
-                {
-                    PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateEncryptor(), CryptoStreamMode.Write))
-                    {
-                        using (BrotliStream CompressionStream = new(cryptoStream, CompressionOption))
-                        {
-                            using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
-                            {
-                                foreach (TarFileList file in FileList)
-                                    await _tarBuilder.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
-                            }
-                        }
-                    }
-                }
             else
                 using (BrotliStream CompressionStream = new(fs, CompressionOption))
                 {

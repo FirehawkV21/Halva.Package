@@ -12,20 +12,6 @@ public class PackageReader(string packageLocation, string password = "", string 
     public string IvKey { get; set; } = ivKey;
     public string PackageLocation { get; set; } = packageLocation;
 
-    private Aes GetEncryptionKey()
-    {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            PackageUtilities.CreateKey(out AesCng encryptionKey, Password, IvKey);
-            return encryptionKey;
-        }
-        else
-        {
-            PackageUtilities.CreateKey(out Aes encryptionKey, Password, IvKey);
-            return encryptionKey;
-        }
-    }
-
     /// <summary>
     /// Exrtacts a file from the package to the destination path.
     /// </summary>
@@ -37,7 +23,7 @@ public class PackageReader(string packageLocation, string password = "", string 
         {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
             {
-                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
+                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
                 {
                     using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
@@ -86,7 +72,7 @@ public class PackageReader(string packageLocation, string password = "", string 
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
         {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
+                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
                 {
                     using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
@@ -131,7 +117,7 @@ public class PackageReader(string packageLocation, string password = "", string 
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
         {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
+                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
                 {
                     using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
@@ -207,7 +193,7 @@ public class PackageReader(string packageLocation, string password = "", string 
         {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
             {
-                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
+                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
                 {
                     using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
@@ -269,7 +255,7 @@ public class PackageReader(string packageLocation, string password = "", string 
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
             {
-                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
+                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
                 {
                     using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
@@ -345,7 +331,7 @@ public class PackageReader(string packageLocation, string password = "", string 
     {
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
+                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
                 {
                     using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
