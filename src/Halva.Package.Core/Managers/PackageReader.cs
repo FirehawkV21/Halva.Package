@@ -7,9 +7,24 @@ using System.Security.Cryptography;
 namespace Halva.Package.Core.Managers;
 public class PackageReader(string packageLocation, string password = "", string ivKey = "")
 {
+    private const int DefaultBufferSize = 81920;
     public string Password { get; set; } = password;
     public string IvKey { get; set; } = ivKey;
     public string PackageLocation { get; set; } = packageLocation;
+
+    private Aes GetEncryptionKey()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            PackageUtilities.CreateKey(out AesCng encryptionKey, Password, IvKey);
+            return encryptionKey;
+        }
+        else
+        {
+            PackageUtilities.CreateKey(out Aes encryptionKey, Password, IvKey);
+            return encryptionKey;
+        }
+    }
 
     /// <summary>
     /// Exrtacts a file from the package to the destination path.
@@ -18,39 +33,19 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="destinationPath">The destination of the file.</param>
     public void ExtractFile(string fileName, string destinationPath)
     {
-        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
         {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
                 {
-                    PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        using (TarReader tarReader = new(decompressionStream))
                         {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                ExtractFileWorkload(fileName, destinationPath, tarReader);
-                            }
+                            ExtractFileWorkload(fileName, destinationPath, tarReader);
                         }
                     }
-
-                }
-                else
-                {
-                    PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                ExtractFileWorkload(fileName, destinationPath, tarReader);
-                            }
-                        }
-                    }
-
                 }
             }
             else
@@ -88,46 +83,20 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="abortToken">The cancellation token to abort the operation.</param>
     public async Task ExtractFileAsync(string fileName, string destinationPath, CancellationToken abortToken = default)
     {
-        if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
-                using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
+        {
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
                 {
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        using (TarReader tarReader = new(decompressionStream))
                         {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                await ExtractFileWorkloadAsync(fileName, destinationPath, tarReader, abortToken);
-                            }
+                            await ExtractFileWorkloadAsync(fileName, destinationPath, tarReader, abortToken);
                         }
                     }
                 }
-
-            }
             else
-            {
-                PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
-                using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
-                {
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                await ExtractFileWorkloadAsync(fileName, destinationPath, tarReader, abortToken);
-                            }
-                        }
-                    }
-                }
-
-            }
-        else
-            using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
-            {
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
                 {
                     using (TarReader tarReader = new(decompressionStream))
@@ -135,7 +104,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                         await ExtractFileWorkloadAsync(fileName, destinationPath, tarReader, abortToken);
                     }
                 }
-            }
+        }
 
     }
 
@@ -159,41 +128,29 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="TargetFolder">The folder that has the files that you want to update.</param>
     public void UpdateFromArchive(string TargetFolder)
     {
-        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
+        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
+        {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
                 {
-                    PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        using (TarReader tarReader = new(decompressionStream))
                         {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                UpdateWorkload(in tarReader, in TargetFolder);
-                            }
-                        }
-                    }
-                        
-                }
-                else
-                {
-                    PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                UpdateWorkload(in tarReader, in TargetFolder);
-                            }
+                            UpdateWorkload(in tarReader, in TargetFolder);
                         }
                     }
                 }
             else
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
-                using (TarReader tarReader = new(decompressionStream))
-                    UpdateWorkload(in tarReader, in TargetFolder);
+                {
+                    using (TarReader tarReader = new(decompressionStream))
+                    {
+                        UpdateWorkload(in tarReader, in TargetFolder);
+                    }
+                }
+        }
+
     }
 
     private void UpdateWorkload(in TarReader tarReader, in string targetFolder)
@@ -211,7 +168,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                 ReadOnlySpan<byte> archiveHashSpan;
                 ReadOnlySpan<byte> targetHashSpan;
                 using (Stream archivedFile = tempEntry.DataStream)
-                using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
+                using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
                 {
                     XxHash128 archiveHash = new();
                     XxHash128 targetHash = new();
@@ -246,37 +203,21 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="TargetFolder">The folder that has the files that you want to update by using file metadata. </param>
     public void FastUpdateFromArchive(string TargetFolder)
     {
-        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
+        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
+        {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
                 {
-                    PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        using (TarReader tarReader = new(decompressionStream))
                         {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                FastUpdateWorkload(in tarReader, in TargetFolder);
-                            }
-                        }
-                    }
-
-                }
-                else
-                {
-                    PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                FastUpdateWorkload(in tarReader, in TargetFolder);
-                            }
+                            FastUpdateWorkload(in tarReader, in TargetFolder);
                         }
                     }
                 }
+            }
             else
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
                 {
@@ -285,6 +226,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                         FastUpdateWorkload(in tarReader, in TargetFolder);
                     }
                 }
+        }
     }
 
     private void FastUpdateWorkload(in TarReader tarReader, in string TargetFolder)
@@ -324,41 +266,31 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="abortToken">The cancellation token to abort the operation.</param>
     public async Task UpdateFromArchiveAsync(string TargetFolder, CancellationToken abortToken = default)
     {
-        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
                 {
-                    PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        using (TarReader tarReader = new(decompressionStream))
                         {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                await UpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
-                            }
+                            await UpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
                         }
                     }
+                }
 
-                }
-                else
+            }
+            else
+            {
+                using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
                 {
-                    PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    using (TarReader tarReader = new(decompressionStream))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                await UpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
-                            }
-                        }
+                        await UpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
                     }
                 }
-            else
-                using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
-                using (TarReader tarReader = new(decompressionStream))
-                    await UpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+            }
     }
 
     private async Task UpdateWorkloadAsync(TarReader tarReader, string targetFolder, CancellationToken abortToken = default)
@@ -376,7 +308,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                 ReadOnlySpan<byte> archiveHashSpan;
                 ReadOnlySpan<byte> targetHashSpan;
                 using (Stream archivedFile = tempEntry.DataStream)
-                using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan))
+                using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan))
                 {
                     XxHash128 archiveHash = new();
                     XxHash128 targetHash = new();
@@ -411,41 +343,26 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="abortToken">The cancellation token to abort the operation.</param>
     public async Task FastUpdateFromArchiveAsync(string TargetFolder, CancellationToken abortToken = default)
     {
-        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+        using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey().CreateDecryptor(), CryptoStreamMode.Read))
                 {
-                    PackageUtilities.CreateKey(out AesCng cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
+                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                        using (TarReader tarReader = new(decompressionStream))
                         {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                await FastUpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
-                            }
-                        }
-                    }
-
-                }
-                else
-                {
-                    PackageUtilities.CreateKey(out Aes cngEncryptionKit, Password, IvKey);
-                    using (CryptoStream cryptoStream = new(fs, cngEncryptionKit.CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                await FastUpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
-                            }
+                            await FastUpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
                         }
                     }
                 }
             else
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
-                using (TarReader tarReader = new(decompressionStream))
-                    await FastUpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+                {
+                    using (TarReader tarReader = new(decompressionStream))
+                    {
+                        await FastUpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+                    }
+                }
     }
 
     private async Task FastUpdateWorkloadAsync(TarReader tarReader, string TargetFolder, CancellationToken abortToken = default)
