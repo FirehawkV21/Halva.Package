@@ -19,6 +19,7 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="destinationPath">The destination of the file.</param>
     public void ExtractFile(string fileName, string destinationPath)
     {
+        string normalizedDestinationPath = Path.GetFullPath(destinationPath);
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
         {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
@@ -29,7 +30,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            ExtractFileWorkload(fileName, destinationPath, tarReader);
+                            ExtractFileWorkload(fileName, normalizedDestinationPath, tarReader);
                         }
                     }
                 }
@@ -40,7 +41,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        ExtractFileWorkload(fileName, destinationPath, tarReader);
+                        ExtractFileWorkload(fileName, normalizedDestinationPath, tarReader);
                     }
                 }
             }
@@ -54,6 +55,9 @@ public class PackageReader(string packageLocation, string password = "", string 
         {
             if (entry.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase))
             {
+                string dir = Path.GetDirectoryName(destinationPath);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
                 entry.ExtractToFile(destinationPath, true);
                 break;
             }
@@ -69,6 +73,7 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="abortToken">The cancellation token to abort the operation.</param>
     public async Task ExtractFileAsync(string fileName, string destinationPath, CancellationToken abortToken = default)
     {
+        string normalizedDestinationPath = Path.GetFullPath(destinationPath);
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
         {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
@@ -78,7 +83,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            await ExtractFileWorkloadAsync(fileName, destinationPath, tarReader, abortToken);
+                            await ExtractFileWorkloadAsync(fileName, normalizedDestinationPath, tarReader, abortToken);
                         }
                     }
                 }
@@ -87,7 +92,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        await ExtractFileWorkloadAsync(fileName, destinationPath, tarReader, abortToken);
+                        await ExtractFileWorkloadAsync(fileName, normalizedDestinationPath, tarReader, abortToken);
                     }
                 }
         }
@@ -101,6 +106,9 @@ public class PackageReader(string packageLocation, string password = "", string 
         {
             if (entry.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase))
             {
+                string dir = Path.GetDirectoryName(destinationPath);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
                 await entry.ExtractToFileAsync(destinationPath, true, abortToken);
                 break;
             }
@@ -114,6 +122,7 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="TargetFolder">The folder that has the files that you want to update.</param>
     public void UpdateFromArchive(string TargetFolder)
     {
+        string normalizedTargetFolder = Path.GetFullPath(TargetFolder);
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
         {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
@@ -123,7 +132,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            UpdateWorkload(in tarReader, in TargetFolder);
+                            UpdateWorkload(in tarReader, in normalizedTargetFolder);
                         }
                     }
                 }
@@ -132,7 +141,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        UpdateWorkload(in tarReader, in TargetFolder);
+                        UpdateWorkload(in tarReader, in normalizedTargetFolder);
                     }
                 }
         }
@@ -189,6 +198,7 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="TargetFolder">The folder that has the files that you want to update by using file metadata. </param>
     public void FastUpdateFromArchive(string TargetFolder)
     {
+        string normalizedTargetFolder = Path.GetFullPath(TargetFolder);
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
         {
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
@@ -199,7 +209,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            FastUpdateWorkload(in tarReader, in TargetFolder);
+                            FastUpdateWorkload(in tarReader, in normalizedTargetFolder);
                         }
                     }
                 }
@@ -209,7 +219,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        FastUpdateWorkload(in tarReader, in TargetFolder);
+                        FastUpdateWorkload(in tarReader, in normalizedTargetFolder);
                     }
                 }
         }
@@ -235,7 +245,7 @@ public class PackageReader(string packageLocation, string password = "", string 
             else
             {
                 string dirPath = Path.GetDirectoryName(targetName);
-                if (dirPath != null && !Directory.Exists(dirPath))
+                if (!string.IsNullOrEmpty(dirPath) && !Directory.Exists(dirPath))
                 {
                     Directory.CreateDirectory(dirPath);
                 }
@@ -252,6 +262,7 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="abortToken">The cancellation token to abort the operation.</param>
     public async Task UpdateFromArchiveAsync(string TargetFolder, CancellationToken abortToken = default)
     {
+        string normalizedTargetFolder = Path.GetFullPath(TargetFolder);
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
             {
@@ -261,7 +272,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            await UpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+                            await UpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
                         }
                     }
                 }
@@ -273,7 +284,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        await UpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+                        await UpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
                     }
                 }
             }
@@ -329,6 +340,7 @@ public class PackageReader(string packageLocation, string password = "", string 
     /// <param name="abortToken">The cancellation token to abort the operation.</param>
     public async Task FastUpdateFromArchiveAsync(string TargetFolder, CancellationToken abortToken = default)
     {
+        string normalizedTargetFolder = Path.GetFullPath(TargetFolder);
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
                 using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
@@ -337,7 +349,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            await FastUpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+                            await FastUpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
                         }
                     }
                 }
@@ -346,7 +358,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        await FastUpdateWorkloadAsync(tarReader, TargetFolder, abortToken);
+                        await FastUpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
                     }
                 }
     }
@@ -359,21 +371,25 @@ public class PackageReader(string packageLocation, string password = "", string 
             tempEntry = await tarReader.GetNextEntryAsync(true, abortToken);
             if (tempEntry != null)
             {
-                string targetName = Path.Combine(!(TargetFolder[..0] != Path.DirectorySeparatorChar.ToString()) ? TargetFolder + Path.DirectorySeparatorChar : TargetFolder, PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-                if (tempEntry != null)
-                    if (File.Exists(targetName))
+                string normalizedPath = PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                string targetName = Path.Combine(TargetFolder, normalizedPath);
+                if (File.Exists(targetName))
+                {
+                    FileInfo targetFile = new(targetName);
+                    if (tempEntry.DataStream.Length != targetFile.Length || tempEntry.ModificationTime != targetFile.LastWriteTimeUtc)
                     {
-                        FileInfo targetFile = new(targetName);
-                        if (tempEntry.DataStream.Length != targetFile.Length || tempEntry.ModificationTime != targetFile.LastWriteTimeUtc)
-                        {
-                            await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
-                        }
-                    }
-                    else
-                    {
-                        if (!Directory.Exists(targetName.Replace(Path.GetFileName(targetName), "").TrimEnd(Path.DirectorySeparatorChar))) Directory.CreateDirectory(targetName.Replace(Path.GetFileName(targetName), "").TrimEnd(Path.DirectorySeparatorChar));
                         await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
                     }
+                }
+                else
+                {
+                    string dirPath = Path.GetDirectoryName(targetName);
+                    if (!string.IsNullOrEmpty(dirPath) && !Directory.Exists(dirPath))
+                    {
+                        Directory.CreateDirectory(dirPath);
+                    }
+                    await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+                }
             }
         }
         while (tempEntry != null);

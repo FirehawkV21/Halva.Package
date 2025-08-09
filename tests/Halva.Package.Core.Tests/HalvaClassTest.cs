@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-using Xunit;
+﻿using Xunit;
 using Halva.Package.Core.Managers;
 
 namespace Halva.Package.Core.Tests;
@@ -23,7 +21,7 @@ public class HalvaClassTest
     {
         Cleanup();
         PackageBuilder package = new(destinationArchive);
-        package.AddFilesFromAFolder(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles");
+        package.AddFilesFromAFolder(sourceFolder);
         package.Commit();
         PackageUtilities.DecompressPackageToFolder(destinationArchive, destinationFolder);
     }
@@ -33,7 +31,7 @@ public class HalvaClassTest
     {
         Cleanup();
         PackageBuilder package = new(destinationArchive);
-        package.AddFilesFromAFolder(AppDomain.CurrentDomain.BaseDirectory, "SampleFiles");
+        package.AddFilesFromAFolder(sourceFolder);
         await package.CommitAsync(TestContext.Current.CancellationToken);
         PackageUtilities.DecompressPackageToFolder(destinationArchive, destinationFolder);
     }

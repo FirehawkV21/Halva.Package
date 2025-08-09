@@ -2,13 +2,13 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net9.0-windows10.0.19041.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net9.0-windows10.0.26100.0;net9.0</TargetFrameworks>
 		<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
 		<AssemblyTitle>Halva Package Bootstrapper</AssemblyTitle>
 		<PackageId>Halva.Package.Bootstrapper</PackageId>
 		<Version>1.0.10-20220914</Version>
-		<AssemblyVersion>1.0.10.25176</AssemblyVersion>
-		<FileVersion>1.0.10.25176</FileVersion>
+		<AssemblyVersion>1.0.10.25221</AssemblyVersion>
+		<FileVersion>1.0.10.25221</FileVersion>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishAot>true</PublishAot>
 		<OptimizationPreference>Speed</OptimizationPreference>

@@ -1,6 +1,5 @@
 ﻿using System.Formats.Tar;
 using System.IO.Compression;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using Halva.Package.Core.Models;
@@ -20,9 +19,21 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     /// <summary>
     /// Adds a file to the list of files to be archived.
     /// </summary>
-    /// <param name="source">The parent folder for the file.</param>
-    /// <param name="fileRelativeLocation">The relative location of the file in the parent folder.</param>
-    public void AddFileToList(string source, string fileRelativeLocation) => FileList.Add(new TarFileList(Path.Combine(source.TrimEnd(Path.DirectorySeparatorChar), fileRelativeLocation.TrimStart(Path.DirectorySeparatorChar)), fileRelativeLocation));
+    /// <param name="source">The base folder that holds the file.</param>
+    /// <param name="fileRelativeLocation">The relative location of the file.</param>
+    public void AddFileToList(string source, string fileRelativeLocation)
+    {
+        string normalizedSource = Path.GetFullPath(Path.TrimEndingDirectorySeparator(source));
+        string normalizedRelativeLocation = fileRelativeLocation.TrimStart(Path.DirectorySeparatorChar);
+        string combinedPath = Path.Combine(normalizedSource, normalizedRelativeLocation);
+
+        if (!File.Exists(combinedPath))
+        {
+            throw new FileNotFoundException($"The file '{combinedPath}' does not exist.");
+        }
+
+        FileList.Add(new TarFileList(combinedPath, normalizedRelativeLocation));
+    }
 
     /// <summary>
     /// Adds files from a folder to the list of files to be archived.
@@ -31,15 +42,23 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     /// <param name="SourceFolderRelativeLocation">The relative location of the folder that has the files in the parent folder.</param>
     public void AddFilesFromAFolder(string sourceLocation, string SourceFolderRelativeLocation = "")
     {
-        List<string> tempList;
-        if (!string.IsNullOrEmpty(SourceFolderRelativeLocation) || !string.IsNullOrWhiteSpace(SourceFolderRelativeLocation))
-            tempList = PullFilesFromFolder(Path.Combine(sourceLocation.TrimEnd(Path.DirectorySeparatorChar), SourceFolderRelativeLocation.TrimStart(Path.DirectorySeparatorChar)));
-        else tempList = PullFilesFromFolder(sourceLocation);
+        string normalizedSourceLocation = Path.GetFullPath(Path.TrimEndingDirectorySeparator(sourceLocation));
+        string combinedPath = string.IsNullOrEmpty(SourceFolderRelativeLocation)
+            ? normalizedSourceLocation
+            : Path.Combine(normalizedSourceLocation, SourceFolderRelativeLocation.TrimStart(Path.DirectorySeparatorChar));
 
+        if (!Directory.Exists(combinedPath))
+        {
+            throw new DirectoryNotFoundException($"The directory '{combinedPath}' does not exist.");
+        }
+
+        List<string> tempList = PullFilesFromFolder(combinedPath);
 
         foreach (string fileEntry in tempList)
-            FileList.Add(new TarFileList(fileEntry, fileEntry.Replace(sourceLocation, "")));
-
+        {
+            string relativePath = Path.GetRelativePath(normalizedSourceLocation, fileEntry);
+            FileList.Add(new TarFileList(fileEntry, relativePath));
+        }
     }
 
     /// <summary>
