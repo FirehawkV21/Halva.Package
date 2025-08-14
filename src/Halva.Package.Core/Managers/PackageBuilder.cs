@@ -23,16 +23,12 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     /// <param name="fileRelativeLocation">The relative location of the file.</param>
     public void AddFileToList(string source, string fileRelativeLocation)
     {
-        string normalizedSource = Path.GetFullPath(Path.TrimEndingDirectorySeparator(source));
-        string normalizedRelativeLocation = fileRelativeLocation.TrimStart(Path.DirectorySeparatorChar);
-        string combinedPath = Path.Combine(normalizedSource, normalizedRelativeLocation);
-
-        if (!File.Exists(combinedPath))
+        string fullPath = Path.Combine(Path.GetFullPath(source), fileRelativeLocation.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        if (!File.Exists(fullPath))
         {
-            throw new FileNotFoundException($"The file '{combinedPath}' does not exist.");
+            throw new FileNotFoundException($"The file '{fullPath}' does not exist.");
         }
-
-        FileList.Add(new TarFileList(combinedPath, normalizedRelativeLocation));
+        FileList.Add(new TarFileList(fullPath, fileRelativeLocation));
     }
 
     /// <summary>
@@ -43,33 +39,16 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     public void AddFilesFromAFolder(string sourceLocation, string SourceFolderRelativeLocation = "")
     {
         string normalizedSourceLocation = Path.GetFullPath(Path.TrimEndingDirectorySeparator(sourceLocation));
-        string combinedPath = string.IsNullOrEmpty(SourceFolderRelativeLocation)
-            ? normalizedSourceLocation
-            : Path.Combine(normalizedSourceLocation, SourceFolderRelativeLocation.TrimStart(Path.DirectorySeparatorChar));
-
+        string combinedPath = string.IsNullOrEmpty(SourceFolderRelativeLocation) ? normalizedSourceLocation : Path.Combine(normalizedSourceLocation, SourceFolderRelativeLocation.TrimStart(Path.DirectorySeparatorChar));
         if (!Directory.Exists(combinedPath))
         {
             throw new DirectoryNotFoundException($"The directory '{combinedPath}' does not exist.");
         }
-
-        List<string> tempList = PullFilesFromFolder(combinedPath);
-
-        foreach (string fileEntry in tempList)
+        foreach (string fileEntry in Directory.EnumerateFiles(combinedPath, "*", SearchOption.AllDirectories))
         {
             string relativePath = Path.GetRelativePath(normalizedSourceLocation, fileEntry);
             FileList.Add(new TarFileList(fileEntry, relativePath));
         }
-    }
-
-    /// <summary>
-    /// Pulls files from a folder recursively.
-    /// </summary>
-    /// <param name="source">The source folder.</param>
-    /// <returns>A list of files from the folder.</returns>
-    public static List<string> PullFilesFromFolder(string source)
-    {
-        IEnumerable<string> foundFiles = Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories);
-        return [.. foundFiles];
     }
 
     /// <summary>

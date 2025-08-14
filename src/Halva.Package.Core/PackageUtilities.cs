@@ -140,18 +140,6 @@ public static class PackageUtilities
     }
     #endregion
 
-    /// <summary>
-    /// Normalizes a file path to use the correct directory separator character for the current platform.
-    /// </summary>
-    /// <param name="path">The path to normalize.</param>
-    /// <returns>The given path, normalized to the OS'.</returns>
-    static internal string NormalizePath(string path)
-    {
-        string temp = path.TrimStart('/', '\\');
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return temp.Replace('/', Path.DirectorySeparatorChar);
-        else return temp.Replace('\\', Path.DirectorySeparatorChar);
-    }
-
     #region Encryption Key Handling
 
     static internal Aes GetEncryptionKey(in string password, in string iv)
@@ -173,7 +161,7 @@ public static class PackageUtilities
     /// <param name="encryptor">The Aes Encryptor/Decryptor to initialize.</param>
     /// <param name="password">The password of the archive.</param>
     /// <param name="ivKey">The IV for the archive.</param>
-    internal static void CreateKey(out Aes encryptor, in string password, in string ivKey = "")
+    static internal void CreateKey(out Aes encryptor, in string password, in string ivKey = "")
     {
         encryptor = Aes.Create();
         encryptor.KeySize = 256;
@@ -195,7 +183,7 @@ public static class PackageUtilities
     /// <param name="encryptor">The Aes Encryptor/Decryptor to initialize.</param>
     /// <param name="password">The password of the archive.</param>
     /// <param name="ivKey">The IV for the archive.</param>
-    internal static void CreateKey(out AesCng encryptor, in string password, in string ivKey = "")
+    static internal void CreateKey(out AesCng encryptor, in string password, in string ivKey = "")
     {
         encryptor = new AesCng
         {
