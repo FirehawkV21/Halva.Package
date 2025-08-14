@@ -13,7 +13,6 @@ internal sealed class Program
     {
         string projectLocation = null;
         bool mustEncrypt = false;
-        bool useMemoryStream = true;
         string archiveDestination = null;
         string password = null;
         string ivKey = null;
@@ -148,9 +147,6 @@ internal sealed class Program
                                 Console.ResetColor();
                             }
                         }
-                        break;
-                    case "--RequireFS":
-                        useMemoryStream = false;
                         break;
 
                 }

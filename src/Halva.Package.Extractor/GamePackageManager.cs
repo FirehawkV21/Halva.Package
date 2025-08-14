@@ -13,7 +13,7 @@ public class GamePackageManager
     private readonly string PackageLocation = Path.Combine(AppContext.BaseDirectory, "GamePackages");
     //Change this to set a different folder.
     private static readonly string LocalFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
-    private bool shallUseMemoryStream = false;
+
     public static string ExctractLocation
     {
         get

@@ -167,10 +167,8 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     XxHash128 archiveHash = new();
                     XxHash128 targetHash = new();
-
                     archiveHash.Append(archivedFile);
                     targetHash.Append(targetFile);
-
                     archiveHashSpan = archiveHash.GetCurrentHash();
                     targetHashSpan = targetHash.GetCurrentHash();
                 }
@@ -315,10 +313,11 @@ public class PackageReader(string packageLocation, string password = "", string 
 
                     archiveHashSpan = archiveHash.GetCurrentHash();
                     targetHashSpan = targetHash.GetCurrentHash();
-                }
-                if (!archiveHashSpan.SequenceEqual(targetHashSpan))
-                {
-                    await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+                    if (!archiveHashSpan.SequenceEqual(targetHashSpan))
+                    {
+                        tempEntry.DataStream.Position = 0;
+                        await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+                    }
                 }
             }
             else
