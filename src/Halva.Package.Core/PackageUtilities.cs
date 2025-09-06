@@ -166,14 +166,36 @@ public static class PackageUtilities
         encryptor = Aes.Create();
         encryptor.KeySize = 256;
         encryptor.Padding = PaddingMode.PKCS7;
+#if NET10_0_OR_GREATER
+        byte[] hashCode = SHA512.HashData(Encoding.UTF8.GetBytes(password));
+        byte[] hashIV = !string.IsNullOrEmpty(ivKey) && !string.IsNullOrWhiteSpace(ivKey) ? SHA512.HashData(Encoding.UTF8.GetBytes(ivKey)) : SHA512.HashData(hashCode);
+
+        encryptor.Key = Rfc2898DeriveBytes.Pbkdf2(
+            password: password,
+            salt: hashCode,
+            iterations: 50000,
+            hashAlgorithm: HashAlgorithmName.SHA512,
+            outputLength: encryptor.KeySize / 8
+        );
+
+        encryptor.IV = Rfc2898DeriveBytes.Pbkdf2(
+            password: ivKey,
+            salt: hashIV,
+            iterations: 50000,
+            hashAlgorithm: HashAlgorithmName.SHA512,
+            outputLength: encryptor.BlockSize / 8
+        );
+#else
         byte[] hashCode = SHA512.HashData(Encoding.UTF8.GetBytes(password));
         byte[] hashIV = !string.IsNullOrEmpty(ivKey) && !string.IsNullOrWhiteSpace(ivKey) ? SHA512.HashData(Encoding.UTF8.GetBytes(ivKey)) : SHA512.HashData(hashCode);
         Rfc2898DeriveBytes key = new(password, hashCode, 50000, HashAlgorithmName.SHA512);
         Rfc2898DeriveBytes vectorKey = new(ivKey, hashIV, 50000, HashAlgorithmName.SHA512);
+
         encryptor.Key = key.GetBytes(encryptor.KeySize / 8);
         encryptor.IV = vectorKey.GetBytes(encryptor.BlockSize / 8);
         key.Dispose();
         vectorKey.Dispose();
+#endif
     }
 
     [SupportedOSPlatform("windows")]
@@ -190,14 +212,36 @@ public static class PackageUtilities
             KeySize = 256,
             Padding = PaddingMode.PKCS7
         };
+#if NET10_0_OR_GREATER
+        byte[] hashCode = SHA512.HashData(Encoding.UTF8.GetBytes(password));
+        byte[] hashIV = !string.IsNullOrEmpty(ivKey) && !string.IsNullOrWhiteSpace(ivKey) ? SHA512.HashData(Encoding.UTF8.GetBytes(ivKey)) : SHA512.HashData(hashCode);
+
+        encryptor.Key = Rfc2898DeriveBytes.Pbkdf2(
+            password: password,
+            salt: hashCode,
+            iterations: 50000,
+            hashAlgorithm: HashAlgorithmName.SHA512,
+            outputLength: encryptor.KeySize / 8
+        );
+
+        encryptor.IV = Rfc2898DeriveBytes.Pbkdf2(
+            password: ivKey,
+            salt: hashIV,
+            iterations: 50000,
+            hashAlgorithm: HashAlgorithmName.SHA512,
+            outputLength: encryptor.BlockSize / 8
+        );
+#else
         byte[] hashCode = SHA512.HashData(Encoding.UTF8.GetBytes(password));
         byte[] hashIV = !string.IsNullOrEmpty(ivKey) && !string.IsNullOrWhiteSpace(ivKey) ? SHA512.HashData(Encoding.UTF8.GetBytes(ivKey)) : SHA512.HashData(hashCode);
         Rfc2898DeriveBytes key = new(password, hashCode, 50000, HashAlgorithmName.SHA512);
         Rfc2898DeriveBytes vectorKey = new(ivKey, hashIV, 50000, HashAlgorithmName.SHA512);
+
         encryptor.Key = key.GetBytes(encryptor.KeySize / 8);
         encryptor.IV = vectorKey.GetBytes(encryptor.BlockSize / 8);
         key.Dispose();
         vectorKey.Dispose();
+#endif
     }
     #endregion
 }

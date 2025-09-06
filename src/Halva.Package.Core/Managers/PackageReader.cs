@@ -29,7 +29,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            ExtractFileWorkload(fileName, normalizedDestinationPath, tarReader);
+                            PackageReader.ExtractFileWorkload(fileName, normalizedDestinationPath, tarReader);
                         }
                     }
                 }
@@ -40,14 +40,14 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        ExtractFileWorkload(fileName, normalizedDestinationPath, tarReader);
+                        PackageReader.ExtractFileWorkload(fileName, normalizedDestinationPath, tarReader);
                     }
                 }
             }
         }
     }
 
-    private void ExtractFileWorkload(in string fileName, in string destinationPath, in TarReader tarReader)
+    private static void ExtractFileWorkload(in string fileName, in string destinationPath, in TarReader tarReader)
     {
         TarEntry entry = tarReader.GetNextEntry();
         while (entry != null)
@@ -82,7 +82,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            await ExtractFileWorkloadAsync(fileName, normalizedDestinationPath, tarReader, abortToken);
+                            await PackageReader.ExtractFileWorkloadAsync(fileName, normalizedDestinationPath, tarReader, abortToken);
                         }
                     }
                 }
@@ -91,14 +91,14 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        await ExtractFileWorkloadAsync(fileName, normalizedDestinationPath, tarReader, abortToken);
+                        await PackageReader.ExtractFileWorkloadAsync(fileName, normalizedDestinationPath, tarReader, abortToken);
                     }
                 }
         }
 
     }
 
-    private async Task ExtractFileWorkloadAsync(string fileName, string destinationPath, TarReader tarReader, CancellationToken abortToken)
+    private static async Task ExtractFileWorkloadAsync(string fileName, string destinationPath, TarReader tarReader, CancellationToken abortToken)
     {
         TarEntry entry = await tarReader.GetNextEntryAsync(cancellationToken: abortToken);
         while (entry != null)
@@ -131,7 +131,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            UpdateWorkload(in tarReader, in normalizedTargetFolder);
+                            PackageReader.UpdateWorkload(in tarReader, in normalizedTargetFolder);
                         }
                     }
                 }
@@ -140,14 +140,14 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        UpdateWorkload(in tarReader, in normalizedTargetFolder);
+                        PackageReader.UpdateWorkload(in tarReader, in normalizedTargetFolder);
                     }
                 }
         }
 
     }
 
-    private void UpdateWorkload(in TarReader tarReader, in string targetFolder)
+    private static void UpdateWorkload(in TarReader tarReader, in string targetFolder)
     {
         TarEntry tempEntry;
         do
@@ -203,7 +203,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            FastUpdateWorkload(in tarReader, in normalizedTargetFolder);
+                            PackageReader.FastUpdateWorkload(in tarReader, in normalizedTargetFolder);
                         }
                     }
                 }
@@ -213,13 +213,13 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        FastUpdateWorkload(in tarReader, in normalizedTargetFolder);
+                        PackageReader.FastUpdateWorkload(in tarReader, in normalizedTargetFolder);
                     }
                 }
         }
     }
 
-    private void FastUpdateWorkload(in TarReader tarReader, in string TargetFolder)
+    private static void FastUpdateWorkload(in TarReader tarReader, in string TargetFolder)
     {
         TarEntry tempEntry;
         do
@@ -266,7 +266,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            await UpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
+                            await PackageReader.UpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
                         }
                     }
                 }
@@ -278,13 +278,13 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        await UpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
+                        await PackageReader.UpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
                     }
                 }
             }
     }
 
-    private async Task UpdateWorkloadAsync(TarReader tarReader, string targetFolder, CancellationToken abortToken = default)
+    private static async Task UpdateWorkloadAsync(TarReader tarReader, string targetFolder, CancellationToken abortToken = default)
     {
         TarEntry tempEntry;
         do
@@ -338,7 +338,7 @@ public class PackageReader(string packageLocation, string password = "", string 
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
-                            await FastUpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
+                            await PackageReader.FastUpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
                         }
                     }
                 }
@@ -347,12 +347,12 @@ public class PackageReader(string packageLocation, string password = "", string 
                 {
                     using (TarReader tarReader = new(decompressionStream))
                     {
-                        await FastUpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
+                        await PackageReader.FastUpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
                     }
                 }
     }
 
-    private async Task FastUpdateWorkloadAsync(TarReader tarReader, string TargetFolder, CancellationToken abortToken = default)
+    private static async Task FastUpdateWorkloadAsync(TarReader tarReader, string TargetFolder, CancellationToken abortToken = default)
     {
         TarEntry tempEntry;
         do
