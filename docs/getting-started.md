@@ -95,6 +95,8 @@ packReader.ExtractFile("<source file>", "<destination path and file name + exten
 await packReader.ExtractFileAsync("<source file>", "<destination path and file name + extension>");
 ```
 
+Don't forget to include the password and the IV key, if you set them up for the package.
+
 ## Updating files
 
 This library can also update files on a specific folder, by using `PackageReader`:
