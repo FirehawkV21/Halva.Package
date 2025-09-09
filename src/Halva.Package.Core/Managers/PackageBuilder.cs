@@ -13,7 +13,13 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     /// The list of files of the archive.
     /// </summary>
     internal List<TarFileList> FileList { get; set; } = [];
+    /// <summary>
+    /// Sets the compression level for the archive.
+    /// </summary>
     public CompressionLevel CompressionOption { get; set; } = CompressionLevel.Optimal;
+    /// <summary>
+    /// The destination for the archive file.
+    /// </summary>
     public StringBuilder DestinationLocation { get; set; } = new(destinationLocation);
 
     /// <summary>
