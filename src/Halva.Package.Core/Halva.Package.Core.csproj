@@ -21,6 +21,7 @@
 		<Title>Halva Package Core</Title>
 		<EnablePackageValidation>true</EnablePackageValidation>
 		<Deterministic>true</Deterministic>
+		<ContinouosIntegrationBuild>true</ContinouosIntegrationBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
