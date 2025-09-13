@@ -19,6 +19,8 @@
 		<FileAlignment>4096</FileAlignment>
 		<IsAotCompatible>true</IsAotCompatible>
 		<Title>Halva Package Core</Title>
+		<EnablePackageValidation>true</EnablePackageValidation>
+		<Deterministic>true</Deterministic>
 	</PropertyGroup>
 
 	<ItemGroup>
