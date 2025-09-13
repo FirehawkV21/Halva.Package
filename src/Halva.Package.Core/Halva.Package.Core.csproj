@@ -21,7 +21,10 @@
 		<Title>Halva Package Core</Title>
 		<EnablePackageValidation>true</EnablePackageValidation>
 		<Deterministic>true</Deterministic>
-		<ContinouosIntegrationBuild>true</ContinouosIntegrationBuild>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
