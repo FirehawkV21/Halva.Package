@@ -69,6 +69,8 @@ jobs:
     # Publish only when creating a GitHub Release
     # https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository
     # You can update this logic if you want to manage releases differently
+    permissions:
+     id-token: write  # enable GitHub OIDC token issuance for this job
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     needs: [ validate_nuget ]
@@ -78,6 +80,13 @@ jobs:
         with:
           name: nuget
           path: ${{ env.NuGetDirectory }}
+
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          # Recommended: use a secret like ${{ secrets.NUGET_USER }} for your nuget.org username (profile name), NOT your email address
+          user: FirehawkV21
 
       # Install the .NET SDK indicated in the global.json file
       - name: Setup .NET Core
@@ -91,5 +100,5 @@ jobs:
       - name: Publish NuGet package
         run: |
           foreach($file in (Get-ChildItem "${{ env.NuGetDirectory }}" -Recurse -Include *.nupkg, *.snupkg)) {
-              dotnet nuget push $file --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+              dotnet nuget push $file --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
           }
