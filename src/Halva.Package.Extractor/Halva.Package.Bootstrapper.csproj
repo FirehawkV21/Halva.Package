@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net9.0-windows10.0.26100.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net10.0-windows10.0.26100.0;net10.0</TargetFrameworks>
 		<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
 		<AssemblyTitle>Halva Package Bootstrapper</AssemblyTitle>
 		<PackageId>Halva.Package.Bootstrapper</PackageId>
