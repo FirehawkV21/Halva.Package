@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
-    <AssemblyVersion>3.0.0.25252</AssemblyVersion>
-    <FileVersion>3.0.0.25252</FileVersion>
+    <AssemblyVersion>3.0.0.25291</AssemblyVersion>
+    <FileVersion>3.0.0.25291</FileVersion>
     <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
     <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
     <OutputType>Exe</OutputType>
