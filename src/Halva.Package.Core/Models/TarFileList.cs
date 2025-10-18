@@ -1,4 +1,7 @@
-﻿namespace Halva.Package.Core.Models;
+﻿using System.Diagnostics;
+
+namespace Halva.Package.Core.Models;
+[DebuggerDisplay("File Location = {FileLocation} | Entry in Tar file = {FileEntry}")]
 internal record TarFileList
 {
     public string FileLocation { get; set; }
