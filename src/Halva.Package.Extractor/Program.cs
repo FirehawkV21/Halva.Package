@@ -23,7 +23,7 @@ internal class Program
         Console.WriteLine();
 
         GamePackageManager packageManager = new();
-        if (GamePackageManager.IsPackageMetadataPresent()) { 
+        if (packageManager.IsPackageMetadataPresent()) { 
              int updatedPackages = 0;
             if (!packageManager.IsInstalledPackageLatest("assetsVersion")) {
                 Console.WriteLine(Properties.Resources.UpdatingAssetsText);
@@ -59,7 +59,7 @@ internal class Program
             packageManager.SavePackageMetadata();
         }
 
-        GameInfo.Arguments += "--nwapp=\"" + Path.Combine(GamePackageManager.ExctractLocation, "GameData") + "\"";
+        GameInfo.Arguments += "--nwapp=\"" + Path.Combine(packageManager.ExctractLocation, "GameData") + "\"";
         GameProcess.StartInfo = GameInfo;
         GameProcess.Start();
     }        

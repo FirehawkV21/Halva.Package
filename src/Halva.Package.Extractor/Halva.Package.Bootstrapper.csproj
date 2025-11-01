@@ -14,10 +14,8 @@
 		<OptimizationPreference>Speed</OptimizationPreference>
 	<StripSymbols>true</StripSymbols>
     <FileAlignment>4096</FileAlignment>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="DesktopBridge.Helpers" />
-	</ItemGroup>
 	
 
 	<ItemGroup>

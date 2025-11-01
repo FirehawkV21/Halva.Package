@@ -5,16 +5,17 @@ using System.Text.Json;
 using System.Diagnostics.CodeAnalysis;
 using Halva.Package.Core;
 using Halva.Package.Core.Managers;
+using System.Runtime.InteropServices;
 
 namespace Halva.Package.Bootstrapper;
 
-public class GamePackageManager
+public partial class GamePackageManager
 {
     private readonly string PackageLocation = Path.Combine(AppContext.BaseDirectory, "GamePackages");
     //Change this to set a different folder.
     private static readonly string LocalFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
 
-    public static string ExctractLocation
+    public string ExctractLocation
     {
         get
         {
@@ -34,6 +35,44 @@ public class GamePackageManager
 #endif
         }
     }
+
+#if WINDOWS10_0_18362_0_OR_GREATER
+    private const long APPMODEL_ERROR_NO_PACKAGE = 15700L;
+
+    [LibraryImport("kernel32.dll", StringMarshalling = StringMarshalling.Utf16)]
+    private static partial int GetCurrentPackageFullName(ref int packageFullNameLength, Span<char> packageFullName);
+
+    public bool IsUwp()
+    {
+        if (IsWindows7OrLower)
+        {
+            return false;
+        }
+        else
+        {
+            int length = 0;
+            Span<char> sb = [];
+            int result = GetCurrentPackageFullName(ref length, sb);
+
+            sb = new char[result];
+            result = GetCurrentPackageFullName(ref length, sb);
+
+            return result != APPMODEL_ERROR_NO_PACKAGE;
+        }
+    }
+
+    private static bool IsWindows7OrLower
+    {
+        get
+        {
+            int versionMajor = Environment.OSVersion.Version.Major;
+            int versionMinor = Environment.OSVersion.Version.Minor;
+            double version = versionMajor + (double)versionMinor / 10;
+            return version <= 6.1;
+        }
+    }
+#endif
+
     //If you have a password for the archives, place it here or read from a file.
     private readonly string PackagePassword = "";
     //If you have set a IV for the archives, place it here or read from a file.
@@ -44,7 +83,6 @@ public class GamePackageManager
     /// <summary>
     /// Creates a package manager.
     /// </summary>
-    [RequiresUnreferencedCode("Uses JSON Source Generator")]
     public GamePackageManager()
     {
         TargetPackageVersion.PackageList.AssetsVersion = 20211016;
@@ -59,11 +97,10 @@ public class GamePackageManager
         }
     }
 
-    public static bool IsRunningInCentennial()
-    {
-        DesktopBridge.Helpers checker = new();
-        return checker.IsRunningAsUwp();
-    }
+#if WINDOWS
+
+    public bool IsRunningInCentennial() => IsUwp();
+#endif
 
     private void ExtractPackage(string PackageName)
     {
@@ -131,7 +168,7 @@ public class GamePackageManager
         _ => true,
     };
 
-    public static bool IsPackageMetadataPresent() => File.Exists(Path.Combine(ExctractLocation, "PackageData.json"));
+    public bool IsPackageMetadataPresent() => File.Exists(Path.Combine(ExctractLocation, "PackageData.json"));
 
     [RequiresUnreferencedCode("Uses JSON Source Generator")]
     public void SavePackageMetadata()
