@@ -42,14 +42,14 @@ jobs:
     - run: dotnet pack ${{ env.TargetProject}} --configuration Release --output ${{ env.NuGetDirectory }} /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg
 
     # Publish the NuGet package as an artifact, so they can be used in the following jobs
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: nuget
         if-no-files-found: error
         retention-days: 7
         path: ${{ env.NuGetDirectory }}/*.nupkg
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: nuget-pdb
         if-no-files-found: error
@@ -67,13 +67,13 @@ jobs:
          dotnet-version: 10.x
 
       # Download the NuGet package created in the previous job
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: nuget
           path: ${{ env.NuGetDirectory }}
 
       # Download the NuGet package created in the previous job
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: nuget-pdb
           path: ${{ env.NuGetDirectory }}
@@ -89,13 +89,13 @@ jobs:
     needs: [ validate_nuget ]
     steps:
       # Download the NuGet package created in the previous job
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: nuget
           path: ${{ env.NuGetDirectory }}
 
       # Download the NuGet package created in the previous job
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: nuget-pdb
           path: ${{ env.NuGetDirectory }}
