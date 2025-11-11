@@ -170,7 +170,6 @@ public partial class GamePackageManager
 
     public bool IsPackageMetadataPresent() => File.Exists(Path.Combine(ExctractLocation, "PackageData.json"));
 
-    [RequiresUnreferencedCode("Uses JSON Source Generator")]
     public void SavePackageMetadata()
     {
         string output = JsonSerializer.Serialize(CurrentPackageVersion, PackageMetadataSerializer.Default.PackageMetadata);

@@ -7,7 +7,6 @@ namespace Halva.Package.Bootstrapper;
 
 internal class Program
 {
-    [RequiresUnreferencedCode("Calls Halva.Package.Bootstrapper.GamePackageManager.GamePackageManager()")]
     private static void Main()
     {
         Process GameProcess = new();
