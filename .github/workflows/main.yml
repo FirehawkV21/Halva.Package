@@ -42,14 +42,14 @@ jobs:
     - run: dotnet pack ${{ env.TargetProject}} --configuration Release --output ${{ env.NuGetDirectory }} /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg
 
     # Publish the NuGet package as an artifact, so they can be used in the following jobs
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
         name: nuget
         if-no-files-found: error
         retention-days: 7
         path: ${{ env.NuGetDirectory }}/*.nupkg
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
         name: nuget-pdb
         if-no-files-found: error
