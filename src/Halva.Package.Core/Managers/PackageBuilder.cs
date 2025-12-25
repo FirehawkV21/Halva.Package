@@ -5,8 +5,9 @@ using System.Text;
 using Halva.Package.Core.Models;
 
 namespace Halva.Package.Core.Managers;
-public class PackageBuilder(string destinationLocation, string password = "", string ivKey = "")
+public sealed class PackageBuilder(string destinationLocation, string password = "", string ivKey = "")
 {
+    private readonly int bufferSize = 81920;
     public string Password { get; set; } = password;
     public string IvKey { get; set; } = ivKey;
     /// <summary>
@@ -62,8 +63,8 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     /// </summary>
     public void Commit()
     {
-        using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.SequentialScan))
-            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+        using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.SequentialScan))
+            if (!string.IsNullOrWhiteSpace(Password))
             {
                 using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
                 {
@@ -95,8 +96,8 @@ public class PackageBuilder(string destinationLocation, string password = "", st
     /// <returns>A task that handles the creation of the archive.</returns>
     public async Task CommitAsync(CancellationToken abortToken = default)
     {
-        using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan))
-            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+        using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan))
+            if (!string.IsNullOrWhiteSpace(Password))
                     using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
                     {
                         using (BrotliStream CompressionStream = new(cryptoStream, CompressionOption))

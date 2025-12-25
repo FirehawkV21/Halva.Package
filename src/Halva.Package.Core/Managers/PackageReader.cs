@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using Blake3;
 
 namespace Halva.Package.Core.Managers;
-public class PackageReader(string packageLocation, string password = "", string ivKey = "")
+public sealed class PackageReader(string packageLocation, string password = "", string ivKey = "")
 {
     private const int DefaultBufferSize = 81920;
     public string Password { get; set; } = password;
