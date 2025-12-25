@@ -4,7 +4,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Blake3" Version="2.1.1" />
+    <PackageVersion Include="Blake3" Version="2.2.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="System.IO.Hashing" Version="10.0.1" />
     <PackageVersion Include="DesktopBridge.Helpers" Version="1.2.2" />
