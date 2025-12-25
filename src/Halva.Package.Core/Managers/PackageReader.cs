@@ -1,7 +1,7 @@
 ﻿using System.Formats.Tar;
 using System.IO.Compression;
-using System.IO.Hashing;
 using System.Security.Cryptography;
+using Blake3;
 
 namespace Halva.Package.Core.Managers;
 public class PackageReader(string packageLocation, string password = "", string ivKey = "")
@@ -44,6 +44,68 @@ public class PackageReader(string packageLocation, string password = "", string 
                     }
                 }
             }
+        }
+    }
+
+    public static Hash CalcHash(string fileToHash, CancellationToken abortToken = default)
+    {
+        using (FileStream fs = new(fileToHash, FileMode.Open, FileAccess.Read, FileShare.Read, 131072, FileOptions.SequentialScan | FileOptions.Asynchronous))
+        {
+            using (var hasher = Hasher.New())
+            {
+                byte[] buffer = new byte[131072];
+                int bytesRead;
+                while ((bytesRead = fs.Read(buffer)) > 0)
+                {
+                    hasher.Update(buffer.AsSpan()[..bytesRead]);
+                }
+                return hasher.Finalize();
+            }
+        }
+    }
+
+    public static async Task<Hash> CalcHashAsync(string fileToHash, CancellationToken abortToken = default)
+    {
+        using (FileStream fs = new(fileToHash, FileMode.Open, FileAccess.Read, FileShare.Read, 131072, FileOptions.SequentialScan | FileOptions.Asynchronous))
+        {
+            using (Hasher hasher = Hasher.New())
+            {
+                byte[] buffer = new byte[131072];
+                int bytesRead;
+                while ((bytesRead = await fs.ReadAsync(buffer, abortToken)) > 0)
+                {
+                    hasher.Update(buffer.AsSpan()[..bytesRead]);
+                }
+                return hasher.Finalize();
+            }
+        }
+    }
+
+    public static Hash CalcHash(Stream streamToHash, CancellationToken abortToken = default)
+    {
+            using (Hasher hasher = Hasher.New())
+            {
+                byte[] buffer = new byte[131072];
+                int bytesRead;
+                while ((bytesRead = streamToHash.Read(buffer)) > 0)
+                {
+                    hasher.Update(buffer.AsSpan()[..bytesRead]);
+                }
+                return hasher.Finalize();
+            }
+    }
+
+    public static async Task<Hash> CalcHashAsync(Stream streamToHash, CancellationToken abortToken = default)
+    {
+        using (Hasher hasher = Hasher.New())
+        {
+                byte[] buffer = new byte[131072];
+            int bytesRead;
+            while ((bytesRead = await streamToHash.ReadAsync(buffer, abortToken)) > 0)
+            {
+                hasher.Update(buffer.AsSpan()[..bytesRead]);
+            }
+            return hasher.Finalize();
         }
     }
 
@@ -150,28 +212,41 @@ public class PackageReader(string packageLocation, string password = "", string 
     private static void UpdateWorkload(in TarReader tarReader, in string targetFolder)
     {
         TarEntry tempEntry;
-        do
+        while ((tempEntry = tarReader.GetNextEntry(true)) != null)
         {
-            tempEntry = tarReader.GetNextEntry(true);
-            if (tempEntry == null || tempEntry.DataStream == null) continue;
+            if (tempEntry.DataStream == null) continue;
+
             string normalizedPath = NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             string targetName = Path.Combine(targetFolder, normalizedPath);
             if (File.Exists(targetName))
             {
+                FileInfo targetInfo = new(targetName);
+                // Fast path: if lengths differ, overwrite without hashing
+                if (tempEntry.Length != targetInfo.Length)
+                {
+                    tempEntry.ExtractToFile(targetName, true);
+                    continue;
+                }
+
+                // Lengths equal -> compute content hash
                 bool areEqual = false;
                 using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
                 {
-                    XxHash128 archiveHash = new();
-                    XxHash128 targetHash = new();
-                    archiveHash.Append(tempEntry.DataStream);
-                    targetHash.Append(targetFile);
-                    areEqual = archiveHash.GetCurrentHash().SequenceEqual(targetHash.GetCurrentHash());
+                    Hash sourceHash = CalcHash(tempEntry.DataStream);
+                    Hash destHash = CalcHash(targetFile);
+
+                    areEqual = sourceHash.Equals(destHash);
                 }
 
+                // Reset archive stream to allow extraction if needed
                 if (!areEqual)
                 {
                     tempEntry.DataStream.Position = 0;
                     tempEntry.ExtractToFile(targetName, true);
+                }
+                else
+                {
+                    tempEntry.DataStream.Position = 0;
                 }
             }
             else
@@ -182,8 +257,7 @@ public class PackageReader(string packageLocation, string password = "", string 
 
                 tempEntry.ExtractToFile(targetName, true);
             }
-
-        } while (tempEntry != null);
+        }
     }
 
     /// <summary>
@@ -222,15 +296,15 @@ public class PackageReader(string packageLocation, string password = "", string 
     private static void FastUpdateWorkload(in TarReader tarReader, in string TargetFolder)
     {
         TarEntry tempEntry;
-        do
+        while ((tempEntry = tarReader.GetNextEntry(false)) != null)
         {
-            tempEntry = tarReader.GetNextEntry(false);
-            if (tempEntry == null) continue;
             string normalizedPath = NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             string targetName = Path.Combine(TargetFolder, normalizedPath);
+
             if (File.Exists(targetName))
             {
                 FileInfo targetFile = new(targetName);
+                // Use length and modification time as a cheap heuristic
                 if (tempEntry.Length != targetFile.Length || tempEntry.ModificationTime > targetFile.LastWriteTimeUtc)
                 {
                     tempEntry.ExtractToFile(targetName, true);
@@ -246,7 +320,6 @@ public class PackageReader(string packageLocation, string password = "", string 
                 tempEntry.ExtractToFile(targetName, true);
             }
         }
-        while (tempEntry != null);
     }
 
     /// <summary>
@@ -287,27 +360,39 @@ public class PackageReader(string packageLocation, string password = "", string 
     private static async Task UpdateWorkloadAsync(TarReader tarReader, string targetFolder, CancellationToken abortToken = default)
     {
         TarEntry tempEntry;
-        do
+        while ((tempEntry = await tarReader.GetNextEntryAsync(true, abortToken)) != null)
         {
-            tempEntry = await tarReader.GetNextEntryAsync(true, abortToken);
-            if (tempEntry == null || tempEntry.DataStream == null) continue;
+            if (tempEntry.DataStream == null) continue;
+
             string normalizedPath = NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             string targetName = Path.Combine(targetFolder, normalizedPath);
+
             if (File.Exists(targetName))
             {
+                FileInfo targetInfo = new(targetName);
+                if (tempEntry.Length != targetInfo.Length)
+                {
+                    await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+                    continue;
+                }
+
                 bool areEqual = false;
                 using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan))
                 {
-                    XxHash128 archiveHash = new();
-                    XxHash128 targetHash = new();
-                    archiveHash.Append(tempEntry.DataStream);
-                    targetHash.Append(targetFile);
-                    areEqual = archiveHash.GetCurrentHash().SequenceEqual(targetHash.GetCurrentHash());
+                    Hash archiveHash = await CalcHashAsync(tempEntry.DataStream, abortToken);
+                    Hash targetHash = await CalcHashAsync(targetFile, abortToken);
+
+                    areEqual = archiveHash.Equals(targetHash);
                 }
+
                 if (!areEqual)
                 {
                     tempEntry.DataStream.Position = 0;
                     await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
+                }
+                else
+                {
+                    tempEntry.DataStream.Position = 0;
                 }
             }
             else
@@ -318,8 +403,7 @@ public class PackageReader(string packageLocation, string password = "", string 
 
                 await tempEntry.ExtractToFileAsync(targetName, true, abortToken);
             }
-
-        } while (tempEntry != null);
+        }
     }
 
     /// <summary>
