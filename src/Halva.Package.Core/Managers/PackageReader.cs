@@ -47,41 +47,7 @@ public class PackageReader(string packageLocation, string password = "", string 
         }
     }
 
-    public static Hash CalcHash(string fileToHash, CancellationToken abortToken = default)
-    {
-        using (FileStream fs = new(fileToHash, FileMode.Open, FileAccess.Read, FileShare.Read, 131072, FileOptions.SequentialScan | FileOptions.Asynchronous))
-        {
-            using (var hasher = Hasher.New())
-            {
-                byte[] buffer = new byte[131072];
-                int bytesRead;
-                while ((bytesRead = fs.Read(buffer)) > 0)
-                {
-                    hasher.Update(buffer.AsSpan()[..bytesRead]);
-                }
-                return hasher.Finalize();
-            }
-        }
-    }
-
-    public static async Task<Hash> CalcHashAsync(string fileToHash, CancellationToken abortToken = default)
-    {
-        using (FileStream fs = new(fileToHash, FileMode.Open, FileAccess.Read, FileShare.Read, 131072, FileOptions.SequentialScan | FileOptions.Asynchronous))
-        {
-            using (Hasher hasher = Hasher.New())
-            {
-                byte[] buffer = new byte[131072];
-                int bytesRead;
-                while ((bytesRead = await fs.ReadAsync(buffer, abortToken)) > 0)
-                {
-                    hasher.Update(buffer.AsSpan()[..bytesRead]);
-                }
-                return hasher.Finalize();
-            }
-        }
-    }
-
-    public static Hash CalcHash(Stream streamToHash, CancellationToken abortToken = default)
+    private static Hash CalcHash(Stream streamToHash, CancellationToken abortToken = default)
     {
             using (Hasher hasher = Hasher.New())
             {
@@ -95,7 +61,7 @@ public class PackageReader(string packageLocation, string password = "", string 
             }
     }
 
-    public static async Task<Hash> CalcHashAsync(Stream streamToHash, CancellationToken abortToken = default)
+    private static async Task<Hash> CalcHashAsync(Stream streamToHash, CancellationToken abortToken = default)
     {
         using (Hasher hasher = Hasher.New())
         {
