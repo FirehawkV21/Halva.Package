@@ -47,27 +47,61 @@ public sealed class PackageReader(string packageLocation, string password = "", 
         }
     }
 
-    private static Hash CalcHash(Stream streamToHash, CancellationToken abortToken = default)
+    private static Hash CalcHash(in string filePath)
     {
+        using (FileStream fs = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
+        {
             using (Hasher hasher = Hasher.New())
             {
                 byte[] buffer = new byte[131072];
                 int bytesRead;
-                while ((bytesRead = streamToHash.Read(buffer)) > 0)
+                while ((bytesRead = fs.Read(buffer)) > 0)
                 {
                     hasher.Update(buffer.AsSpan()[..bytesRead]);
                 }
                 return hasher.Finalize();
             }
+        }
     }
 
-    private static async Task<Hash> CalcHashAsync(Stream streamToHash, CancellationToken abortToken = default)
+    private static async Task<Hash> CalcHashAsync(string filePath, CancellationToken abortToken = default)
+    {
+        using (FileStream fs = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
+        {
+            using (Hasher hasher = Hasher.New())
+            {
+                byte[] buffer = new byte[131072];
+                int bytesRead;
+                while ((bytesRead = await fs.ReadAsync(buffer, abortToken)) > 0)
+                {
+                    hasher.Update(buffer.AsSpan()[..bytesRead]);
+                }
+                return hasher.Finalize();
+            }
+        }
+    }
+
+    private static Hash CalcHash(in Stream streamToHash, CancellationToken abortToken = default)
     {
         using (Hasher hasher = Hasher.New())
         {
-                byte[] buffer = new byte[131072];
+            byte[] buffer = new byte[131072];
             int bytesRead;
-            while ((bytesRead = await streamToHash.ReadAsync(buffer, abortToken)) > 0)
+            while ((bytesRead = streamToHash.Read(buffer)) > 0)
+            {
+                hasher.Update(buffer.AsSpan()[..bytesRead]);
+            }
+            return hasher.Finalize();
+        }
+    }
+
+    private static async Task<Hash> CalcHashAsync(Stream stream, CancellationToken abortToken = default)
+    {
+        using (Hasher hasher = Hasher.New())
+        {
+            byte[] buffer = new byte[131072];
+            int bytesRead;
+            while ((bytesRead = await stream.ReadAsync(buffer, abortToken)) > 0)
             {
                 hasher.Update(buffer.AsSpan()[..bytesRead]);
             }
@@ -147,7 +181,7 @@ public sealed class PackageReader(string packageLocation, string password = "", 
     /// Updates the files in the target folder from the archive.
     /// </summary>
     /// <param name="TargetFolder">The folder that has the files that you want to update.</param>
-    public void UpdateFromArchive(string TargetFolder)
+    public void UpdateFromArchive(in string TargetFolder)
     {
         string normalizedTargetFolder = Path.GetFullPath(TargetFolder);
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
@@ -195,14 +229,10 @@ public sealed class PackageReader(string packageLocation, string password = "", 
                 }
 
                 // Lengths equal -> compute content hash
-                bool areEqual = false;
-                using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
-                {
-                    Hash sourceHash = CalcHash(tempEntry.DataStream);
-                    Hash destHash = CalcHash(targetFile);
-
-                    areEqual = sourceHash.Equals(destHash);
-                }
+                Hash hashSource = default;
+                Hash destHash = default;
+                Parallel.Invoke(() => { hashSource = CalcHash(tempEntry.DataStream); }, () => { destHash = CalcHash(targetName); });
+                bool areEqual = hashSource.Equals(destHash);
 
                 // Reset archive stream to allow extraction if needed
                 if (!areEqual)
@@ -329,7 +359,6 @@ public sealed class PackageReader(string packageLocation, string password = "", 
         while ((tempEntry = await tarReader.GetNextEntryAsync(true, abortToken)) != null)
         {
             if (tempEntry.DataStream == null) continue;
-
             string normalizedPath = NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             string targetName = Path.Combine(targetFolder, normalizedPath);
 
@@ -342,14 +371,10 @@ public sealed class PackageReader(string packageLocation, string password = "", 
                     continue;
                 }
 
-                bool areEqual = false;
-                using (FileStream targetFile = new(targetName, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan))
-                {
-                    Hash archiveHash = await CalcHashAsync(tempEntry.DataStream, abortToken);
-                    Hash targetHash = await CalcHashAsync(targetFile, abortToken);
-
-                    areEqual = archiveHash.Equals(targetHash);
-                }
+                Task<Hash> archiveHash = CalcHashAsync(tempEntry.DataStream, abortToken);
+                Task<Hash> targetHash = CalcHashAsync(targetName, abortToken);
+                await Task.WhenAll(archiveHash, targetHash);
+                bool areEqual = archiveHash.Result.Equals(targetHash.Result);
 
                 if (!areEqual)
                 {

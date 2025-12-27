@@ -7,8 +7,8 @@
 		<AssemblyTitle>Halva Package Bootstrapper</AssemblyTitle>
 		<PackageId>Halva.Package.Bootstrapper</PackageId>
 		<Version>1.0.10-20220914</Version>
-		<AssemblyVersion>1.0.10.25359</AssemblyVersion>
-		<FileVersion>1.0.10.25359</FileVersion>
+		<AssemblyVersion>1.0.10.25361</AssemblyVersion>
+		<FileVersion>1.0.10.25361</FileVersion>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<PublishAot>true</PublishAot>
 		<OptimizationPreference>Speed</OptimizationPreference>
