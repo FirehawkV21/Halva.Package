@@ -97,6 +97,29 @@ public sealed class PackageBuilder(string destinationLocation, string password =
     public async Task CommitAsync(CancellationToken abortToken = default)
     {
         using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan))
+#if NET11_0_OR_GREATER
+            if (!string.IsNullOrWhiteSpace(Password))
+                    using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        using (ZstandardStream CompressionStream = new(cryptoStream, CompressionOption))
+                        {
+                            using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                            {
+                                foreach (TarFileList file in FileList)
+                                    await _tarBuilder.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
+                            }
+                        }
+                    }
+            else
+                using (ZstandardStream CompressionStream = new(fs, CompressionOption))
+                {
+                    using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                    {
+                        foreach (TarFileList file in FileList)
+                            await _tarBuilder.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
+                    }
+                }
+#else
             if (!string.IsNullOrWhiteSpace(Password))
                     using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
                     {
@@ -118,5 +141,7 @@ public sealed class PackageBuilder(string destinationLocation, string password =
                             await _tarBuilder.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
                     }
                 }
+#endif
+
     }
 }
