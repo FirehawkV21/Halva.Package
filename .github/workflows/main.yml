@@ -35,7 +35,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: 10.x
+        dotnet-version: 11.x
       
 
     # Create the NuGet package in the folder from the environment variable NuGetDirectory
@@ -64,7 +64,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-         dotnet-version: 10.x
+         dotnet-version: 11.x
 
       # Download the NuGet package created in the previous job
       - uses: actions/download-artifact@v7
@@ -111,7 +111,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v5
         with:
-         dotnet-version: 10.x
+         dotnet-version: 11.x
 
       # Publish all NuGet packages to NuGet.org
       # Use --skip-duplicate to prevent errors if a package with the same version already exists.
