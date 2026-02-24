@@ -3,7 +3,7 @@
     <Authors>AceOfAces</Authors>
     <Company>Dragonhouse Software</Company>
     <Product>Halva Package</Product>
-    <TargetFrameworks>net11.0;net10.0;net9.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
       <BuildDate>$([System.DateTime]::Now.ToString("yy"))</BuildDate>
     <BuildDateTag>$([System.DateTime]::Now.ToString("yy"))$([System.DateTime]::Now.DayOfYear.ToString("000"))</BuildDateTag>
     <RepositoryUrl>https://github.com/FirehawkV21/Halva.Package</RepositoryUrl>
