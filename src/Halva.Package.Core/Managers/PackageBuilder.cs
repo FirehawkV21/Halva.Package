@@ -71,7 +71,7 @@ public sealed class PackageBuilder(string destinationLocation, string password =
                 if (!string.IsNullOrWhiteSpace(Password))
                     using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
                     {
-                        using (ZstandardStream CompressionStream = new(cryptoStream, CompressionOption))
+                        using (ZstandardStream CompressionStream = new(cryptoStream, PackageUtilities.GetCompressionSettings(CompressionOption)))
                         {
                             using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
                             {
@@ -81,7 +81,7 @@ public sealed class PackageBuilder(string destinationLocation, string password =
                         }
                     }
                 else
-                    using (ZstandardStream CompressionStream = new(fs, CompressionOption))
+                    using (ZstandardStream CompressionStream = new(fs, PackageUtilities.GetCompressionSettings(CompressionOption)))
                     {
                         using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
                         {
@@ -155,7 +155,7 @@ public sealed class PackageBuilder(string destinationLocation, string password =
                 if (!string.IsNullOrWhiteSpace(Password))
                     using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
                     {
-                        using (ZstandardStream CompressionStream = new(cryptoStream, CompressionOption))
+                        using (ZstandardStream CompressionStream = new(cryptoStream, PackageUtilities.GetCompressionSettings(CompressionOption)))
                         {
                             using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
                             {
@@ -165,7 +165,7 @@ public sealed class PackageBuilder(string destinationLocation, string password =
                         }
                     }
                 else
-                    using (ZstandardStream CompressionStream = new(fs, CompressionOption))
+                    using (ZstandardStream CompressionStream = new(fs, PackageUtilities.GetCompressionSettings(CompressionOption)))
                     {
                         using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
                         {

@@ -8,6 +8,37 @@ using System.Text;
 namespace Halva.Package.Core;
 public static class PackageUtilities
 {
+
+#if NET11_0_OR_GREATER
+    static internal ZstandardCompressionOptions GetCompressionSettings(CompressionLevel compression) => compression switch
+    {
+        CompressionLevel.Fastest => new()
+        {
+            Quality = 3,
+            EnableLongDistanceMatching = true,
+            WindowLog = 23
+        },
+        CompressionLevel.NoCompression => new()
+        {
+            Quality = 1,
+            EnableLongDistanceMatching = false
+        },
+        CompressionLevel.SmallestSize => new()
+        {
+            Quality = 22,
+            EnableLongDistanceMatching = true,
+
+            WindowLog = 27
+        },
+        _ => new()
+        {
+            Quality = 19,
+            EnableLongDistanceMatching = true,
+            WindowLog = 27
+        }
+    };
+#endif
+
     #region Creating Packages
     /// <summary>
     /// Creates a Halva package from a folder.
@@ -18,6 +49,7 @@ public static class PackageUtilities
     /// <param name="ivKey">The IV key for the package.</param>
     /// <param name="compression">The level of compression for the package.</param>
     /// <param name="useZstd">Whether to use Zstandard compression.</param>
+    /// 
     public static void CreatePackageFromFolder(string sourceFolder, string targetPackagePath, string password = "", string ivKey = "", CompressionLevel compression = CompressionLevel.Optimal, bool useZstd = false)
     {
         using (FileStream fs = new(targetPackagePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.SequentialScan))
@@ -28,14 +60,14 @@ public static class PackageUtilities
                 if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
                 {
                     using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
-                    using (ZstandardStream CompressionStream = new(cryptoStream, compression))
+                    using (ZstandardStream CompressionStream = new(cryptoStream, PackageUtilities.GetCompressionSettings(compression)))
                     {
                         TarFile.CreateFromDirectory(sourceFolder, CompressionStream, false);
                     }
                 }
                 else
                 {
-                    using (ZstandardStream CompressionStream = new(fs, compression))
+                    using (ZstandardStream CompressionStream = new(fs, PackageUtilities.GetCompressionSettings(compression)))
                     {
                         TarFile.CreateFromDirectory(sourceFolder, CompressionStream, false);
                     }
@@ -98,14 +130,14 @@ public static class PackageUtilities
                 if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
                 {
                     using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
-                    using (ZstandardStream CompressionStream = new(cryptoStream, compression))
+                    using (ZstandardStream CompressionStream = new(cryptoStream, GetCompressionSettings(compression)))
                     {
                         await TarFile.CreateFromDirectoryAsync(sourceFolder, CompressionStream, false, abortToken);
                     }
                 }
                 else
                 {
-                    using (ZstandardStream CompressionStream = new(fs, compression))
+                    using (ZstandardStream CompressionStream = new(fs, GetCompressionSettings(compression)))
                     {
                         await TarFile.CreateFromDirectoryAsync(sourceFolder, CompressionStream, false, abortToken);
                     }
