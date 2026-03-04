@@ -74,6 +74,28 @@ public static class PackageUtilities
     #endregion
 
     #region Decompression Packages
+
+    private static void TarFileExtractToDirectory(BrotliStream decompressionStream, string targetFolder)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
+            return;
+        }
+        // Manual way: https://stackoverflow.com/a/76396529/10477326
+        using TarReader tarReader = new TarReader(decompressionStream);
+        while (tarReader.GetNextEntry() is { } entry)
+        {
+            // Only Windows allows using backslashes as path separators
+            // Linux only accepts normal slashes
+            // This fix ensures subdirectories are created
+            string destinationFileName = Path.Join(targetFolder, entry.Name.Replace('\\', '/'));
+            Directory.CreateDirectory(Directory.GetParent(destinationFileName)!.FullName);
+            entry.ExtractToFile(destinationFileName, true);
+        }
+
+    }
+
     /// <summary>
     /// Decompresses a Halva package to a folder.
     /// </summary>
@@ -92,7 +114,7 @@ public static class PackageUtilities
                     {
                         using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                         {
-                            TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
+                            TarFileExtractToDirectory(decompressionStream, targetFolder);
                         }
                     }
             }
@@ -100,7 +122,7 @@ public static class PackageUtilities
             {
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
                 {
-                    TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
+                    TarFileExtractToDirectory(decompressionStream, targetFolder);
                 }
             }
         }
