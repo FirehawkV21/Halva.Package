@@ -8,6 +8,7 @@
     <BuildDateTag>$([System.DateTime]::Now.ToString("yy"))$([System.DateTime]::Now.DayOfYear.ToString("000"))</BuildDateTag>
     <RepositoryUrl>https://github.com/FirehawkV21/Halva.Package</RepositoryUrl>
     <PackageTags>compression, package, Brotli, game-package</PackageTags>
+    <Nullable>enable</Nullable>
     <TieredCompilation>true</TieredCompilation>
     <TieredPGO>true</TieredPGO>
     <TieredCompilationQuickJit>true</TieredCompilationQuickJit>

@@ -11,7 +11,7 @@ internal class Program
     {
         Process GameProcess = new();
         // Edit this part to point over to the game's executable.
-        ProcessStartInfo GameInfo = new(Path.Combine(AppContext.BaseDirectory, "Binaries", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Game.exe" : "Game"));
+        ProcessStartInfo GameInfo = new(Path.Combine(GamePackageManager.PackageLocation, "Binaries", OperatingSystem.IsWindows() ? "Game.exe" : "Game"));
 
         Console.WriteLine(Properties.Resources.SplitterText);
         Console.WriteLine(Properties.Resources.ProgramTitle);
@@ -61,5 +61,5 @@ internal class Program
         GameInfo.Arguments += "--nwapp=\"" + Path.Combine(packageManager.ExctractLocation, "GameData") + "\"";
         GameProcess.StartInfo = GameInfo;
         GameProcess.Start();
-    }        
+    }
 }

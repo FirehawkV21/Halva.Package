@@ -185,6 +185,19 @@ public static class PackageUtilities
 #endregion
 
     #region Decompression Packages
+
+    private static void HandleTarExtraction(in BrotliStream decompressionStream, in string targetFolder)
+    {
+        TarReader tarReader = new(decompressionStream);
+        while (tarReader.GetNextEntry() is { } entry)
+        {
+            string destinationFileName = Path.Join(targetFolder, NormalizePath(entry.Name));
+            Directory.CreateDirectory(Directory.GetParent(destinationFileName)!.FullName);
+            entry.ExtractToFile(destinationFileName, true);
+        }
+
+    }
+
     /// <summary>
     /// Decompresses a Halva package to a folder.
     /// </summary>
@@ -249,10 +262,21 @@ public static class PackageUtilities
             {
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
                 {
-                    TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
+                    HandleTarExtraction(decompressionStream, targetFolder);
                 }
             }
 #endif
+        }
+    }
+
+    private static async Task HandleTarExtractionAsync(BrotliStream decompressionStream, string targetFolder, CancellationToken abortToken = default)
+    {
+        TarReader tarReader = new(decompressionStream);
+        while (tarReader.GetNextEntry() is { } entry)
+        {
+            string destinationFileName = Path.Join(targetFolder, NormalizePath(entry.Name));
+            Directory.CreateDirectory(Directory.GetParent(destinationFileName)!.FullName);
+            await entry.ExtractToFileAsync(destinationFileName, true, abortToken);
         }
     }
 
@@ -321,7 +345,7 @@ public static class PackageUtilities
             {
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
                 {
-                    await TarFile.ExtractToDirectoryAsync(decompressionStream, targetFolder, true, abortToken);
+                    await HandleTarExtractionAsync(decompressionStream, targetFolder, abortToken);
                 }
             }
 #endif
@@ -433,4 +457,11 @@ public static class PackageUtilities
 #endif
     }
     #endregion
+
+    /// <summary>
+    /// Normalizes a file path to use the correct directory separator character for the current platform.
+    /// </summary>
+    /// <param name="path">The path to normalize.</param>
+    /// <returns>The given path, normalized to the OS'.</returns>
+    static internal string NormalizePath(string path) => path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar).TrimStart(Path.DirectorySeparatorChar);
 }
