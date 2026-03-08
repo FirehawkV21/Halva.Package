@@ -10,33 +10,47 @@ public static class PackageUtilities
 {
 
 #if NET11_0_OR_GREATER
-    static internal ZstandardCompressionOptions GetCompressionSettings(CompressionLevel compression) => compression switch
+    static internal ZstandardCompressionOptions GetCompressionSettings(CompressionLevel compression, bool useDictionary = false, string dictionaryLocation = "")
     {
-        CompressionLevel.Fastest => new()
-        {
-            Quality = 3,
-            EnableLongDistanceMatching = true,
-            WindowLog = 23
-        },
-        CompressionLevel.NoCompression => new()
-        {
-            Quality = 1,
-            EnableLongDistanceMatching = false
-        },
-        CompressionLevel.SmallestSize => new()
-        {
-            Quality = 22,
-            EnableLongDistanceMatching = true,
+        ZstandardCompressionOptions options = new();
 
-            WindowLog = 27
-        },
-        _ => new()
+        if (useDictionary && !string.IsNullOrEmpty(dictionaryLocation))
         {
-            Quality = 19,
-            EnableLongDistanceMatching = true,
-            WindowLog = 27
+            options.Dictionary = ZstandardDictionary.Create(File.ReadAllBytes(dictionaryLocation));
         }
-    };
+
+        switch (compression)
+        {
+            case CompressionLevel.NoCompression:
+                options.Quality = 1;
+                options.EnableLongDistanceMatching = false;
+                break;
+
+            case CompressionLevel.Fastest:
+                options.Quality = 3;
+                options.EnableLongDistanceMatching = false;
+                break;
+
+            case CompressionLevel.Optimal:
+                options.Quality = 9;
+                options.EnableLongDistanceMatching = true;
+                options.WindowLog = 25; 
+                break;
+
+            case CompressionLevel.SmallestSize:
+                options.Quality = 22;
+                options.EnableLongDistanceMatching = true;
+                options.WindowLog = 27;
+                break;
+
+            default:
+                options.Quality = 3;
+                options.EnableLongDistanceMatching = false;
+                break;
+        }
+
+        return options;
+    }
 #endif
 
     #region Creating Packages

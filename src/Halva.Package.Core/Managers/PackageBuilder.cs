@@ -23,6 +23,9 @@ public sealed class PackageBuilder(string destinationLocation, string password =
     /// The destination for the archive file.
     /// </summary>
     public StringBuilder DestinationLocation { get; set; } = new(destinationLocation);
+#if NET11_0_OR_GREATER
+    bool createDictionary = false;
+#endif
 
     /// <summary>
     /// Adds a file to the list of files to be archived.
@@ -59,6 +62,78 @@ public sealed class PackageBuilder(string destinationLocation, string password =
         }
     }
 
+#if NET11_0_OR_GREATER
+    private ZstandardDictionary? GenerateZstdDictionary()
+    {
+        using MemoryStream ms = new();
+        List<int> sampleLengths = [];
+
+        foreach (TarFileList file in FileList)
+        {
+            byte[] fileBytes = File.ReadAllBytes(file.FileLocation);
+            if (fileBytes.Length == 0)
+                continue;
+
+            ms.Write(fileBytes, 0, fileBytes.Length);
+            sampleLengths.Add(fileBytes.Length); // track each sample's length
+        }
+
+        byte[] bytes = ms.ToArray();
+        if (bytes.Length == 0)
+            return default;
+
+        return ZstandardDictionary.Train(
+            samples: bytes.AsSpan(),
+            sampleLengths: [.. sampleLengths],
+            maxDictionarySize: 112 * 1024  // 112 KB is the recommended sweet spot
+        );
+    }
+
+    private async Task<ZstandardDictionary?> GenerateZstdDictionaryAsync(CancellationToken abortToken = default)
+    {
+        using MemoryStream ms = new();
+        List<int> sampleLengths = [];
+
+        foreach (TarFileList file in FileList)
+        {
+            byte[] fileBytes = await File.ReadAllBytesAsync(file.FileLocation);
+            if (fileBytes.Length == 0)
+                continue;
+
+            await ms.WriteAsync(fileBytes, abortToken);
+            sampleLengths.Add(fileBytes.Length); // track each sample's length
+        }
+
+        byte[] bytes = ms.ToArray();
+        if (bytes.Length == 0)
+            return default;
+
+        return ZstandardDictionary.Train(
+            samples: bytes.AsSpan(),
+            sampleLengths: [.. sampleLengths],
+            maxDictionarySize: 112 * 1024  // 112 KB is the recommended sweet spot
+        );
+    }
+
+    public void GenerateZstdDictionary(string output)
+    {
+        ZstandardDictionary? zstdDict = GenerateZstdDictionary();
+        if (zstdDict is not null)
+        {
+            File.WriteAllBytes(output, zstdDict.Data.ToArray());
+        }
+    }
+
+    public async Task GenerateZstdDictionaryAsync(string output, CancellationToken abortToken = default)
+    {
+        ZstandardDictionary? zstdDict = await GenerateZstdDictionaryAsync(abortToken);
+        if (zstdDict is not null)
+        {
+            await File.WriteAllBytesAsync(output, zstdDict.Data.ToArray(), abortToken);
+        }
+    }
+#endif
+
     /// <summary>
     /// Creates the archive file with the files added to the list.
     /// </summary>
@@ -68,6 +143,7 @@ public sealed class PackageBuilder(string destinationLocation, string password =
         using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.SequentialScan))
             if (isZstd)
             {
+                if (createDictionary) GenerateZstdDictionary(Path.GetFileNameWithoutExtension(DestinationLocation.ToString()) + ".zdict");
                 if (!string.IsNullOrWhiteSpace(Password))
                     using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
                     {
