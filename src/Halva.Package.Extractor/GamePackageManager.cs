@@ -11,7 +11,12 @@ namespace Halva.Package.Bootstrapper;
 
 public partial class GamePackageManager
 {
-    private readonly string PackageLocation = Path.Combine(AppContext.BaseDirectory, "GamePackages");
+    public static readonly string PackageLocation = Path.Combine(OperatingSystem.IsWindows()
+        ? AppContext.BaseDirectory // Exe folder on Windows
+        // Use current directory on Linux because `dotnet run --framework net10.0` forces
+        // "Halva.Package/artifacts/bin/Halva.Package.Bootstrapper/debug_net10.0/GamePackages"
+        : Directory.GetCurrentDirectory(), "GamePackages");
+
     //Change this to set a different folder.
     private static readonly string LocalFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RMDev", "Game");
 
@@ -31,6 +36,11 @@ public partial class GamePackageManager
             }
             else return LocalFolder;
 #else
+            if (!OperatingSystem.IsWindows())
+            {
+                // /usr/share/RMDev is only writable by root on Linux, so use the current directory
+                return Directory.GetCurrentDirectory();
+            }
             return LocalFolder;
 #endif
         }
