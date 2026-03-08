@@ -60,13 +60,6 @@ internal class Program
 
         GameInfo.Arguments += "--nwapp=\"" + Path.Combine(packageManager.ExctractLocation, "GameData") + "\"";
         GameProcess.StartInfo = GameInfo;
-        if (OperatingSystem.IsWindows())
-        {
-            GameProcess.Start();
-        }
-        else
-        {
-            Console.WriteLine($"Now run {GameInfo.FileName} {GameInfo.Arguments}");
-        }
+        GameProcess.Start();
     }
 }

@@ -38,10 +38,11 @@ public partial class GamePackageManager
 #else
             if (!OperatingSystem.IsWindows())
             {
-                // /usr/share/RMDev is only writable by root on Linux, so use the current directory
-                return Directory.GetCurrentDirectory();
+                string? xdgDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+                if (!string.IsNullOrWhiteSpace(xdgDataHome)) return xdgDataHome;
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share");
             }
-            return LocalFolder;
+            else return LocalFolder;
 #endif
         }
     }
