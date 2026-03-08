@@ -8,6 +8,37 @@ using System.Text;
 namespace Halva.Package.Core;
 public static class PackageUtilities
 {
+
+#if NET11_0_OR_GREATER
+    static internal ZstandardCompressionOptions GetCompressionSettings(CompressionLevel compression) => compression switch
+    {
+        CompressionLevel.Fastest => new()
+        {
+            Quality = 3,
+            EnableLongDistanceMatching = true,
+            WindowLog = 23
+        },
+        CompressionLevel.NoCompression => new()
+        {
+            Quality = 1,
+            EnableLongDistanceMatching = false
+        },
+        CompressionLevel.SmallestSize => new()
+        {
+            Quality = 22,
+            EnableLongDistanceMatching = true,
+
+            WindowLog = 27
+        },
+        _ => new()
+        {
+            Quality = 19,
+            EnableLongDistanceMatching = true,
+            WindowLog = 27
+        }
+    };
+#endif
+
     #region Creating Packages
     /// <summary>
     /// Creates a Halva package from a folder.
@@ -17,10 +48,50 @@ public static class PackageUtilities
     /// <param name="password">The password for the package.</param>
     /// <param name="ivKey">The IV key for the package.</param>
     /// <param name="compression">The level of compression for the package.</param>
-    public static void CreatePackageFromFolder(string sourceFolder, string targetPackagePath, string password = "", string ivKey = "", CompressionLevel compression = CompressionLevel.Optimal)
+    /// <param name="useZstd">Whether to use Zstandard compression.</param>
+    /// 
+    public static void CreatePackageFromFolder(string sourceFolder, string targetPackagePath, string password = "", string ivKey = "", CompressionLevel compression = CompressionLevel.Optimal, bool useZstd = false)
     {
         using (FileStream fs = new(targetPackagePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.SequentialScan))
         {
+#if NET11_0_OR_GREATER
+            if (useZstd)
+            {
+                if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
+                {
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
+                    using (ZstandardStream CompressionStream = new(cryptoStream, PackageUtilities.GetCompressionSettings(compression)))
+                    {
+                        TarFile.CreateFromDirectory(sourceFolder, CompressionStream, false);
+                    }
+                }
+                else
+                {
+                    using (ZstandardStream CompressionStream = new(fs, PackageUtilities.GetCompressionSettings(compression)))
+                    {
+                        TarFile.CreateFromDirectory(sourceFolder, CompressionStream, false);
+                    }
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
+                {
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
+                    using (BrotliStream CompressionStream = new(cryptoStream, compression))
+                    {
+                        TarFile.CreateFromDirectory(sourceFolder, CompressionStream, false);
+                    }
+                }
+                else
+                {
+                    using (BrotliStream CompressionStream = new(fs, compression))
+                    {
+                        TarFile.CreateFromDirectory(sourceFolder, CompressionStream, false);
+                    }
+                }
+            }
+#else
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {
                     using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
@@ -36,6 +107,7 @@ public static class PackageUtilities
                     TarFile.CreateFromDirectory(sourceFolder, CompressionStream, false);
                 }
             }
+#endif
         }
     }
 
@@ -48,10 +120,48 @@ public static class PackageUtilities
     /// <param name="ivKey">The IV key for the package.</param>
     /// <param name="compression">The level of compression for the package.</param>
     /// <param name="abortToken">The cancellation token to abort the operation.</param>
-    public static async Task CreatePackageFromFolderAsync(string sourceFolder, string targetPackagePath, string password ="", string ivKey = "", CompressionLevel compression = CompressionLevel.Optimal, CancellationToken abortToken = default)
+    public static async Task CreatePackageFromFolderAsync(string sourceFolder, string targetPackagePath, string password ="", string ivKey = "", CompressionLevel compression = CompressionLevel.Optimal, bool useZstd = false, CancellationToken abortToken = default)
     {
         using (FileStream fs = new(targetPackagePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan))
         {
+#if NET11_0_OR_GREATER
+            if (useZstd)
+            {
+                if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
+                {
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
+                    using (ZstandardStream CompressionStream = new(cryptoStream, GetCompressionSettings(compression)))
+                    {
+                        await TarFile.CreateFromDirectoryAsync(sourceFolder, CompressionStream, false, abortToken);
+                    }
+                }
+                else
+                {
+                    using (ZstandardStream CompressionStream = new(fs, GetCompressionSettings(compression)))
+                    {
+                        await TarFile.CreateFromDirectoryAsync(sourceFolder, CompressionStream, false, abortToken);
+                    }
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
+                {
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
+                    using (BrotliStream CompressionStream = new(cryptoStream, compression))
+                    {
+                        await TarFile.CreateFromDirectoryAsync(sourceFolder, CompressionStream, false, abortToken);
+                    }
+                }
+                else
+                {
+                    using (BrotliStream CompressionStream = new(fs, compression))
+                    {
+                        await TarFile.CreateFromDirectoryAsync(sourceFolder, CompressionStream, false, abortToken);
+                    }
+                }
+            }
+#else
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {
                     using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
@@ -69,9 +179,10 @@ public static class PackageUtilities
                     await TarFile.CreateFromDirectoryAsync(sourceFolder, CompressionStream, false, abortToken);
                 }
             }
+#endif
         }
     }
-    #endregion
+#endregion
 
     #region Decompression Packages
 
@@ -94,20 +205,58 @@ public static class PackageUtilities
     /// <param name="targetFolder">The folder where the files of the package will be decompressed to.</param>
     /// <param name="password">The password for the package.</param>
     /// <param name="ivKey">The IV key for the package.</param>
-    public static void DecompressPackageToFolder(string packagePath, string targetFolder, string password = "", string ivKey = "")
+    public static void DecompressPackageToFolder(string packagePath, string targetFolder, string password = "", string ivKey = "", bool useZstd = false)
     {
         if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
         using (FileStream fs = new(packagePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
         {
+#if NET11_0_OR_GREATER
+            if (useZstd)
+            {
+                if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
+                {
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
+                    using (ZstandardStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                    {
+                        TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
+                    }
+                }
+                else
+                {
+                    using (ZstandardStream decompressionStream = new(fs, CompressionMode.Decompress))
+                    {
+                        TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
+                    }
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
+                {
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
+                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                    {
+                        TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
+                    }
+                }
+                else
+                {
+                    using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
+                    {
+                        TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
+                    }
+                }
+            }
+#else
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {
-                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
+                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
+                {
+                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            HandleTarExtraction(decompressionStream, targetFolder);
-                        }
+                        TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
                     }
+                }
             }
             else
             {
@@ -116,6 +265,7 @@ public static class PackageUtilities
                     HandleTarExtraction(decompressionStream, targetFolder);
                 }
             }
+#endif
         }
     }
 
@@ -138,20 +288,58 @@ public static class PackageUtilities
     /// <param name="password">The password for the package.</param>
     /// <param name="ivKey">The IV key for the package.</param>
     /// <param name="abortToken">The cancellation token to abort the operation.</param>
-    public static async Task DecompressPackageToFolderAsync(string packagePath, string targetFolder, string password = "", string ivKey = "", CancellationToken abortToken = default)
+    public static async Task DecompressPackageToFolderAsync(string packagePath, string targetFolder, string password = "", string ivKey = "", bool useZstd = false, CancellationToken abortToken = default)
     {
         if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
         using (FileStream fs = new(packagePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan))
         {
+#if NET11_0_OR_GREATER
+            if (useZstd)
+            {
+                if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
+                {
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
+                    using (ZstandardStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                    {
+                        await TarFile.ExtractToDirectoryAsync(decompressionStream, targetFolder, true, abortToken);
+                    }
+                }
+                else
+                {
+                    using (ZstandardStream decompressionStream = new(fs, CompressionMode.Decompress))
+                    {
+                        await TarFile.ExtractToDirectoryAsync(decompressionStream, targetFolder, true, abortToken);
+                    }
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
+                {
+                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
+                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
+                    {
+                        await TarFile.ExtractToDirectoryAsync(decompressionStream, targetFolder, true, abortToken);
+                    }
+                }
+                else
+                {
+                    using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
+                    {
+                        await TarFile.ExtractToDirectoryAsync(decompressionStream, targetFolder, true, abortToken);
+                    }
+                }
+            }
+#else
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {
-                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
+                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
+                {
+                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            await HandleTarExtractionAsync(decompressionStream, targetFolder, abortToken);
+                        await TarFile.ExtractToDirectoryAsync(decompressionStream, targetFolder, true, abortToken);
                     }
-                    }
+                }
             }
             else
             {
@@ -160,9 +348,10 @@ public static class PackageUtilities
                     await HandleTarExtractionAsync(decompressionStream, targetFolder, abortToken);
                 }
             }
+#endif
         }
     }
-    #endregion
+#endregion
 
     #region Encryption Key Handling
 
