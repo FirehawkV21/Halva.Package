@@ -75,21 +75,12 @@ public static class PackageUtilities
 
     #region Decompression Packages
 
-    private static void TarFileExtractToDirectory(BrotliStream decompressionStream, string targetFolder)
+    private static void HandleTarExtraction(in BrotliStream decompressionStream, in string targetFolder)
     {
-        if (OperatingSystem.IsWindows())
-        {
-            TarFile.ExtractToDirectory(decompressionStream, targetFolder, true);
-            return;
-        }
-        // Manual way: https://stackoverflow.com/a/76396529/10477326
-        using TarReader tarReader = new TarReader(decompressionStream);
+        TarReader tarReader = new(decompressionStream);
         while (tarReader.GetNextEntry() is { } entry)
         {
-            // Only Windows allows using backslashes as path separators
-            // Linux only accepts normal slashes
-            // This fix ensures subdirectories are created
-            string destinationFileName = Path.Join(targetFolder, entry.Name.Replace('\\', '/'));
+            string destinationFileName = Path.Join(targetFolder, NormalizePath(entry.Name));
             Directory.CreateDirectory(Directory.GetParent(destinationFileName)!.FullName);
             entry.ExtractToFile(destinationFileName, true);
         }
@@ -114,7 +105,7 @@ public static class PackageUtilities
                     {
                         using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                         {
-                            TarFileExtractToDirectory(decompressionStream, targetFolder);
+                            HandleTarExtraction(decompressionStream, targetFolder);
                         }
                     }
             }
@@ -122,9 +113,20 @@ public static class PackageUtilities
             {
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
                 {
-                    TarFileExtractToDirectory(decompressionStream, targetFolder);
+                    HandleTarExtraction(decompressionStream, targetFolder);
                 }
             }
+        }
+    }
+
+    private static async Task HandleTarExtractionAsync(BrotliStream decompressionStream, string targetFolder, CancellationToken abortToken = default)
+    {
+        TarReader tarReader = new(decompressionStream);
+        while (tarReader.GetNextEntry() is { } entry)
+        {
+            string destinationFileName = Path.Join(targetFolder, NormalizePath(entry.Name));
+            Directory.CreateDirectory(Directory.GetParent(destinationFileName)!.FullName);
+            await entry.ExtractToFileAsync(destinationFileName, true, abortToken);
         }
     }
 
@@ -147,15 +149,15 @@ public static class PackageUtilities
                     {
                         using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                         {
-                            await TarFile.ExtractToDirectoryAsync(decompressionStream, targetFolder, true, abortToken);
-                        }
+                            await HandleTarExtractionAsync(decompressionStream, targetFolder, abortToken);
+                    }
                     }
             }
             else
             {
                 using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
                 {
-                    await TarFile.ExtractToDirectoryAsync(decompressionStream, targetFolder, true, abortToken);
+                    await HandleTarExtractionAsync(decompressionStream, targetFolder, abortToken);
                 }
             }
         }
@@ -266,4 +268,11 @@ public static class PackageUtilities
 #endif
     }
     #endregion
+
+    /// <summary>
+    /// Normalizes a file path to use the correct directory separator character for the current platform.
+    /// </summary>
+    /// <param name="path">The path to normalize.</param>
+    /// <returns>The given path, normalized to the OS'.</returns>
+    static internal string NormalizePath(string path) => path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar).TrimStart(Path.DirectorySeparatorChar);
 }

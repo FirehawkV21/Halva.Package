@@ -269,7 +269,7 @@ public sealed class PackageReader(string packageLocation, string password = "", 
         {
             if (tempEntry.DataStream == null) continue;
 
-            string normalizedPath = NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            string normalizedPath = PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             string targetName = Path.Combine(targetFolder, normalizedPath);
             if (File.Exists(targetName))
             {
@@ -371,7 +371,7 @@ public sealed class PackageReader(string packageLocation, string password = "", 
         TarEntry tempEntry;
         while ((tempEntry = tarReader.GetNextEntry(false)) != null)
         {
-            string normalizedPath = NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            string normalizedPath = PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             string targetName = Path.Combine(TargetFolder, normalizedPath);
 
             if (File.Exists(targetName))
@@ -463,7 +463,7 @@ public sealed class PackageReader(string packageLocation, string password = "", 
         while ((tempEntry = await tarReader.GetNextEntryAsync(true, abortToken)) != null)
         {
             if (tempEntry.DataStream == null) continue;
-            string normalizedPath = NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            string normalizedPath = PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             string targetName = Path.Combine(targetFolder, normalizedPath);
 
             if (File.Exists(targetName))
@@ -561,7 +561,7 @@ public sealed class PackageReader(string packageLocation, string password = "", 
             tempEntry = await tarReader.GetNextEntryAsync(false, abortToken);
             if (tempEntry == null) continue;
 
-            string normalizedPath = NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            string normalizedPath = PackageUtilities.NormalizePath(tempEntry.Name).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             string targetName = Path.Combine(TargetFolder, normalizedPath);
             if (File.Exists(targetName))
             {
@@ -584,12 +584,5 @@ public sealed class PackageReader(string packageLocation, string password = "", 
         }
         while (tempEntry != null);
     }
-
-    /// <summary>
-    /// Normalizes a file path to use the correct directory separator character for the current platform.
-    /// </summary>
-    /// <param name="path">The path to normalize.</param>
-    /// <returns>The given path, normalized to the OS'.</returns>
-    private static string NormalizePath(string path) => path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar).TrimStart(Path.DirectorySeparatorChar);
 
 }
