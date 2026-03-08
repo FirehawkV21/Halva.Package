@@ -17,6 +17,11 @@
 	<FileAlignment>4096</FileAlignment>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
+
+		<PropertyGroup Condition = "'$(TargetFramework)' == 'net11.0'">
+		<EnablePreviewFeatures>true</EnablePreviewFeatures>
+		<Features>$(Features);runtime-async=on</Features>
+	</PropertyGroup>
 	
 
 	<ItemGroup>
