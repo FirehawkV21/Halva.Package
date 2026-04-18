@@ -3,12 +3,12 @@
 	<PropertyGroup>
 		<AssemblyTitle>Halva Package Core</AssemblyTitle>
 		<Product>Halva Package</Product>
-		<AssemblyVersion>5.1.5.$(BuildDateTag)</AssemblyVersion>
-		<FileVersion>5.1.5.$(BuildDateTag)</FileVersion>
+		<AssemblyVersion>6.0.0.$(BuildDateTag)</AssemblyVersion>
+		<FileVersion>6.0.0.$(BuildDateTag)</FileVersion>
 		<PackageId>Halva.Package.Core</PackageId>
-		<Version>6.0.0-experimental.$(BuildDate)</Version>
-		<Description>Halva (Χαλβάς in Greek) is a small .NET 8+ library that implements Google's Brotli compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
-		<PackageReleaseNotes>- Ensure that .NET 11 uses the experimental Runtime Async (you may have to enable that feature to use the package).</PackageReleaseNotes>
+		<Version>6.0.0-preview.$(BuildDate)</Version>
+		<Description>Halva (Χαλβάς in Greek) is a small .NET 8+ library that implements the Zstandard compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
+		<PackageReleaseNotes>- [.NET 11] Fully switch to ZStandard.</PackageReleaseNotes>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>

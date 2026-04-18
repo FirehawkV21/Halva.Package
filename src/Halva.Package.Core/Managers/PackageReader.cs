@@ -5,10 +5,9 @@ using Blake3;
 
 namespace Halva.Package.Core.Managers;
 
-public sealed class PackageReader(string packageLocation, string password = "", string ivKey = "", bool useZstd = false)
+public sealed class PackageReader(string packageLocation, string password = "", string ivKey = "")
 {
     private const int DefaultBufferSize = 81920;
-    private readonly bool _useZstd = useZstd;
     public string Password { get; set; } = password;
     public string IvKey { get; set; } = ivKey;
     public string PackageLocation { get; set; } = packageLocation;
@@ -24,28 +23,26 @@ public sealed class PackageReader(string packageLocation, string password = "", 
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
         {
 #if NET11_0_OR_GREATER
-            if (_useZstd) {
-                if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+            {
+                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
                 {
-                    using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (ZstandardStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                PackageReader.ExtractFileWorkload(fileName, normalizedDestinationPath, tarReader);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    using (ZstandardStream decompressionStream = new(fs, CompressionMode.Decompress))
+                    using (ZstandardStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
                             PackageReader.ExtractFileWorkload(fileName, normalizedDestinationPath, tarReader);
                         }
+                    }
+                }
+            }
+            else
+            {
+                using (ZstandardStream decompressionStream = new(fs, CompressionMode.Decompress))
+                {
+                    using (TarReader tarReader = new(decompressionStream))
+                    {
+                        PackageReader.ExtractFileWorkload(fileName, normalizedDestinationPath, tarReader);
                     }
                 }
             }
@@ -346,54 +343,28 @@ public sealed class PackageReader(string packageLocation, string password = "", 
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan))
         {
 #if NET11_0_OR_GREATER
-           if (_useZstd)
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
             {
-                if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
                 {
-                    using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (ZstandardStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                PackageReader.FastUpdateWorkload(in tarReader, in normalizedTargetFolder);
-                            }
-                        }
-                    }
-                }
-                else
-                    using (ZstandardStream decompressionStream = new(fs, CompressionMode.Decompress))
+                    using (ZstandardStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
                             PackageReader.FastUpdateWorkload(in tarReader, in normalizedTargetFolder);
                         }
                     }
+                }
             }
             else
-            {
-                if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                using (ZstandardStream decompressionStream = new(fs, CompressionMode.Decompress))
                 {
-                    using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
+                    using (TarReader tarReader = new(decompressionStream))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                PackageReader.FastUpdateWorkload(in tarReader, in normalizedTargetFolder);
-                            }
-                        }
+                        PackageReader.FastUpdateWorkload(in tarReader, in normalizedTargetFolder);
                     }
                 }
-                else
-                    using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
-                    {
-                        using (TarReader tarReader = new(decompressionStream))
-                        {
-                            PackageReader.FastUpdateWorkload(in tarReader, in normalizedTargetFolder);
-                        }
-                    }
-            }
+
 #else
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
             {
@@ -419,6 +390,7 @@ public sealed class PackageReader(string packageLocation, string password = "", 
 #endif
         }
     }
+
 
     private static void FastUpdateWorkload(in TarReader tarReader, in string TargetFolder)
     {
@@ -459,24 +431,11 @@ public sealed class PackageReader(string packageLocation, string password = "", 
         string normalizedTargetFolder = Path.GetFullPath(TargetFolder);
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
 #if NET11_0_OR_GREATER
-            if (_useZstd)
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
             {
-                if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
                 {
-                    using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (ZstandardStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                await PackageReader.UpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    using (ZstandardStream decompressionStream = new(fs, CompressionMode.Decompress))
+                    using (ZstandardStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
@@ -484,30 +443,17 @@ public sealed class PackageReader(string packageLocation, string password = "", 
                         }
                     }
                 }
+
             }
             else
             {
-                if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                using (ZstandardStream decompressionStream = new(fs, CompressionMode.Decompress))
                 {
-                    using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
+                    using (TarReader tarReader = new(decompressionStream))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                await PackageReader.UpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
-                            }
-                        }
+                        await PackageReader.UpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
                     }
                 }
-                else
-                    using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
-                    {
-                        using (TarReader tarReader = new(decompressionStream))
-                        {
-                            await PackageReader.UpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
-                        }
-                    }
             }
 #else
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
@@ -591,24 +537,10 @@ public sealed class PackageReader(string packageLocation, string password = "", 
         string normalizedTargetFolder = Path.GetFullPath(TargetFolder);
         using (FileStream fs = new(PackageLocation, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan | FileOptions.Asynchronous))
 #if NET11_0_OR_GREATER
-            if (_useZstd)
-            {
-                if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+            if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
                 {
-                    using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (ZstandardStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                await PackageReader.FastUpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    using (ZstandardStream decompressionStream = new(fs, CompressionMode.Decompress))
+                    using (ZstandardStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
                     {
                         using (TarReader tarReader = new(decompressionStream))
                         {
@@ -616,31 +548,14 @@ public sealed class PackageReader(string packageLocation, string password = "", 
                         }
                     }
                 }
-            }
             else
-            {
-                if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
+                using (ZstandardStream decompressionStream = new(fs, CompressionMode.Decompress))
                 {
-                    using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
+                    using (TarReader tarReader = new(decompressionStream))
                     {
-                        using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                        {
-                            using (TarReader tarReader = new(decompressionStream))
-                            {
-                                await PackageReader.FastUpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
-                            }
-                        }
+                        await PackageReader.FastUpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
                     }
                 }
-                else
-                    using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
-                    {
-                        using (TarReader tarReader = new(decompressionStream))
-                        {
-                            await PackageReader.FastUpdateWorkloadAsync(tarReader, normalizedTargetFolder, abortToken);
-                        }
-                    }
-            }
 #else
             if (!string.IsNullOrEmpty(Password) && !string.IsNullOrWhiteSpace(Password))
                 using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateDecryptor(), CryptoStreamMode.Read))
