@@ -1,27 +1,29 @@
 <Project>
   <PropertyGroup>
-    <Authors>AceOfAces</Authors>
-    <Company>Dragonhouse Software</Company>
-    <Product>Halva Package</Product>
-    <TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
-    <BuildDate>$([System.DateTime]::Now.ToString("yyyyMMdd"))</BuildDate>
-    <BuildDateTag>$([System.DateTime]::Now.ToString("yy"))$([System.DateTime]::Now.DayOfYear.ToString("000"))</BuildDateTag>
-    <RepositoryUrl>https://github.com/FirehawkV21/Halva.Package</RepositoryUrl>
-    <PackageTags>compression, package, Brotli, game-package</PackageTags>
-    <Nullable>enable</Nullable>
-    <TieredCompilation>true</TieredCompilation>
-    <TieredPGO>true</TieredPGO>
-    <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
-    <LangVersion>latest</LangVersion>
-    <FileAlignment>4096</FileAlignment>
-    <Copyright>2025 © Dragonhouse Software</Copyright>
-    <NeutralLanguage>en</NeutralLanguage>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <EnableNETAnalyzers>True</EnableNETAnalyzers>
-    <AnalysisLevel>latest</AnalysisLevel>
-    <PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
-    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+	<Authors>AceOfAces</Authors>
+	<Company>Dragonhouse Software</Company>
+	<Product>Halva Package</Product>
+	<TargetFrameworks>net11.0;net10.0;net9.0;net8.0</TargetFrameworks>
+	  <BuildDate>$([System.DateTime]::Now.ToString("yyyyMMdd"))</BuildDate>
+	  <BuildYear>$([System.DateTime]::Now.ToString("yyyy"))</BuildYear>
+	<BuildDateTag>$([System.DateTime]::Now.ToString("yy"))$([System.DateTime]::Now.DayOfYear.ToString("000"))</BuildDateTag>
+	<RepositoryUrl>https://github.com/FirehawkV21/Halva.Package</RepositoryUrl>
+	<PackageTags>compression, package, Brotli, game-package</PackageTags>
+	<Nullable>enable</Nullable>
+	<TieredCompilation>true</TieredCompilation>
+	<TieredPGO>true</TieredPGO>
+	<TieredCompilationQuickJit>true</TieredCompilationQuickJit>
+	<LangVersion>latest</LangVersion>
+	<FileAlignment>4096</FileAlignment>
+	<Copyright>$(BuildYear) © Dragonhouse Software</Copyright>
+	<NeutralLanguage>en</NeutralLanguage>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<EnableNETAnalyzers>True</EnableNETAnalyzers>
+	<AnalysisLevel>latest</AnalysisLevel>
+	<PackageProjectUrl>https://studioace.wordpress.com/halva-packaging-system/</PackageProjectUrl>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+	<AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
   </PropertyGroup>
+
 </Project>

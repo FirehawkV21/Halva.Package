@@ -5,11 +5,12 @@ using System.Text;
 using Halva.Package.Core.Models;
 
 namespace Halva.Package.Core.Managers;
-public sealed class PackageBuilder(string destinationLocation, string password = "", string ivKey = "")
+public sealed class PackageBuilder(string destinationLocation, string password = "", string ivKey = "", bool useZstd = false)
 {
     private readonly int bufferSize = 81920;
     public string Password { get; set; } = password;
     public string IvKey { get; set; } = ivKey;
+    private readonly bool isZstd = useZstd;
     /// <summary>
     /// The list of files of the archive.
     /// </summary>
@@ -22,6 +23,9 @@ public sealed class PackageBuilder(string destinationLocation, string password =
     /// The destination for the archive file.
     /// </summary>
     public StringBuilder DestinationLocation { get; set; } = new(destinationLocation);
+#if NET11_0_OR_GREATER
+    bool createDictionary = false;
+#endif
 
     /// <summary>
     /// Adds a file to the list of files to be archived.
@@ -58,11 +62,135 @@ public sealed class PackageBuilder(string destinationLocation, string password =
         }
     }
 
+#if NET11_0_OR_GREATER
+    private ZstandardDictionary? GenerateZstdDictionary()
+    {
+        using MemoryStream ms = new();
+        List<int> sampleLengths = [];
+
+        foreach (TarFileList file in FileList)
+        {
+            byte[] fileBytes = File.ReadAllBytes(file.FileLocation);
+            if (fileBytes.Length == 0)
+                continue;
+
+            ms.Write(fileBytes, 0, fileBytes.Length);
+            sampleLengths.Add(fileBytes.Length); // track each sample's length
+        }
+
+        byte[] bytes = ms.ToArray();
+        if (bytes.Length == 0)
+            return default;
+
+        return ZstandardDictionary.Train(
+            samples: bytes.AsSpan(),
+            sampleLengths: [.. sampleLengths],
+            maxDictionarySize: 112 * 1024  // 112 KB is the recommended sweet spot
+        );
+    }
+
+    private async Task<ZstandardDictionary?> GenerateZstdDictionaryAsync(CancellationToken abortToken = default)
+    {
+        using MemoryStream ms = new();
+        List<int> sampleLengths = [];
+
+        foreach (TarFileList file in FileList)
+        {
+            byte[] fileBytes = await File.ReadAllBytesAsync(file.FileLocation);
+            if (fileBytes.Length == 0)
+                continue;
+
+            await ms.WriteAsync(fileBytes, abortToken);
+            sampleLengths.Add(fileBytes.Length); // track each sample's length
+        }
+
+        byte[] bytes = ms.ToArray();
+        if (bytes.Length == 0)
+            return default;
+
+        return ZstandardDictionary.Train(
+            samples: bytes.AsSpan(),
+            sampleLengths: [.. sampleLengths],
+            maxDictionarySize: 112 * 1024  // 112 KB is the recommended sweet spot
+        );
+    }
+
+    public void GenerateZstdDictionary(string output)
+    {
+        ZstandardDictionary? zstdDict = GenerateZstdDictionary();
+        if (zstdDict is not null)
+        {
+            File.WriteAllBytes(output, zstdDict.Data.ToArray());
+        }
+    }
+
+    public async Task GenerateZstdDictionaryAsync(string output, CancellationToken abortToken = default)
+    {
+        ZstandardDictionary? zstdDict = await GenerateZstdDictionaryAsync(abortToken);
+        if (zstdDict is not null)
+        {
+            await File.WriteAllBytesAsync(output, zstdDict.Data.ToArray(), abortToken);
+        }
+    }
+#endif
+
     /// <summary>
     /// Creates the archive file with the files added to the list.
     /// </summary>
     public void Commit()
     {
+#if NET11_0_OR_GREATER
+        using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.SequentialScan))
+            if (isZstd)
+            {
+                if (createDictionary) GenerateZstdDictionary(Path.GetFileNameWithoutExtension(DestinationLocation.ToString()) + ".zdict");
+                if (!string.IsNullOrWhiteSpace(Password))
+                    using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        using (ZstandardStream CompressionStream = new(cryptoStream, PackageUtilities.GetCompressionSettings(CompressionOption)))
+                        {
+                            using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                            {
+                                foreach (TarFileList file in FileList)
+                                    _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
+                            }
+                        }
+                    }
+                else
+                    using (ZstandardStream CompressionStream = new(fs, PackageUtilities.GetCompressionSettings(CompressionOption)))
+                    {
+                        using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                        {
+                            foreach (TarFileList file in FileList)
+                                _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
+                        }
+                    }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(Password))
+                    using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        using (BrotliStream CompressionStream = new(cryptoStream, CompressionOption))
+                        {
+                            using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                            {
+                                foreach (TarFileList file in FileList)
+                                    _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
+                            }
+                        }
+                    }
+                else
+                    using (BrotliStream CompressionStream = new(fs, CompressionOption))
+                    {
+                        using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                        {
+                            foreach (TarFileList file in FileList)
+                                _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
+                        }
+                    }
+            }
+#else
         using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.SequentialScan))
             if (!string.IsNullOrWhiteSpace(Password))
             {
@@ -87,6 +215,7 @@ public sealed class PackageBuilder(string destinationLocation, string password =
                             _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
                     }
                 }
+#endif
     }
 
     /// <summary>
@@ -98,10 +227,11 @@ public sealed class PackageBuilder(string destinationLocation, string password =
     {
         using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan))
 #if NET11_0_OR_GREATER
-            if (!string.IsNullOrWhiteSpace(Password))
+            if (isZstd) {
+                if (!string.IsNullOrWhiteSpace(Password))
                     using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
                     {
-                        using (ZstandardStream CompressionStream = new(cryptoStream, CompressionOption))
+                        using (ZstandardStream CompressionStream = new(cryptoStream, PackageUtilities.GetCompressionSettings(CompressionOption)))
                         {
                             using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
                             {
@@ -110,15 +240,40 @@ public sealed class PackageBuilder(string destinationLocation, string password =
                             }
                         }
                     }
-            else
-                using (ZstandardStream CompressionStream = new(fs, CompressionOption))
-                {
-                    using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                else
+                    using (ZstandardStream CompressionStream = new(fs, PackageUtilities.GetCompressionSettings(CompressionOption)))
                     {
-                        foreach (TarFileList file in FileList)
-                            await _tarBuilder.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
+                        using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                        {
+                            foreach (TarFileList file in FileList)
+                                await _tarBuilder.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
+                        }
                     }
-                }
+            }
+            else
+            {
+                    if (!string.IsNullOrWhiteSpace(Password))
+                        using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
+                        {
+                            using (BrotliStream CompressionStream = new(cryptoStream, CompressionOption))
+                            {
+                                using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                                {
+                                    foreach (TarFileList file in FileList)
+                                        await _tarBuilder.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
+                                }
+                            }
+                        }
+                    else
+                        using (BrotliStream CompressionStream = new(fs, CompressionOption))
+                        {
+                            using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
+                            {
+                                foreach (TarFileList file in FileList)
+                                    await _tarBuilder.WriteEntryAsync(file.FileLocation, file.FileEntry, abortToken);
+                            }
+                    }
+            }
 #else
             if (!string.IsNullOrWhiteSpace(Password))
                     using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
