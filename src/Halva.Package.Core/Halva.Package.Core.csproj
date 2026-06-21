@@ -25,9 +25,8 @@
 		<Deterministic>true</Deterministic>
 	</PropertyGroup>
 
-		<PropertyGroup Condition = "'$(TargetFramework)' == 'net11.0'">
-		<EnablePreviewFeatures>true</EnablePreviewFeatures>
-		<Features>$(Features);runtime-async=on</Features>
+		<PropertyGroup Condition="'$(TargetFramework)' == 'net11.0'">
+		<Features>runtime-async=on</Features>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
@@ -47,6 +46,10 @@
 
 	<ItemGroup>
 	  <PackageReference Include="Blake3" />
+	  <PackageReference Include="SystemIOCompression.Zstandard.Backporting" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
 	</ItemGroup>
 
 </Project>

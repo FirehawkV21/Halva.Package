@@ -8,8 +8,6 @@ using System.Text;
 namespace Halva.Package.Core;
 public static class PackageUtilities
 {
-
-#if NET11_0_OR_GREATER
     static internal ZstandardCompressionOptions GetCompressionSettings(CompressionLevel compression, bool useDictionary = false, string dictionaryLocation = "")
     {
         ZstandardCompressionOptions options = new();
@@ -51,7 +49,6 @@ public static class PackageUtilities
 
         return options;
     }
-#endif
 
     #region Creating Packages
     /// <summary>
@@ -68,7 +65,6 @@ public static class PackageUtilities
     {
         using (FileStream fs = new(targetPackagePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.SequentialScan))
         {
-#if NET11_0_OR_GREATER
             if (useZstd)
             {
                 if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
@@ -105,23 +101,6 @@ public static class PackageUtilities
                     }
                 }
             }
-#else
-            if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
-            {
-                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
-                    using (BrotliStream CompressionStream = new(cryptoStream, compression))
-                    {
-                        TarFile.CreateFromDirectory(sourceFolder, CompressionStream, false);
-                    }
-            }
-            else
-            {
-                using (BrotliStream CompressionStream = new(fs, compression))
-                {
-                    TarFile.CreateFromDirectory(sourceFolder, CompressionStream, false);
-                }
-            }
-#endif
         }
     }
 
@@ -138,7 +117,6 @@ public static class PackageUtilities
     {
         using (FileStream fs = new(targetPackagePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan))
         {
-#if NET11_0_OR_GREATER
             if (useZstd)
             {
                 if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
@@ -175,32 +153,12 @@ public static class PackageUtilities
                     }
                 }
             }
-#else
-            if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
-            {
-                    using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateEncryptor(), CryptoStreamMode.Write))
-                    {
-                        using (BrotliStream CompressionStream = new(cryptoStream, compression))
-                        {
-                            await TarFile.CreateFromDirectoryAsync(sourceFolder, CompressionStream, false, abortToken);
-                        }
-                    }
-            }
-            else
-            {
-                using (BrotliStream CompressionStream = new(fs, compression))
-                {
-                    await TarFile.CreateFromDirectoryAsync(sourceFolder, CompressionStream, false, abortToken);
-                }
-            }
-#endif
         }
     }
     #endregion
 
     #region Decompression Packages
 
-#if NET11_0_OR_GREATER
     private static void HandleTarExtraction(in ZstandardStream decompressionStream, in string targetFolder)
     {
         TarReader tarReader = new(decompressionStream);
@@ -212,19 +170,6 @@ public static class PackageUtilities
         }
 
     }
-#else
-    private static void HandleTarExtraction(in BrotliStream decompressionStream, in string targetFolder)
-    {
-        TarReader tarReader = new(decompressionStream);
-        while (tarReader.GetNextEntry() is { } entry)
-        {
-            string destinationFileName = Path.Join(targetFolder, NormalizePath(entry.Name));
-            Directory.CreateDirectory(Directory.GetParent(destinationFileName)!.FullName);
-            entry.ExtractToFile(destinationFileName, true);
-        }
-
-    }
-#endif
 
     /// <summary>
     /// Decompresses a Halva package to a folder.
@@ -238,7 +183,6 @@ public static class PackageUtilities
         if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
         using (FileStream fs = new(packagePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
         {
-#if NET11_0_OR_GREATER
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {
                 using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
@@ -254,29 +198,9 @@ public static class PackageUtilities
                     HandleTarExtraction(decompressionStream, targetFolder);
                 }
             }
-#else
-            if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
-            {
-                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
-                {
-                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                    {
-                        HandleTarExtraction(decompressionStream, targetFolder);
-                    }
-                }
-            }
-            else
-            {
-                using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
-                {
-                    HandleTarExtraction(decompressionStream, targetFolder);
-                }
-            }
-#endif
         }
     }
 
-#if NET11_0_OR_GREATER
     private static async Task HandleTarExtractionAsync(ZstandardStream decompressionStream, string targetFolder, CancellationToken abortToken = default)
     {
         TarReader tarReader = new(decompressionStream);
@@ -287,18 +211,6 @@ public static class PackageUtilities
             await entry.ExtractToFileAsync(destinationFileName, true, abortToken);
         }
     }
-#else
-    private static async Task HandleTarExtractionAsync(BrotliStream decompressionStream, string targetFolder, CancellationToken abortToken = default)
-    {
-        TarReader tarReader = new(decompressionStream);
-        while (tarReader.GetNextEntry() is { } entry)
-        {
-            string destinationFileName = Path.Join(targetFolder, NormalizePath(entry.Name));
-            Directory.CreateDirectory(Directory.GetParent(destinationFileName)!.FullName);
-            await entry.ExtractToFileAsync(destinationFileName, true, abortToken);
-        }
-    }
-#endif
 
     /// <summary>
     /// Decompresses a Halva package to a folder.
@@ -313,7 +225,6 @@ public static class PackageUtilities
         if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
         using (FileStream fs = new(packagePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan))
         {
-#if NET11_0_OR_GREATER
             if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
             {
                 using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
@@ -329,25 +240,6 @@ public static class PackageUtilities
                     await HandleTarExtractionAsync(decompressionStream, targetFolder, abortToken);
                 }
             }
-#else
-            if (!string.IsNullOrEmpty(password) && !string.IsNullOrWhiteSpace(password))
-            {
-                using (CryptoStream cryptoStream = new(fs, GetEncryptionKey(password, ivKey).CreateDecryptor(), CryptoStreamMode.Read))
-                {
-                    using (BrotliStream decompressionStream = new(cryptoStream, CompressionMode.Decompress))
-                    {
-                        await HandleTarExtractionAsync(decompressionStream, targetFolder, abortToken);
-                    }
-                }
-            }
-            else
-            {
-                using (BrotliStream decompressionStream = new(fs, CompressionMode.Decompress))
-                {
-                    await HandleTarExtractionAsync(decompressionStream, targetFolder, abortToken);
-                }
-            }
-#endif
         }
     }
 #endregion

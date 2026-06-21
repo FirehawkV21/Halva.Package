@@ -22,9 +22,7 @@ public sealed class PackageBuilder(string destinationLocation, string password =
     /// The destination for the archive file.
     /// </summary>
     public StringBuilder DestinationLocation { get; set; } = new(destinationLocation);
-#if NET11_0_OR_GREATER
     bool createDictionary = false;
-#endif
 
     /// <summary>
     /// Adds a file to the list of files to be archived.
@@ -61,7 +59,6 @@ public sealed class PackageBuilder(string destinationLocation, string password =
         }
     }
 
-#if NET11_0_OR_GREATER
     private ZstandardDictionary? GenerateZstdDictionary()
     {
         using MemoryStream ms = new();
@@ -131,14 +128,12 @@ public sealed class PackageBuilder(string destinationLocation, string password =
             await File.WriteAllBytesAsync(output, zstdDict.Data.ToArray(), abortToken);
         }
     }
-#endif
 
     /// <summary>
     /// Creates the archive file with the files added to the list.
     /// </summary>
     public void Commit()
     {
-#if NET11_0_OR_GREATER
         using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.SequentialScan))
         {
             if (createDictionary) GenerateZstdDictionary(Path.GetFileNameWithoutExtension(DestinationLocation.ToString()) + ".zdict");
@@ -164,32 +159,6 @@ public sealed class PackageBuilder(string destinationLocation, string password =
                     }
                 }
         }
-#else
-        using (FileStream fs = new(DestinationLocation.ToString(), FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, FileOptions.SequentialScan))
-            if (!string.IsNullOrWhiteSpace(Password))
-            {
-                using (CryptoStream cryptoStream = new(fs, PackageUtilities.GetEncryptionKey(Password, IvKey).CreateEncryptor(), CryptoStreamMode.Write))
-                {
-                    using (BrotliStream CompressionStream = new(cryptoStream, CompressionOption))
-                    {
-                        using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
-                        {
-                            foreach (TarFileList file in FileList)
-                                _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
-                        }
-                    }
-                }
-            }
-            else
-                using (BrotliStream CompressionStream = new(fs, CompressionOption))
-                {
-                    using (TarWriter _tarBuilder = new(CompressionStream, TarEntryFormat.Pax, false))
-                    {
-                        foreach (TarFileList file in FileList)
-                            _tarBuilder.WriteEntry(file.FileLocation, file.FileEntry);
-                    }
-                }
-#endif
     }
 
     /// <summary>
