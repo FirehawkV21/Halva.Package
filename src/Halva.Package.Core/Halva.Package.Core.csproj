@@ -47,10 +47,7 @@
 
 	<ItemGroup>
 	  <PackageReference Include="Blake3" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
-		<PackageReference Include="SystemIOCompression.Zstandard.Backporting" />
+	  <PackageReference Include="SystemIOCompression.Zstandard.Backporting" />
 	</ItemGroup>
 
 </Project>
