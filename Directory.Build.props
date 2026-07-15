@@ -6,6 +6,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <BuildDate>$([System.DateTime]::Now.ToString("yyyyMMdd"))</BuildDate>
     <BuildDateTag>$([System.DateTime]::Now.ToString("yy"))$([System.DateTime]::Now.DayOfYear.ToString("000"))</BuildDateTag>
+    <BuildYear> $([System.DateTime]::Now.ToString("yyyy"))$([System.DateTime]::Now.DayOfYear.ToString())</BuildYear>
     <RepositoryUrl>https://github.com/FirehawkV21/Halva.Package</RepositoryUrl>
     <PackageTags>compression, package, Brotli, game-package</PackageTags>
     <Nullable>enable</Nullable>
@@ -14,7 +15,7 @@
     <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
     <LangVersion>latest</LangVersion>
     <FileAlignment>4096</FileAlignment>
-    <Copyright>2025 © Dragonhouse Software</Copyright>
+    <Copyright>$(BuildYear) © Dragonhouse Software</Copyright>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
