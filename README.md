@@ -12,4 +12,4 @@ Halva (Χαλβάς in Greek) is a small .NET library that implements Google's B
 ## Features
 - Uses the Brotli compression algorithm, providing smaller file sizes (compared to Zip).
 - Easy to use API.
-- Versitile for all platforms that support .NET 8+ (.NET Core, MAUI, Avalonia, etc.)
+- Versitile for all platforms that support .NET 10+ (.NET Core, MAUI, Avalonia, etc.)
