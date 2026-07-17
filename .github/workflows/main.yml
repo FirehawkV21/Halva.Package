@@ -33,7 +33,7 @@ jobs:
 
     # Install the .NET SDK indicated in the global.json file
     - name: Setup .NET
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.x
       
@@ -62,7 +62,7 @@ jobs:
     steps:
       # Install the .NET SDK indicated in the global.json file
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
          dotnet-version: 10.x
 
@@ -109,7 +109,7 @@ jobs:
 
       # Install the .NET SDK indicated in the global.json file
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
          dotnet-version: 10.x
 
