@@ -24,9 +24,6 @@
 		<Title>Halva Package Core</Title>
 		<EnablePackageValidation>true</EnablePackageValidation>
 		<Deterministic>true</Deterministic>
-	</PropertyGroup>
-
-		<PropertyGroup Condition="'$(TargetFramework)' == 'net11.0'">
 		<Features>runtime-async=on</Features>
 	</PropertyGroup>
 
@@ -47,7 +44,6 @@
 
 	<ItemGroup>
 	  <PackageReference Include="Blake3" />
-	  <PackageReference Include="SystemIOCompression.Zstandard.Backporting" />
 	</ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net10.0-windows10.0.26100.0;net10.0</TargetFrameworks>
+		<TargetFrameworks>net11.0-windows10.0.26100.0;net11.0</TargetFrameworks>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
 		<AssemblyTitle>Halva Package Bootstrapper</AssemblyTitle>
@@ -16,11 +16,7 @@
 	<StripSymbols>true</StripSymbols>
 	<FileAlignment>4096</FileAlignment>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup>
-
-		<PropertyGroup Condition = "'$(TargetFramework)' == 'net11.0'">
-		<EnablePreviewFeatures>true</EnablePreviewFeatures>
-		<Features>$(Features);runtime-async=on</Features>
+	<Features>runtime-async=on</Features>
 	</PropertyGroup>
 	
 

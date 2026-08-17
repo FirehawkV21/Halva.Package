@@ -13,11 +13,7 @@
 		<FileAlignment>4096</FileAlignment>
 		<TargetFramework>net11.0</TargetFramework>
 		<OptimizationPreference>Speed</OptimizationPreference>
-	</PropertyGroup>
-
-		<PropertyGroup Condition = "'$(TargetFramework)' == 'net11.0'">
-		<EnablePreviewFeatures>true</EnablePreviewFeatures>
-		<Features>$(Features);runtime-async=on</Features>
+		<Features>runtime-async=on</Features>
 	</PropertyGroup>
 
 	<ItemGroup>
