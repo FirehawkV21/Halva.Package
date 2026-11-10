@@ -116,7 +116,8 @@ public static class PackageUtilities
     /// <param name="targetFolder">The folder where the files of the package will be decompressed to.</param>
     /// <param name="password">The password for the package.</param>
     /// <param name="ivKey">The IV key for the package.</param>
-    public static void DecompressPackageToFolder(string packagePath, string targetFolder, string password = "", string ivKey = "")
+    /// <param name="useZstd">Legacy compatibility flag ignored by the current Zstd-based implementation.</param>
+    public static void DecompressPackageToFolder(string packagePath, string targetFolder, string password = "", string ivKey = "", bool useZstd = false)
     {
         if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
         using (FileStream fs = new(packagePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
@@ -157,6 +158,7 @@ public static class PackageUtilities
     /// <param name="targetFolder">The folder where the files of the package will be decompressed to.</param>
     /// <param name="password">The password for the package.</param>
     /// <param name="ivKey">The IV key for the package.</param>
+    /// <param name="useZstd">Legacy compatibility flag ignored by the current Zstd-based implementation.</param>
     /// <param name="abortToken">The cancellation token to abort the operation.</param>
     public static async Task DecompressPackageToFolderAsync(string packagePath, string targetFolder, string password = "", string ivKey = "", bool useZstd = false, CancellationToken abortToken = default)
     {

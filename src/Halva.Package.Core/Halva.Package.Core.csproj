@@ -3,13 +3,12 @@
 	<PropertyGroup>
 		<AssemblyTitle>Halva Package Core</AssemblyTitle>
 		<Product>Halva Package</Product>
-		<AssemblyVersion>6.0.0.$(BuildDateTag)</AssemblyVersion>
-		<FileVersion>6.0.0.$(BuildDateTag)</FileVersion>
+		<AssemblyVersion>6.0.1.$(BuildDateTag)</AssemblyVersion>
+		<FileVersion>$(AssemblyVersion)</FileVersion>
 		<PackageId>Halva.Package.Core</PackageId>
-		<Version>6.0.0+release.$(BuildDate)</Version>
+		<Version>6.0.1+release.$(BuildDate)</Version>
 		<Description>Halva (Χαλβάς in Greek) is a small .NET 8+ library that implements the Zstandard compression, alognside some encryption options. The Halva package is a general purpose game data packaging system that provides good and fast compression, making it suitable for storing the game files with the game, releasing patches, etc.</Description>
-		<PackageReleaseNotes>- Compiled for .NET 11 Preview 5 (and maybe newer).
-- Added ZStandard support for older .NET runtimes.</PackageReleaseNotes>
+		<PackageReleaseNotes>- Compiled with the RTM version of .NET 11.</PackageReleaseNotes>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>

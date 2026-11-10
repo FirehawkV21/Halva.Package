@@ -22,7 +22,7 @@ public sealed class PackageBuilder(string destinationLocation, string password =
     /// The destination for the archive file.
     /// </summary>
     public StringBuilder DestinationLocation { get; set; } = new(destinationLocation);
-    bool createDictionary = false;
+    private bool createDictionary = false;
 
     /// <summary>
     /// Adds a file to the list of files to be archived.
@@ -59,7 +59,7 @@ public sealed class PackageBuilder(string destinationLocation, string password =
         }
     }
 
-    private ZstandardDictionary? GenerateZstdDictionary()
+    private byte[]? GenerateZstdDictionary()
     {
         using MemoryStream ms = new();
         List<int> sampleLengths = [];
@@ -78,21 +78,17 @@ public sealed class PackageBuilder(string destinationLocation, string password =
         if (bytes.Length == 0)
             return default;
 
-        return ZstandardDictionary.Train(
-            samples: bytes.AsSpan(),
-            sampleLengths: [.. sampleLengths],
-            maxDictionarySize: 112 * 1024  // 112 KB is the recommended sweet spot
-        );
+        return ZstandardDictionary.Train(samples: bytes.AsSpan(), sampleLengths: [.. sampleLengths], maxDictionarySize: 112 * 1024);
     }
 
-    private async Task<ZstandardDictionary?> GenerateZstdDictionaryAsync(CancellationToken abortToken = default)
+    private async Task<byte[]?> GenerateZstdDictionaryAsync(CancellationToken abortToken = default)
     {
         using MemoryStream ms = new();
         List<int> sampleLengths = [];
 
         foreach (TarFileList file in FileList)
         {
-            byte[] fileBytes = await File.ReadAllBytesAsync(file.FileLocation);
+            byte[] fileBytes = await File.ReadAllBytesAsync(file.FileLocation, abortToken);
             if (fileBytes.Length == 0)
                 continue;
 
@@ -113,19 +109,19 @@ public sealed class PackageBuilder(string destinationLocation, string password =
 
     public void GenerateZstdDictionary(string output)
     {
-        ZstandardDictionary? zstdDict = GenerateZstdDictionary();
+        byte[]? zstdDict = GenerateZstdDictionary();
         if (zstdDict is not null)
         {
-            File.WriteAllBytes(output, zstdDict.Data.ToArray());
+            File.WriteAllBytes(output, zstdDict);
         }
     }
 
     public async Task GenerateZstdDictionaryAsync(string output, CancellationToken abortToken = default)
     {
-        ZstandardDictionary? zstdDict = await GenerateZstdDictionaryAsync(abortToken);
+        byte[]? zstdDict = await GenerateZstdDictionaryAsync(abortToken);
         if (zstdDict is not null)
         {
-            await File.WriteAllBytesAsync(output, zstdDict.Data.ToArray(), abortToken);
+            await File.WriteAllBytesAsync(output, zstdDict, abortToken);
         }
     }
 
